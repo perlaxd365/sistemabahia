@@ -30,12 +30,21 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => fake()->randomElement([bcrypt('123')]),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
             'current_team_id' => null,
+            'dni' => Str::random(10),
+            "nombre_cargo" =>  fake()->randomElement(['Administrador', 'Doctor(a)','Enfermero(a)', 'Recepcionista']),
+            "especialidad_cargo" => 'Sin especialidad',
+            "colegiatura_cargo" => 'Sin colegiatura',
+            "privilegio_cargo" => fake()->numberBetween(1, 4),
+            "direccion" => fake()->streetAddress(),
+            "foto_url" => 'https://picsum.photos/300/300',
+            "telefono" => fake()->phoneNumber(),
+            "estado_user" => fake()->randomElement([true, false]),
         ];
     }
 
@@ -44,7 +53,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -60,8 +69,8 @@ class UserFactory extends Factory
 
         return $this->has(
             Team::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name.'\'s Team',
+                ->state(fn(array $attributes, User $user) => [
+                    'name' => $user->name . '\'s Team',
                     'user_id' => $user->id,
                     'personal_team' => true,
                 ])

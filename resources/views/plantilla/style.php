@@ -13,10 +13,6 @@
             color: #222;
         }
 
-        .container {
-            max-width: 1230px;
-            width: 100%;
-        }
 
         h1 {
             font-weight: 700;
@@ -145,8 +141,6 @@
     .contenedor {
         height: 38em;
         line-height: 1em;
-        overflow-x: hidden;
-        overflow-y: scroll;
         width: 100%;
     }
 </style>

@@ -18,7 +18,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/index', function () {
-        return view('index');
+        return view('login');
     })->name('index');
 });
 

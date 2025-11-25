@@ -28,8 +28,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'dni',
+        'nombre_cargo',
+        'especialidad_cargo',
+        'colegiatura_cargo',
+        'privilegio_cargo',
+        'direccion',
+        'telefono',
+        'foto_url',
         'password',
+        'estado_user',
     ];
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -64,6 +74,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function adminlte_profile_url()
     {
         // Aquí coloca la ruta a tu perfil, por ejemplo:
@@ -73,11 +84,11 @@ class User extends Authenticatable
     public function adminlte_image()
     {
         // Imagen del usuario
-        return 'https://picsum.photos/300/300';
+        return auth()->user()->foto_url;
     }
 
     public function adminlte_desc()
     {
-        return 'Usuario';
+        return  auth()->user()->nombre_cargo;
     }
 }

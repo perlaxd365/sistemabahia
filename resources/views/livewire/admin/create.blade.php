@@ -1,12 +1,10 @@
-
 <div class="container">
     <div id="clasepadre">
         <div class="form-wrap">
             <form id="survey-form">
-                <h4>Creación</h4>
+                <h4>Datos Personales</h4>
                 <hr>
                 <div class="row">
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label id="name-label" for="name">Nombres</label>
@@ -17,44 +15,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group" >
-                            <label id="name-label" for="name">Colegio</label>
-                            <div wire:ignore>
-                                  <select  wire:model="id_colegio" class="form-control select2" id="select2" required>
-                                <option value="">Seleccionar</option>
-                               
-                            </select>
-                            </div>
-                          
-                            @error('id_colegio')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label id="name-label" for="name">Rol</label>
-                            <select wire:model="id_tipo_usuario" class="form-control select2 " id="" required>
-                                <option value="">Seleccionar</option>
-                               
-                            </select>
-                            @error('id_tipo_usuario')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label id="email-label" for="email">Correo</label>
-                            <input type="email" wire:model='email' placeholder="Nombre de usuario"
-                                class="form-control" required>
-                            @error('email')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label id="email-label" for="email">DNI</label>
@@ -67,10 +28,88 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label id="name-label" for="name">Dirección</label>
+                            <input type="text" wire:model='name' placeholder="Dirección" class="form-control"
+                                required>
+                            @error('direccion')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label id="email-label" for="email">Teléfono</label>
                             <input type="text" wire:model='telefono' placeholder="Ingresar número de teléfono"
                                 maxlength="9" class="form-control" required>
                             @error('telefono')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="name-label" for="foto_perfil">Foto Perfil</label>
+                            <input type="file" wire:model='foto_perfil' placeholder="Adjuntar foto" class="form-control"
+                                required>
+                            @error('foto_perfil')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <h4>Datos Profesionales</h4>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="name-label" for="name">Nombre de Cargo</label>
+                            <select wire:model="nombre_cargo" class="form-control" id="" required>
+                                <option value="">Seleccionar</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Doctor">Doctor (a)</option>
+                                <option value="Enfermero">Enfermero (a)</option>
+                                <option value="Recepcionista">Recepcionista</option>
+                                <option value="Farmaceutico">Farmaceutico (a)</option>
+
+                            </select>
+                            @error('nombre_cargo')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="name-label" for="especialidad_cargo">Especialidad</label>
+                            <input type="text" wire:model='especialidad_cargo' placeholder="Especialidad" class="form-control"
+                                required>
+                            @error('especialidad_cargo')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="name-label" for="colegiatura_cargo">Colegiatura</label>
+                            <input type="text" wire:model='colegiatura_cargo' placeholder="Especialidad" class="form-control"
+                                required>
+                            @error('colegiatura_cargo')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <h4>Acceso</h4>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="email-label" for="email">Correo</label>
+                            <input type="email" wire:model='email' placeholder="Nombre de usuario"
+                                class="form-control" required>
+                            @error('email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

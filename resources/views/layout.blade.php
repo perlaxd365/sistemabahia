@@ -7,7 +7,7 @@
     <header class="header" >
         @include('plantilla.link')
         <h1 id="title" class="text-center"> <a href="{{ URL::route(Route::current()->getName()) }}">@yield('title')</a>
-        </h1>
+        </h1>   
         <p id="description" class="text-center">
             @yield('desc')
         </p>
