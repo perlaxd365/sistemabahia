@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Clinica</b> BAHIA',
+    'logo' => '<b>CLINICA</b> BAHIA',
     'logo_img' => 'vendor/adminlte/dist/img/logo_clinica.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,

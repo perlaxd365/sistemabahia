@@ -11,6 +11,7 @@
             line-height: 1.5;
             font-family: 'Roboto', sans-serif;
             color: #222;
+            
         }
 
 
@@ -139,9 +140,9 @@
 </style>
 <style>
     .contenedor {
-        height: 38em;
+        height: 55em;
         line-height: 1em;
-        width: 100%;
+        width: 100%; overflow-y: auto;
     }
 </style>
 <style>

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('dni')->unique();
             $table->string('nombre_cargo')->comment('nombre del cargo');
-            $table->string('especialidad_cargo')->comment('especialidad del cargo');
-            $table->string('colegiatura_cargo')->comment('colegiatura del cargo');
+            $table->string('especialidad_cargo')->nullable()->comment('especialidad del cargo');
+            $table->string('colegiatura_cargo')->nullable()->comment('colegiatura del cargo');
             $table->integer('privilegio_cargo')->comment('privilegio del cargo');
             $table->text('direccion');
             $table->string('foto_url');

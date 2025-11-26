@@ -29,7 +29,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label id="name-label" for="name">Dirección</label>
-                            <input type="text" wire:model='name' placeholder="Dirección" class="form-control"
+                            <input type="text" wire:model='direccion' placeholder="Dirección" class="form-control"
                                 required>
                             @error('direccion')
                                 <span class="text-danger">{{ $message }}</span>
@@ -48,10 +48,10 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label id="name-label" for="foto_perfil">Foto Perfil</label>
-                            <input type="file" wire:model='foto_perfil' placeholder="Adjuntar foto" class="form-control"
-                                required>
-                            @error('foto_perfil')
+                            <label id="name-label" for="foto_url">Foto Perfil</label>
+                            <input type="file" wire:model='foto_url'  accept="image/x-png,image/gif,image/jpeg" placeholder="Adjuntar foto"
+                                class="form-control" required>
+                            @error('foto_url')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -66,7 +66,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label id="name-label" for="name">Nombre de Cargo</label>
-                            <select wire:model="nombre_cargo" class="form-control" id="" required>
+                            <select wire:model="nombre_cargo" wire:change='showDetailCargo()' class="form-control"
+                                id="" required>
                                 <option value="">Seleccionar</option>
                                 <option value="Administrador">Administrador</option>
                                 <option value="Doctor">Doctor (a)</option>
@@ -80,26 +81,28 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label id="name-label" for="especialidad_cargo">Especialidad</label>
-                            <input type="text" wire:model='especialidad_cargo' placeholder="Especialidad" class="form-control"
-                                required>
-                            @error('especialidad_cargo')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                    @if ($showDetail)
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="name-label" for="especialidad_cargo">Especialidad</label>
+                                <input type="text" wire:model='especialidad_cargo' placeholder="Especialidad"
+                                    class="form-control" required>
+                                @error('especialidad_cargo')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label id="name-label" for="colegiatura_cargo">Colegiatura</label>
-                            <input type="text" wire:model='colegiatura_cargo' placeholder="Especialidad" class="form-control"
-                                required>
-                            @error('colegiatura_cargo')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="name-label" for="colegiatura_cargo">Colegiatura</label>
+                                <input type="text" wire:model='colegiatura_cargo' placeholder="Colegiatura"
+                                    class="form-control" required>
+                                @error('colegiatura_cargo')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
                 <h4>Acceso</h4>
                 <hr>
