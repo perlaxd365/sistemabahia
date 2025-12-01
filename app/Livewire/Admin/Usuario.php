@@ -12,7 +12,7 @@ use Livewire\WithPagination;
 
 class Usuario extends Component
 {
-    public $id_usuario, $name, $dni, $direccion, $telefono, $email, $password, $nombre_cargo, $especialidad_cargo, $colegiatura_cargo, $foto_url;
+    public $id_usuario, $name, $dni, $direccion, $telefono, $email, $password, $nombre_cargo, $especialidad_cargo, $colegiatura_cargo, $foto_url, $foto_url_update;
     public $showDetail = false;
 
     ////// image
@@ -148,7 +148,9 @@ class Usuario extends Component
         $this->especialidad_cargo = '';
         $this->colegiatura_cargo = '';
         $this->foto_url = '';
+        $this->foto_url_update = '';
         $this->table = true;
+        $this->view = 'create';
         $this->dispatch('gotoTop');
     }
 
@@ -200,11 +202,11 @@ class Usuario extends Component
             'telefono' => 'required',
             'direccion' => 'required',
             'nombre_cargo' => 'required',
-
         ];
+
         $this->validate($rules, $messages);
-        $privilegio=0;
-         switch ($this->nombre_cargo) {
+        $privilegio = 0;
+        switch ($this->nombre_cargo) {
             case 'Administrador':
                 $privilegio = 1;
                 break;
@@ -226,6 +228,7 @@ class Usuario extends Component
                 break;
         }
 
+
         $user = User::find($this->id_usuario);
         $user->update([
             'name' => $this->name,
@@ -239,8 +242,16 @@ class Usuario extends Component
             'privilegio_cargo' => $privilegio,
         ]);
 
-        
 
+
+        if ($this->foto_url_update) {
+
+            $path = Storage::disk('cloudinary')->put('foto_perfil', $this->foto_url_update);
+            $url = Storage::disk('cloudinary')->url($path);
+            $user->update([
+                'foto_url' => $url,
+            ]);
+        }
 
 
         if ($this->password != '') {
@@ -254,6 +265,32 @@ class Usuario extends Component
         $this->dispatch(
             'alert',
             ['type' => 'success', 'title' => 'Se actualizó el usuario correctamente', 'message' => 'Exito']
+        );
+    }
+
+    public function desactivar_usuario($id_usuario)
+    {
+        $usuario = User::find($id_usuario);
+        $usuario->update([
+            'estado_user' => false
+        ]);
+        // show alert
+        $this->dispatch(
+            'alert',
+            ['type' => 'success', 'title' => 'Se deshabilitó a ' . $usuario->name, 'message' => 'Exito']
+        );
+    }
+
+    public function activar_usuario($id)
+    {
+        $usuario = User::find($id);
+        $usuario->update([
+            'estado_user' => true
+        ]);
+        // show alert
+        $this->dispatch(
+            'alert',
+            ['type' => 'success', 'title' => 'Se habilitó a ' . $usuario->name, 'message' => 'Exito']
         );
     }
 }

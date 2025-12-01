@@ -31,6 +31,6 @@ class UserSeeder extends Seeder
         ]);
         date_default_timezone_set('America/Lima');
         
-        User::factory()->count(5)->create();
+        User::factory()->count(50)->create();
     }
 }

@@ -19,7 +19,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label id="email-label" for="email">DNI</label>
-                            <input type="text" wire:model='dni' placeholder="Ingresar número de dni" maxlength="8"
+                            <input type="text" wire:model='dni' placeholder="Ingresar número de dni" maxlength="12"
                                 class="form-control" required>
                             @error('dni')
                                 <span class="text-danger">{{ $message }}</span>

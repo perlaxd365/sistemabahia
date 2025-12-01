@@ -388,9 +388,9 @@ return [
             'url' => '#',
         ],
         [
-            'text' => 'information',
+            'text' => 'Configuración',
             'icon_color' => 'cyan',
-            'url' => '#',
+            'url' => 'configuracion',
         ],
     ],
 

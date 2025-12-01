@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
@@ -31,7 +32,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     //INICIO
     Route::get('index', [IndexController::class, 'index'])->name('index');
-    //INICIO
+    //USUARIO
     Route::get('usuario', [UsuarioController::class, 'index'])->name('usuario');
+    //CONFIGUACION
+    Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
 
 });

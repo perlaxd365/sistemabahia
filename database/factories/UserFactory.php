@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'profile_photo_path' => null,
             'current_team_id' => null,
             'dni' => Str::random(10),
-            "nombre_cargo" =>  fake()->randomElement(['Administrador', 'Doctor(a)','Enfermero(a)', 'Recepcionista']),
+            "nombre_cargo" =>  fake()->randomElement(['Administrador', 'Doctor','Enfermero', 'Recepcionista','Farmaceutico']),
             "especialidad_cargo" => 'Sin especialidad',
             "colegiatura_cargo" => 'Sin colegiatura',
             "privilegio_cargo" => fake()->numberBetween(1, 4),

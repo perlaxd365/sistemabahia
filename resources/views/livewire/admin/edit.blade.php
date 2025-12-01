@@ -48,10 +48,10 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label id="name-label" for="foto_url">Foto Perfil</label>
-                            <input type="file" wire:model='foto_url'  accept="image/x-png,image/gif,image/jpeg" placeholder="Adjuntar foto"
+                            <label id="name-label" for="foto_url_update">Foto Perfil</label>
+                            <input type="file" wire:model='foto_url_update'  accept="image/x-png,image/gif,image/jpeg" placeholder="Adjuntar foto"
                                 class="form-control" required>
-                            @error('foto_url')
+                            @error('foto_url_update')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

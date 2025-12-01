@@ -70,10 +70,10 @@
                                         &nbsp;
                                         @if ($usuario->estado_user)
                                             <a class="text-danger" href="#"
-                                                wire:click='desactivar_colegio({{ $usuario->id }})'><u>Deshabilitar</u></a>
+                                                wire:click='desactivar_usuario({{ $usuario->id }})'><u>Deshabilitar</u></a>
                                         @else
                                             <a class="text-success" href="#"
-                                                wire:click='activar_colegio({{ $usuario->id }})'><u>Habilitar</u></a>
+                                                wire:click='activar_usuario({{ $usuario->id }})'><u>Habilitar</u></a>
                                         @endif
 
                                     </td>
