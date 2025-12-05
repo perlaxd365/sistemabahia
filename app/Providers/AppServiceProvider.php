@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
         });
         //
         Gate::define('recepcion', function ($user) {
-            return $user->privilegio_cargo > 1;
+            return $user->privilegio_cargo >= 1;
         });
     }
 

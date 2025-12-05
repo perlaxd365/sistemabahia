@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AtencionController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\UsuarioController;
@@ -36,5 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('usuario', [UsuarioController::class, 'index'])->name('usuario');
     //CONFIGUACION
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
+    //ATENCION
+    Route::get('atencion', [AtencionController::class, 'index'])->name('atencion');
 
 });

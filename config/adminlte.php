@@ -320,6 +320,7 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
+        ['header' => 'PACIENTE'],
         [
             'text' => 'Usuarios',
             'url' => 'usuario',
@@ -327,6 +328,14 @@ return [
             'label' => 5,
             'label_color' => 'success',
             'can' => 'admin',
+        ],
+        [
+            'text' => 'Atención',
+            'url' => 'atencion',
+            'icon' => 'fas fa-fw fa-file',
+            'label' => 1,
+            'label_color' => 'warning',
+            'can' => 'recepcion',
         ],
         [
             'text' => 'Pacientes',
