@@ -17,13 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('dni')->unique();
+            $table->string('fecha_nacimiento');
+            $table->string('genero')->comment('genero de la persona');
             $table->string('nombre_cargo')->comment('nombre del cargo');
             $table->string('especialidad_cargo')->nullable()->comment('especialidad del cargo');
             $table->string('colegiatura_cargo')->nullable()->comment('colegiatura del cargo');
             $table->integer('privilegio_cargo')->comment('privilegio del cargo');
-            $table->text('direccion');
-            $table->string('foto_url');
-            $table->string('telefono');
+            $table->text('direccion')->nullable();
+            $table->string('foto_url')->nullable();
+            $table->string('telefono')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();

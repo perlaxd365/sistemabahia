@@ -13,11 +13,13 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
         //
         User::create([
             "name" => 'Cesar Raul Baca',
+            "genero" => 'Masculino',
             "dni" => '73888312',
+            "fecha_nacimiento" => '1998-06-02',
             "nombre_cargo" => 'Administrador',
             "especialidad_cargo" => 'Sin especialidad',
             "colegiatura_cargo" => 'Sin colegiatura',
@@ -30,7 +32,7 @@ class UserSeeder extends Seeder
             "estado_user" => true
         ]);
         date_default_timezone_set('America/Lima');
-        
+
         User::factory()->count(50)->create();
     }
 }

@@ -36,6 +36,8 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
             'current_team_id' => null,
+            'genero' => fake()->randomElement(['Masculino', 'Femenino']),
+            'fecha_nacimiento'=> fake()->randomElement([bcrypt('02/06/1998')]), 
             'dni' => Str::random(10),
             "nombre_cargo" =>  fake()->randomElement(['Administrador', 'Doctor','Enfermero', 'Recepcionista','Farmaceutico']),
             "especialidad_cargo" => 'Sin especialidad',

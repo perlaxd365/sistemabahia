@@ -12,9 +12,9 @@ use Livewire\WithPagination;
 
 class Usuario extends Component
 {
-    public $id_usuario, $name, $dni, $direccion, $telefono, $email, $password, $nombre_cargo, $especialidad_cargo, $colegiatura_cargo, $foto_url, $foto_url_update;
+    public $id_usuario, $name, $dni, $fecha_nacimiento, $genero, $direccion, $telefono, $email, $password, $nombre_cargo, $especialidad_cargo, $colegiatura_cargo, $foto_url, $foto_url_update;
     public $showDetail = false;
-
+    public $privilegio_actual;
     ////// image
 
     public $file;
@@ -28,20 +28,34 @@ class Usuario extends Component
     public $table;
     public function mount()
     {
+        $this->privilegio_actual = auth()->user()->privilegio_cargo;
         $this->show = 8;
         $this->table = true;
     }
     public function render()
     {
-        $lista_usuarios = User::select('*')
-            ->where(function ($query) {
-                return $query
-                    ->orwhere('name', 'LIKE', '%' . $this->search . '%')
-                    ->orwhere('dni', 'LIKE', '%' . $this->search . '%')
-                    ->orwhere('email', 'LIKE', '%' . $this->search . '%');
-            })->paginate($this->show);
 
-        return view('livewire.admin.usuario',  compact('lista_usuarios'));
+        if ($this->privilegio_actual > 1) {
+            # code...
+            $lista_usuarios = User::select('*')
+                ->where('privilegio_cargo', 6)
+                ->where(function ($query) {
+                    return $query
+                        ->orwhere('name', 'LIKE', '%' . $this->search . '%')
+                        ->orwhere('dni', 'LIKE', '%' . $this->search . '%')
+                        ->orwhere('email', 'LIKE', '%' . $this->search . '%');
+                })->paginate($this->show);
+        } else {
+            $lista_usuarios = User::select('*')
+                ->where(function ($query) {
+                    return $query
+                        ->orwhere('name', 'LIKE', '%' . $this->search . '%')
+                        ->orwhere('dni', 'LIKE', '%' . $this->search . '%')
+                        ->orwhere('email', 'LIKE', '%' . $this->search . '%');
+                })->paginate($this->show);
+        }
+        $privilegio    = auth()->user()->privilegio_cargo;
+        return view('livewire.admin.usuario',  compact('lista_usuarios', 'privilegio'));
     }
 
     public function showDetailCargo()
@@ -61,23 +75,21 @@ class Usuario extends Component
     {
         $messages = [
             'name.required' => 'Por favor ingresar el nombre del usuario',
-            'email.required' => 'Por favor ingresar el correo del usuario',
-            'password.required' => 'Por favor ingresar la contraseña del usuario',
+            'genero.required' => 'Por favor ingresar el genero del usuario',
             'dni.required' => 'Por favor ingresar el dni del usuario',
+            'fecha_nacimiento.required' => 'Por favor seleccionar fecha de nacimiento del usuario',
             'telefono.required' => 'Por favor ingresar el telefono de contacto del usuario',
             'direccion.required' => 'Por favor ingresar la direccion del usuario',
-            'nombre_cargo.required' => 'Por favor ingresar la direccion del usuario',
-            'foto_perfil' => 'required|file|max:10240', // 10 MB
+
         ];
 
         $rules = [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required',
             'dni' => 'required|unique:users,dni',
+            'fecha_nacimiento' => 'required',
+            'genero' => 'required',
             'telefono' => 'required',
             'direccion' => 'required',
-            'nombre_cargo' => 'required',
 
         ];
         $this->validate($rules, $messages);
@@ -93,28 +105,49 @@ class Usuario extends Component
             case 'Enfermero':
                 $privilegio = 3;
                 break;
-            case 'Recepcionista':
+            case 'Laboratorio':
                 $privilegio = 4;
                 break;
-            case 'Farmaceutico':
+            case 'Recepcionista':
                 $privilegio = 5;
+                break;
+            case 'Farmaceutico':
+                $privilegio = 6;
+                break;
+            case 'Paciente':
+                $privilegio = 7;
                 break;
 
             default:
                 # code...
+                $this->nombre_cargo = "Paciente";
+                $privilegio = 6;
                 break;
         }
 
+        if ($this->foto_url) {
+
+            $path = Storage::disk('cloudinary')->put('foto_perfil', $this->foto_url);
+
+            $url = Storage::disk('cloudinary')->url($path);
+        } else {
+            $url = "";
+        }
+
+        if ($this->privilegio_actual != 1) {
+            # code...
+            $this->email = $this->dni . "@clinicabahia.pe";
+            $this->password = $this->dni;
+        }
 
 
-        $path = Storage::disk('cloudinary')->put('foto_perfil', $this->foto_url);
-
-        $url = Storage::disk('cloudinary')->url($path);
 
         User::create([
             'name' => $this->name,
             'email' => $this->email,
             'password' => bcrypt($this->password),
+            'genero' => $this->genero,
+            'fecha_nacimiento' => $this->fecha_nacimiento,
             'dni' => $this->dni,
             'telefono' => $this->telefono,
             'direccion' => $this->direccion,
@@ -141,7 +174,9 @@ class Usuario extends Component
         $this->name = '';
         $this->email = '';
         $this->password = '';
+        $this->genero = '';
         $this->dni = '';
+        $this->fecha_nacimiento = '';
         $this->telefono = '';
         $this->direccion = '';
         $this->nombre_cargo = '';
@@ -169,7 +204,9 @@ class Usuario extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->telefono = $user->telefono;
+        $this->genero = $user->genero;
         $this->dni = $user->dni;
+        $this->fecha_nacimiento = $user->fecha_nacimiento;
         $this->telefono = $user->telefono;
         $this->direccion = $user->direccion;
         $this->nombre_cargo = $user->nombre_cargo;
@@ -188,20 +225,20 @@ class Usuario extends Component
     {
         $messages = [
             'name.required' => 'Por favor ingresar el nombre del usuario',
-            'email.required' => 'Por favor ingresar el correo del usuario',
             'dni.required' => 'Por favor ingresar el dni del usuario',
+            'genero.required' => 'Por favor ingresar el genero usuario',
+            'fecha_nacimiento.required' => 'Por favor ingresar fecha de nacimiento del usuario',
             'telefono.required' => 'Por favor ingresar el telefono de contacto del usuario',
             'direccion.required' => 'Por favor ingresar la direccion del usuario',
-            'nombre_cargo.required' => 'Por favor ingresar la direccion del usuario',
         ];
 
         $rules = [
             'name' => 'required',
-            'email' => 'required',
             'dni' => 'required',
+            'genero' => 'required',
+            'fecha_nacimiento' => 'required',
             'telefono' => 'required',
             'direccion' => 'required',
-            'nombre_cargo' => 'required',
         ];
 
         $this->validate($rules, $messages);
@@ -216,11 +253,17 @@ class Usuario extends Component
             case 'Enfermero':
                 $privilegio = 3;
                 break;
-            case 'Recepcionista':
+            case 'Laboratorio':
                 $privilegio = 4;
                 break;
-            case 'Farmaceutico':
+            case 'Recepcionista':
                 $privilegio = 5;
+                break;
+            case 'Farmaceutico':
+                $privilegio = 6;
+                break;
+            case 'Paciente':
+                $privilegio = 7;
                 break;
 
             default:
@@ -233,6 +276,8 @@ class Usuario extends Component
         $user->update([
             'name' => $this->name,
             'dni' => $this->dni,
+            'genero' => $this->genero,
+            'fecha_nacimiento' => $this->fecha_nacimiento,
             'telefono' => $this->telefono,
             'email' => $this->email,
             'direccion' => $this->direccion,

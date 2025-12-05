@@ -323,9 +323,18 @@ return [
         [
             'text' => 'Usuarios',
             'url' => 'usuario',
-            'icon' => 'far fa-fw fa-file',
+            'icon' => 'fas fa-fw fa-users',
             'label' => 5,
             'label_color' => 'success',
+            'can' => 'admin',
+        ],
+        [
+            'text' => 'Pacientes',
+            'url' => 'usuario',
+            'icon' => 'fas fa-fw fa-users',
+            'label' => 5,
+            'label_color' => 'success',
+            'can' => 'recepcion',
         ],
         ['header' => 'account_settings'],
         [
