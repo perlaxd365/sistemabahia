@@ -1,103 +1,130 @@
 <div class="max-w-2xl mx-auto p-6">
 
-<div class="container">
-    <div id="clasepadre">
-        <div class="form-wrap">
-            <form id="survey-form">
-                <div class="stepwizard">
-                    <div class="stepwizard-row setup-panel">
-                        <li class="stepwizard-step">
-                            <a href="#step-1" type="button"
-                                class="btn btn-circle {{ $step != 1 ? 'btn-default' : 'btn-primary' }} pt-1"
-                                style="padding-left: 10px; padding-block: 30px">1</a>
-                            <p>Paciente</p>
-                        </li>
-                        <li class="stepwizard-step">
-                            <a href="#step-2" type="button"
-                                class="btn btn-circle {{ $step != 2 ? 'btn-default' : 'btn-warning' }} pt-1 "
-                                style="padding-left: 10px; padding-block: 30px">2</a>
-                            <p>Servicio</p>
-                        </li>
-                        <div class="stepwizard-step">
-                            <a href="#step-3" type="button"
-                                class="btn btn-circle {{ $step != 3 ? 'btn-default' : 'btn-success' }} pt-1 "
-                                style="padding-left: 10px; padding-block: 30px" disabled="disabled">3</a>
-                            <p>Detalles</p>
+    <div class="container">
+        <div id="clasepadre">
+            <div class="form-wrap">
+                <form id="survey-form">
+                    <div class="stepwizard">
+                        <div class="stepwizard-row setup-panel">
+                            <li class="stepwizard-step">
+                                <a href="#step-1" type="button"
+                                    class="btn btn-circle {{ $step != 1 ? 'btn-default' : 'btn-primary' }} pt-1"
+                                    style="padding-left: 10px; padding-block: 30px">1</a>
+                                <p>Paciente</p>
+                            </li>
+                            <li class="stepwizard-step">
+                                <a href="#step-2" type="button"
+                                    class="btn btn-circle {{ $step != 2 ? 'btn-default' : 'btn-warning' }} pt-1 "
+                                    style="padding-left: 10px; padding-block: 30px">2</a>
+                                <p>Servicio</p>
+                            </li>
+                            <div class="stepwizard-step">
+                                <a href="#step-3" type="button"
+                                    class="btn btn-circle {{ $step != 3 ? 'btn-default' : 'btn-success' }} pt-1 "
+                                    style="padding-left: 10px; padding-block: 30px" disabled="disabled">3</a>
+                                <p>Detalles</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                &nbsp; <button id="alerta" class="btn btn-circle btn-success pull-rigth pl-1 pt-2"
-                    style="display: none"><i class="fa fa-check"></i></button>
-                <div class="row">
-                    <div class="col-md-12">
-                        <br>
-                        <br>
-                        <h5><b> Datos de Estudiante</b> </h5>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6 form-group">
-                                <p>Buscar por DNI de estudiante</p>
-                                <div class="input-group">
-                                    <input type="text" wire:model='dni_estudiante' maxlength="8"
-                                        placeholder="Número de DNI" class="form-control" required>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-info" wire:loading.attr="disabled"
-                                            wire:click='buscarEstudiante' type="button" id="button-addon2">
-                                            <i class="fa fa-search"></i> <i wire:target="buscarEstudiante"
-                                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                                            Buscar</button>
+                    &nbsp;
+                    <div id="alerta" class="alert alert-success alert-dismissible fade show col-md-12"
+                        style="display: none" role="alert"><button id=""
+                            class="btn btn-circle btn-success pull-rigth pl-1 pt-2" style=""><i
+                                class="fa fa-check"></i></button>
+                        <strong>Dni encontrado</strong> Datos encontrados.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="alerta-no-existe" class="alert alert-danger alert-dismissible fade show col-md-12"
+                        style="display: none" role="alert"><button id=""
+                            class="btn btn-circle btn-danger pull-rigth pl-1 pt-2"  style=""><i
+                                class="fa fa-info"></i></button>
+                        <strong>Dni no existe</strong> Datos no encontrados.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span >&times;</span>
+                        </button>
+                    </div>
+                    
+    {{-- Paso 2 --}}
+    @if ($step == 1)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <br>
+                            <br>
+                            <h5><b> Datos de Estudiante</b> </h5>
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <p>Buscar por DNI de paciente</p>
+                                    <div class="input-group">
+                                        <input type="text" wire:model='dni' maxlength="8"
+                                            placeholder="Número de DNI" class="form-control" required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info" wire:loading.attr="disabled"
+                                                wire:click='buscarPaciente' type="button" id="button-addon2">
+                                                <i class="fa fa-search"></i> <i wire:target="buscarPaciente"
+                                                    wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                                                Buscar</button>
+                                        </div>
+                                    </div>
+
+                                    @error('dni')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <p>Nombres</p>
+                                        <input type="text" wire:model='name' placeholder="Nombres de Paciente"
+                                            disabled readonly class="form-control" required>
+                                        @error('name')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <p>Teléfono</p>
+                                        <input type="text" wire:model='telefono' placeholder="Telefono de paciente"
+                                            disabled class="form-control" required>
+                                        @error('telefono')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <p>Fecha de nacimiento</p>
+                                        <input type="text" wire:model='fecha_nacimiento'
+                                            placeholder="Fecha de nacimiento" disabled class="form-control" required>
+                                        @error('fecha_nacimiento')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
 
-                                @error('dni_estudiante')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                            <button class="btn btn-sm nextBtn mt-3 " wire:click="Salir" type="button"><u>Cancelar</u> x
+                            </button>
+                            <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
+                                type="button"><u>Siguiente</u> → </button>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <p>Nombres</p>
-                                    <input type="text" wire:model='nombre_estudiante'
-                                        placeholder="Nombres de Estudiante" disabled readonly class="form-control"
-                                        required>
-                                    @error('nombre_estudiante')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <p>Apellidos</p>
-                                    <input type="text" wire:model='apellido_estudiante'
-                                        placeholder="Apellido de Estudiante" disabled class="form-control" required>
-                                    @error('apellido_estudiante')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <p>Fecha de nacimiento</p>
-                                    <input type="text" wire:model='fecha_estudiante'
-                                        placeholder="Fecha de nacimiento" disabled class="form-control" required>
-                                    @error('fecha_estudiante')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
                         </div>
-
-                        <button class="btn btn-sm nextBtn mt-3 " wire:click="Salir" type="button"><u>Cancelar</u> x
-                        </button>
-                        <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="firstStepSubmit"
-                            type="button"><u>Siguiente</u> → </button>
-
                     </div>
-                </div>
-            </form>
+                    
+    @endif
+    {{-- Paso 2 --}}
+    @if ($step == 2)
+    
+    @endif
+
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     {{-- Paso 1 --}}
     @if ($step == 1)
@@ -186,4 +213,3 @@
     @endif
 
 </div>
-

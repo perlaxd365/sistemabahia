@@ -5,12 +5,14 @@ namespace App\Livewire\Atencion;
 use App\Models\Atencion;
 use App\Models\Servicio;
 use App\Models\User;
+use DateUtil;
 use Livewire\Component;
 
 class AtencionIndex extends Component
 {
     public $id_paciente, $id_servicio, $motivo, $diagnostico;
     public $show;
+    public $dni, $name, $fecha_nacimiento, $telefono;
     public function mount()
     {
         $this->show = 20;
@@ -46,7 +48,10 @@ class AtencionIndex extends Component
     {
         if ($this->step == 1) {
             $this->validate([
-                'id_paciente' => 'required',
+                'dni' => 'required',
+                'name' => 'required',
+                'telefono' => 'required',
+                'fecha_nacimiento' => 'required',
             ]);
         }
 
@@ -60,6 +65,24 @@ class AtencionIndex extends Component
             $this->validate([
                 'motivo' => 'required',
             ]);
+        }
+    }
+
+    public function buscarPaciente(){
+        
+        if ($this->dni) {
+            # code...
+            $paciente = User::where('dni', $this->dni)->where('privilegio_cargo', 7)->first();
+            if ($paciente) {
+                # code...
+                $this->id_paciente = $paciente->id;
+                $this->name = $paciente->name;
+                $this->telefono = $paciente->telefono;
+                $this->fecha_nacimiento = DateUtil::getFechaSimple($paciente->fecha_estudiante);
+                $this->dispatch('paciente-encontrado');
+            }else{
+                $this->dispatch('paciente-no-existe');
+            }
         }
     }
 

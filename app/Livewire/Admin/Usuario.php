@@ -121,7 +121,7 @@ class Usuario extends Component
             default:
                 # code...
                 $this->nombre_cargo = "Paciente";
-                $privilegio = 6;
+                $privilegio = 7;
                 break;
         }
 
@@ -268,6 +268,8 @@ class Usuario extends Component
 
             default:
                 # code...
+                $this->nombre_cargo = "Paciente";
+                $privilegio = 7;
                 break;
         }
 
