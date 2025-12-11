@@ -43,7 +43,8 @@
             "Tests\\": "tests/"
         },
         "files": [
-            "app/Util/DateUtil.php"
+            "app/Util/DateUtil.php",
+            "app/Util/PacienteUtil.php"
         ]
     },
     "scripts": {

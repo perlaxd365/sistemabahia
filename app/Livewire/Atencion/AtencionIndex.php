@@ -6,6 +6,7 @@ use App\Models\Atencion;
 use App\Models\Servicio;
 use App\Models\User;
 use DateUtil;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class AtencionIndex extends Component
@@ -13,6 +14,7 @@ class AtencionIndex extends Component
     public $id_paciente, $id_servicio, $motivo, $diagnostico;
     public $show;
     public $dni, $name, $fecha_nacimiento, $telefono;
+    public $tipo_atencion;
     public function mount()
     {
         $this->show = 20;
@@ -20,18 +22,27 @@ class AtencionIndex extends Component
     public function render()
     {
         $pacientes = User::where('estado_user', true)->where('privilegio_cargo', 6)->get();
-         $servicios = Servicio::select('*')
+        $servicios = Servicio::select('*')
             ->join('sub_tipo_servicios', 'sub_tipo_servicios.id_subtipo_servicio', 'servicios.id_subtipo_servicio')
             ->join('tipo_servicios', 'tipo_servicios.id_tipo_servicio', 'sub_tipo_servicios.id_tipo_servicio')
             ->where("estado_servicio", true)->paginate($this->show);
-        return view('livewire.atencion.atencion-index', compact('pacientes', 'servicios'));
+        $atenciones = Atencion::all();
+        return view('livewire.atencion.atencion-index', compact('pacientes', 'servicios', 'atenciones'));
     }
 
-    
+
     public $step = 1;
 
     public $notas;
 
+    public function default()
+    {
+        $this->id_paciente = "";
+        $this->dni = "";
+        $this->name = "";
+        $this->telefono = "";
+        $this->fecha_nacimiento = "";
+    }
 
     public function nextStep()
     {
@@ -56,20 +67,22 @@ class AtencionIndex extends Component
         }
 
         if ($this->step == 2) {
-            $this->validate([
-                'id_servicio' => 'required',
-            ]);
+            $this->dispatch('init-ckeditor');
         }
 
         if ($this->step == 3) {
+            $this->dispatch('get-ckeditor');
+
             $this->validate([
-                'motivo' => 'required',
+                'tipo_atencion' => 'required',
             ]);
+            dd($this->tipo_atencion);
         }
     }
 
-    public function buscarPaciente(){
-        
+    public function buscarPaciente()
+    {
+
         if ($this->dni) {
             # code...
             $paciente = User::where('dni', $this->dni)->where('privilegio_cargo', 7)->first();
@@ -80,11 +93,16 @@ class AtencionIndex extends Component
                 $this->telefono = $paciente->telefono;
                 $this->fecha_nacimiento = DateUtil::getFechaSimple($paciente->fecha_estudiante);
                 $this->dispatch('paciente-encontrado');
-            }else{
+                $this->resetErrorBag();
+                $this->resetValidation();
+            } else {
+                $this->default();
                 $this->dispatch('paciente-no-existe');
             }
         }
     }
+
+
 
     public function guardar()
     {
@@ -104,5 +122,15 @@ class AtencionIndex extends Component
 
         session()->flash('msg', 'Atención registrada correctamente');
         return redirect()->to('/atenciones');
+    }
+
+    
+    #[On('editorUpdated')]
+    public function updateEditorValue($value)
+    {
+        $this->tipo_atencion = $value;
+
+        dd($this->tipo_atencion);
+        logger("Livewire recibió el valor: " . $value);
     }
 }

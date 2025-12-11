@@ -3,7 +3,7 @@
         <div class="form-wrap">
             <form id="survey-form">
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <label class="form-label" for="datatable-search-input">Listado de Escuelas</label>
+                    <label class="form-label" for="datatable-search-input">Listado</label>
                     <hr>
                     <div class="row">
                         <div class="col-11">
@@ -29,9 +29,10 @@
                     </thead>
                     <tbody>
                         @if ($lista_usuarios->count())
+                            <?php $count = 1; ?>
                             @foreach ($lista_usuarios as $usuario)
                                 <tr>
-                                    <th scope="row">1</th>
+                                    <th scope="row">{{ $count++ }}</th>
                                     <td class="border-top-0 px-1 py-1">
                                         <div class="d-flex no-block align-items-center">
                                             <div class="mr-3">

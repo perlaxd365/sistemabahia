@@ -27,145 +27,211 @@
                         </div>
                     </div>
                     &nbsp;
-                    <div id="alerta" class="alert alert-success alert-dismissible fade show col-md-12"
-                        style="display: none" role="alert"><button id=""
-                            class="btn btn-circle btn-success pull-rigth pl-1 pt-2" style=""><i
-                                class="fa fa-check"></i></button>
-                        <strong>Dni encontrado</strong> Datos encontrados.
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div id="alerta-no-existe" class="alert alert-danger alert-dismissible fade show col-md-12"
-                        style="display: none" role="alert"><button id=""
-                            class="btn btn-circle btn-danger pull-rigth pl-1 pt-2"  style=""><i
-                                class="fa fa-info"></i></button>
-                        <strong>Dni no existe</strong> Datos no encontrados.
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span >&times;</span>
-                        </button>
-                    </div>
-                    
-    {{-- Paso 2 --}}
-    @if ($step == 1)
-                    <div class="row">
-                        <div class="col-md-12">
-                            <br>
-                            <br>
-                            <h5><b> Datos de Estudiante</b> </h5>
-                            <hr>
+                    {{-- Paso 2 --}}
+                    @if ($step == 1)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <br>
+                                <br>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <h5><b> Datos de Paciente</b> </h5>
+                                    </div>
 
-                            <div class="row">
-                                <div class="col-md-6 form-group">
-                                    <p>Buscar por DNI de paciente</p>
-                                    <div class="input-group">
-                                        <input type="text" wire:model='dni' maxlength="8"
-                                            placeholder="Número de DNI" class="form-control" required>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-info" wire:loading.attr="disabled"
-                                                wire:click='buscarPaciente' type="button" id="button-addon2">
-                                                <i class="fa fa-search"></i> <i wire:target="buscarPaciente"
-                                                    wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                                                Buscar</button>
+                                    <div class="col-9" style="float: initial">
+
+                                        <div id="alerta"
+                                            class="alert alert-success alert-dismissible fade show col-md-12"
+                                            style="display: none" role="alert"><button id=""
+                                                class="btn btn-circle btn-success pull-rigth pl-1 pt-2"
+                                                style=""><i class="fa fa-check"></i></button>
+                                            <strong>Dni encontrado</strong> Datos encontrados.
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div id="alerta-no-existe"
+                                            class="alert alert-danger alert-dismissible fade show col-md-12"
+                                            style="display: none" role="alert"><button id=""
+                                                class="btn btn-circle btn-danger pull-rigth pl-1 pt-2" style=""><i
+                                                    class="fa fa-info"></i></button>
+                                            <strong>Dni no existe</strong> Datos no encontrados.
+                                            <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close">
+                                                <span>&times;</span>
+                                            </button>
                                         </div>
                                     </div>
 
-                                    @error('dni')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
+
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <p>Buscar por DNI de paciente</p>
+                                        <div class="input-group">
+                                            <input type="text" wire:model='dni' maxlength="8"
+                                                placeholder="Número de DNI" class="form-control" required>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-info" wire:loading.attr="disabled"
+                                                    wire:click='buscarPaciente' type="button" id="button-addon2">
+                                                    <i class="fa fa-search"></i> <i wire:target="buscarPaciente"
+                                                        wire:loading.class="fa fa-spinner fa-spin"
+                                                        aria-hidden="true"></i>
+                                                    Buscar</button>
+                                            </div>
+                                        </div>
+                                        @error('dni')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <p>Nombres</p>
+                                            <input type="text" wire:model='name' placeholder="Nombres de Paciente"
+                                                disabled readonly class="form-control" required>
+                                            @error('name')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <p>Teléfono</p>
+                                            <input type="text" wire:model='telefono'
+                                                placeholder="Telefono de paciente" disabled class="form-control"
+                                                required>
+                                            @error('telefono')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <p>Fecha de nacimiento</p>
+                                            <input type="text" wire:model='fecha_nacimiento'
+                                                placeholder="Fecha de nacimiento" disabled class="form-control"
+                                                required>
+                                            @error('fecha_nacimiento')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <p>Nombres</p>
-                                        <input type="text" wire:model='name' placeholder="Nombres de Paciente"
-                                            disabled readonly class="form-control" required>
-                                        @error('name')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
+                                    type="button"><u>Siguiente</u> → </button>
+
+                            </div>
+                        </div>
+                    @endif
+                    {{-- Paso 2 --}}
+                    @if ($step == 2)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <h5><b>Atenciones</b> </h5>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <p>Teléfono</p>
-                                        <input type="text" wire:model='telefono' placeholder="Telefono de paciente"
-                                            disabled class="form-control" required>
-                                        @error('telefono')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <p>Fecha de nacimiento</p>
-                                        <input type="text" wire:model='fecha_nacimiento'
-                                            placeholder="Fecha de nacimiento" disabled class="form-control" required>
-                                        @error('fecha_nacimiento')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                    <table class="table">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Tipo de Atención</th>
+                                                <th scope="col">fecha creación</th>
+                                                <th scope="col">fecha finalización</th>
+                                                <th scope="col">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+
+                                            @if ($atenciones->count())
+                                                <?php $count = 1; ?>
+                                                @foreach ($atenciones as $atencion)
+                                                    <tr>
+                                                        <th scope="row">{{ $count++ }}</th>
+                                                        <td>{{ $atencion->tipo_atencion }}</td>
+                                                        <td>{{ DateUtil::getFechaSimple($atencion->fecha_inicio_atencion) }}
+                                                        </td>
+                                                        <td>{{ DateUtil::getFechaSimple($atencion->fecha_fin_atencion) }}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if ($atencion->estado_atencion)
+                                                                <i class="fa fa-circle text-success font-12"
+                                                                    data-toggle="tooltip" data-placement="top"
+                                                                    title="In Testing"></i>
+                                                            @else
+                                                                <i class="fa fa-circle text-secondary font-12"
+                                                                    data-toggle="tooltip" data-placement="top"
+                                                                    title="In Testing"></i>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td>
+                                                        <div class="card-body">
+                                                            <strong>No se registraron atenciones.</strong>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-
-                            <button class="btn btn-sm nextBtn mt-3 " wire:click="Salir" type="button"><u>Cancelar</u> x
+                        </div>
+                        <div class="flex justify-between mt-4">
+                            <button class="btn btn-sm nextBtn mt-3 " wire:click="prevStep"
+                                type="button"><u>Atrás</u>
                             </button>
                             <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
                                 type="button"><u>Siguiente</u> → </button>
-
                         </div>
-                    </div>
-                    
-    @endif
-    {{-- Paso 2 --}}
-    @if ($step == 2)
-    
-    @endif
+                    @endif
+
+                    {{-- Paso 3 --}}
+                    @if ($step == 3)
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <hr>
+                                    <div class="col-md-12">
+                                        <div wire:ignore>
+                                            <div class="form-group">
+                                                <p>Detalle de atencion</p>
+                                                <textarea id="editor" name="tipo_atencion" class="form-control" rows="10">{{ $tipo_atencion }}</textarea>
+
+                                                @error('tipo_atencion')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <button type="button" onclick="printEditor()" class="btn btn-sm btn-danger">Imprimir
+                                    <i class="fa fa-print"></i></button>
+                                <div class="flex justify-between mt-4">
+                                    <button class="btn btn-sm nextBtn mt-3 " wire:click="prevStep"
+                                        type="button"><u>Atrás</u>
+                                    </button>
+                                    <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
+                                        type="button"><u><b>Guardar Atención</b></u> → </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                 </form>
             </div>
         </div>
     </div>
-
-    {{-- Paso 1 --}}
-    @if ($step == 1)
-        <h2 class="text-xl font-bold mb-3">1️⃣ Seleccionar Paciente</h2>
-
-        <select wire:model="id_paciente" class="w-full border rounded p-2">
-            <option value="">-- Seleccione un paciente --</option>
-            @foreach ($pacientes as $p)
-                <option value="{{ $p->id }}">{{ $p->nombre_completo }} - {{ $p->dni }}</option>
-            @endforeach
-        </select>
-
-        <div class="flex justify-end mt-4">
-            <button wire:click="nextStep" class="bg-blue-600 text-white px-4 py-2 rounded">
-                Siguiente →
-            </button>
-        </div>
-    @endif
-
-
-    {{-- Paso 2 --}}
-    @if ($step == 2)
-        <h2 class="text-xl font-bold mb-3">2️⃣ Seleccionar Servicio</h2>
-
-        <select wire:model="id_servicio" class="w-full border rounded p-2">
-            <option value="">-- Seleccione un servicio --</option>
-            @foreach ($servicios as $s)
-                <option value="{{ $s->id_servicio }}">{{ $s->nombre_servicio }}</option>
-            @endforeach
-        </select>
-
-        <div class="flex justify-between mt-4">
-            <button wire:click="prevStep" class="bg-gray-500 text-white px-4 py-2 rounded">
-                ← Atrás
-            </button>
-
-            <button wire:click="nextStep" class="bg-blue-600 text-white px-4 py-2 rounded">
-                Siguiente →
-            </button>
-        </div>
-    @endif
 
 
     {{-- Paso 3 --}}

@@ -38,7 +38,7 @@ class Usuario extends Component
         if ($this->privilegio_actual > 1) {
             # code...
             $lista_usuarios = User::select('*')
-                ->where('privilegio_cargo', 6)
+                ->where('privilegio_cargo', 7)
                 ->where(function ($query) {
                     return $query
                         ->orwhere('name', 'LIKE', '%' . $this->search . '%')

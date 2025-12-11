@@ -87,7 +87,7 @@
 
                 @if ($privilegio == 1)
 
-                    <h4>Datos Profesionales</h4>
+                    <h4>Datos Profesionales {{$privilegio}}</h4>
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
