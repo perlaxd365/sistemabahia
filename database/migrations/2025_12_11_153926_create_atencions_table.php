@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('atencions', function (Blueprint $table) {
             $table->bigIncrements('id_atencion');
+            $table->unsignedBigInteger('id_paciente')->comment('id del paciente');
             $table->unsignedBigInteger('id_historia')->comment('id de la historia');
+            $table->unsignedBigInteger('id_responsable')->comment('id del responsable');
             $table->longText('tipo_atencion');
             $table->string('fecha_inicio_atencion');
-            $table->string('fecha_fin_atencion');
+            $table->string('fecha_fin_atencion')->nullable();
             $table->boolean('estado_atencion');
             $table->timestamps();
 
             //foreign keys
             $table->foreign('id_historia')->references('id_historia')->on('historias');
+            $table->foreign('id_paciente')->references('id')->on('users');
+            $table->foreign('id_responsable')->references('id')->on('users');
         });
     }
 

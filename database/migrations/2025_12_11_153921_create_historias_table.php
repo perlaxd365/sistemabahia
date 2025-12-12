@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('historias', function (Blueprint $table) {
             $table->bigIncrements('id_historia');
             $table->unsignedBigInteger('id_paciente')->comment('id del paciente');
+            $table->string('nro_historia');
             $table->string('fecha_historia');
             $table->boolean('estado_historia');
             $table->timestamps();

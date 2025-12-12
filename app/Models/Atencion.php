@@ -12,8 +12,11 @@ class Atencion extends Model
     protected $name = "atencions";
     protected $primaryKey = 'id_atencion';
     protected $fillable = [
+        'id_paciente',
+        'id_responsable',
         'id_atencion',
         'id_historia',
+        'id_responsable',
         'tipo_atencion',
         'fecha_inicio_atencion',
         'fecha_fin_atencion',

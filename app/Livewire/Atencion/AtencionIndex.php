@@ -5,9 +5,11 @@ namespace App\Livewire\Atencion;
 use App\Models\Atencion;
 use App\Models\Servicio;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use DateUtil;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use PacienteUtil;
 
 class AtencionIndex extends Component
 {
@@ -26,7 +28,13 @@ class AtencionIndex extends Component
             ->join('sub_tipo_servicios', 'sub_tipo_servicios.id_subtipo_servicio', 'servicios.id_subtipo_servicio')
             ->join('tipo_servicios', 'tipo_servicios.id_tipo_servicio', 'sub_tipo_servicios.id_tipo_servicio')
             ->where("estado_servicio", true)->paginate($this->show);
-        $atenciones = Atencion::all();
+        if ($this->id_paciente) {
+            $id_historia = PacienteUtil::getHistoria($this->id_paciente);
+            $atenciones = Atencion::where('id_historia', $id_historia)->orderby('id_atencion', 'desc')->get();
+        } else {
+            $atenciones = [];
+        }
+
         return view('livewire.atencion.atencion-index', compact('pacientes', 'servicios', 'atenciones'));
     }
 
@@ -42,6 +50,7 @@ class AtencionIndex extends Component
         $this->name = "";
         $this->telefono = "";
         $this->fecha_nacimiento = "";
+        $this->tipo_atencion = "";
     }
 
     public function nextStep()
@@ -76,7 +85,7 @@ class AtencionIndex extends Component
             $this->validate([
                 'tipo_atencion' => 'required',
             ]);
-            dd($this->tipo_atencion);
+            $this->guardar();
         }
     }
 
@@ -107,30 +116,59 @@ class AtencionIndex extends Component
     public function guardar()
     {
         $this->validate([
-            'paciente_id' => 'required',
-            'servicio_id' => 'required',
-            'motivo' => 'required',
+            'id_paciente' => 'required',
+            'tipo_atencion' => 'required',
         ]);
 
+        $id_historia = PacienteUtil::addHistoria($this->id_paciente);
         Atencion::create([
-            'paciente_id' => $this->paciente_id,
-            'servicio_id' => $this->servicio_id,
-            'motivo' => $this->motivo,
-            'diagnostico' => $this->diagnostico,
-            'notas' => $this->notas,
+            'id_paciente' => $this->id_paciente,
+            'id_responsable' => auth()->user()->id,
+            'id_historia' => $id_historia,
+            'tipo_atencion' => $this->tipo_atencion,
+            'fecha_inicio_atencion' => now(),
+            'estado_atencion' => true,
         ]);
 
-        session()->flash('msg', 'Atención registrada correctamente');
-        return redirect()->to('/atenciones');
+        // show alert
+
+        $this->dispatch(
+            'alert',
+            ['type' => 'success', 'title' => 'Se registro la atencion de ' . $this->name . ' correctamente', 'message' => 'Exito']
+        );
+
+        $this->default();
+        $this->step = 1;
+        return redirect()->route('atencion');
     }
 
-    
+
     #[On('editorUpdated')]
     public function updateEditorValue($value)
     {
         $this->tipo_atencion = $value;
+    }
 
-        dd($this->tipo_atencion);
-        logger("Livewire recibió el valor: " . $value);
+    public function exportarPDF()
+    {
+
+            $id_historia = PacienteUtil::getHistoria($this->id_paciente);
+            $atenciones = Atencion::where('id_historia', $id_historia)->get();
+        if (count($atenciones)>0) {
+            $name = $this->name;
+
+            $pdf = Pdf::loadView('reportes.atenciones', compact('atenciones', 'name'));
+
+            return response()->streamDownload(
+                fn() => print($pdf->output()),
+                'atenciones.pdf'
+            );
+        } else {
+
+            $this->dispatch(
+            'alert',
+            ['type' => 'info', 'title' => 'No se encontraron atenciones', 'message' => 'Sin atenciones']
+        );
+        }
     }
 }

@@ -55,6 +55,7 @@
             height: 250
         });
 
+        CKEDITOR.config.versionCheck = false;
     });
 </script>
 
@@ -64,13 +65,13 @@
 
         // Crear CKEditor
 
-            const data = CKEDITOR.instances.editor.getData();
+        const data = CKEDITOR.instances.editor.getData();
 
 
-            // ⚠️ Livewire 3 usa dispatch, NO emit
-            Livewire.dispatch('editorUpdated', {
-                value: data
-            });
+        // ⚠️ Livewire 3 usa dispatch, NO emit
+        Livewire.dispatch('editorUpdated', {
+            value: data
+        });
     });
 </script>
 

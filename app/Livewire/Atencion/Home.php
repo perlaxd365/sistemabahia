@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Livewire\Atencion;
+
+use Livewire\Component;
+
+class Home extends Component
+{
+    
+    public $id_atencion;
+    public $tab = 'info';  // tab activa
+    public $componente = 'atencion.InfoPaciente'; // componente activo
+
+     public function mount($id_atencion)
+    {
+        $this->id_atencion = $id_atencion;
+    }
+     public function cambiarTab($tab)
+    {
+        $this->tab = $tab;
+
+        $map = [
+            'info'          => 'atencion.info-paciente',
+            'signos'        => 'atencion.signos-vitales',
+            'servicios'     => 'atencion.servicios',
+            'consulta'      => 'atencion.consulta',
+            'medicamentos'  => 'atencion.medicamentos',
+            'laboratorio'   => 'atencion.laboratorio',
+            'rayos'         => 'atencion.rayos',
+            'ecografia'     => 'atencion.ecografia',
+            'tomografia'    => 'atencion.tomografia',
+            'resultados'    => 'atencion.resultados',
+            'insumos'       => 'atencion.insumos',
+            'facturacion'   => 'atencion.facturacion',
+        ];
+
+        $this->componente = $map[$tab];
+    }
+
+    public function render()
+    {
+        return view('livewire.atencion.home');
+    }
+}

@@ -14,4 +14,10 @@ class AtencionController extends Controller
         $carbon = new Carbon();
         return view('admin.atencion.index', compact('carbon'));
     }
+
+    // 
+    public function home($id_atencion)
+    {
+        return view('admin.atencion.home', ['id_atencion' => $id_atencion]);
+    }
 }

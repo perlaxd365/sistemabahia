@@ -6,7 +6,7 @@
     @include('plantilla.style')
     <header class="header" >
         @include('plantilla.link')
-        <h1 id="title" class="text-center"> <a href="{{ URL::route(Route::current()->getName()) }}">@yield('title')</a>
+        <h1 id="title" class="text-center"> <a href="{{ route(Route::currentRouteName(), request()->route('id')) }}">@yield('title')</a>
         </h1>   
         <p id="description" class="text-center">
             @yield('desc')

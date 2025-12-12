@@ -11,7 +11,7 @@
             line-height: 1.5;
             font-family: 'Roboto', sans-serif;
             color: #222;
-            
+
         }
 
 
@@ -142,7 +142,8 @@
     .contenedor {
         height: 55em;
         line-height: 1em;
-        width: 100%; overflow-y: auto;
+        width: 100%;
+        overflow-y: auto;
     }
 </style>
 <style>
@@ -1336,4 +1337,81 @@
         }
     }
 
+
+    .tabs-clinica {
+        background: #ffffff;
+        border-bottom: 2px solid #e5eef5;
+        padding: 0.75rem 1rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .tabs-clinica .nav-link {
+        color: #4a6378;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        margin-right: 6px;
+        border-radius: 10px !important;
+        transition: all 0.25s ease-in-out;
+        border: 1px solid transparent;
+        cursor: pointer !important;
+        /* ← Aquí aparece la manito */
+    }
+
+    .tabs-clinica .nav-link:hover {
+        background: #f1f7fc;
+        border-color: #d0e2f1;
+        color: #2d4b68;
+    }
+
+    .tabs-clinica .nav-link.active {
+        background: #0d6efd;
+        color: white !important;
+        border-color: #0d6efd;
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.20);
+    }
+
+    .tabs-clinica .nav-item {
+        margin-bottom: -2px;
+    }
+
+    /**LO DE INFO DE PACIENTE */
+
+    .info-clinica .card {
+        border-radius: 14px;
+        border: 1px solid #e4e7eb;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+    }
+
+    .info-clinica .titulo-seccion {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #0d5db3;
+        margin-bottom: 10px;
+    }
+
+    .info-clinica .dato-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #6b7b8c;
+        margin-bottom: 2px;
+    }
+
+    .info-clinica .dato-valor {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #29323d;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>

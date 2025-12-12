@@ -14,6 +14,7 @@ class Historia extends Model
     protected $fillable = [
         'id_historia',
         'id_paciente',
+        'nro_historia',
         'fecha_historia',
         'estado_historia'
     ];

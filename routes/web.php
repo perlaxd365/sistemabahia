@@ -39,5 +39,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
     //ATENCION
     Route::get('atencion', [AtencionController::class, 'index'])->name('atencion');
+    Route::get('atencion_general/{id}', [AtencionController::class, 'home'])->name('atencion_general');
 
 });

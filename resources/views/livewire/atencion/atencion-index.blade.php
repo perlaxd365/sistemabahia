@@ -132,16 +132,26 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-3">
-                                        <h5><b>Atenciones</b> </h5>
+                                    <div class="col-9">
+                                        <h5><b>Atenciones de <p class="text-danger">{{ $name }}</p></b> </h5>
                                     </div>
-                                    <table class="table">
+                                    <div class="col-3">
+
+                                        <button wire:click="exportarPDF" wire:loading.attr="disabled"
+                                            class="btn btn-secondary btn-sm" type="button"> <i
+                                                class="fa fa-print"></i> <i wire:target="exportarPDF"
+                                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                                            Imprimir</button>
+                                    </div>
+
+                                    <table class="table table-responsive">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th scope="col">#</th>
                                                 <th scope="col">Tipo de Atención</th>
-                                                <th scope="col">fecha creación</th>
+                                                <th scope="col">Fecha Atención</th>
                                                 <th scope="col">fecha finalización</th>
+                                                <th scope="col">Ver</th>
                                                 <th scope="col">Estado</th>
                                             </tr>
                                         </thead>
@@ -153,22 +163,26 @@
                                                 @foreach ($atenciones as $atencion)
                                                     <tr>
                                                         <th scope="row">{{ $count++ }}</th>
-                                                        <td>{{ $atencion->tipo_atencion }}</td>
-                                                        <td>{{ DateUtil::getFechaSimple($atencion->fecha_inicio_atencion) }}
+                                                        <td>{!! $atencion->tipo_atencion !!}</td>
+                                                        <td>{{ DateUtil::getFechaCompleta($atencion->fecha_inicio_atencion) }}
                                                         </td>
-                                                        <td>{{ DateUtil::getFechaSimple($atencion->fecha_fin_atencion) }}
+                                                        <td>{{ $atencion->fecha_fin_atencion ? DateUtil::getFechaCompleta($atencion->fecha_fin_atencion) : 'Atendiendose' }}
                                                         </td>
                                                         <td class="text-center">
-                                                            @if ($atencion->estado_atencion)
-                                                                <i class="fa fa-circle text-success font-12"
-                                                                    data-toggle="tooltip" data-placement="top"
-                                                                    title="In Testing"></i>
+
+
+                                                            @if ($atencion->estado_atencion == true)
+                                                                <span class="badge bg-success">Activa</span>
+                                                            @elseif($atencion->estado_atencion == false)
+                                                                <span class="badge bg-secondary">Finalizada</span>
                                                             @else
-                                                                <i class="fa fa-circle text-secondary font-12"
-                                                                    data-toggle="tooltip" data-placement="top"
-                                                                    title="In Testing"></i>
+                                                                <span class="badge bg-warning">Pendiente</span>
                                                             @endif
                                                         </td>
+                                                        
+                                                        <td><a
+                                                                href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"><u>Ir
+                                                                    a atención</u></a></td>
                                                     </tr>
                                                 @endforeach
                                             @else
@@ -203,12 +217,17 @@
                                     <div class="col-md-12">
                                         <div wire:ignore>
                                             <div class="form-group">
-                                                <p>Detalle de atencion</p>
+                                                <div class="col-12">
+                                                    <h5><b>Motivo de visita <p class="text-danger">{{ $name }}
+                                                            </p></b>
+                                                    </h5>
+                                                </div>
                                                 <textarea id="editor" name="tipo_atencion" class="form-control" rows="10">{{ $tipo_atencion }}</textarea>
 
                                                 @error('tipo_atencion')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
+
                                             </div>
                                         </div>
                                     </div>
@@ -222,7 +241,8 @@
                                         type="button"><u>Atrás</u>
                                     </button>
                                     <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
-                                        type="button"><u><b>Guardar Atención</b></u> → </button>
+                                        type="button"><u><b>Guardar Atención</b></u> ✔ </button>
+
                                 </div>
                             </div>
                         </div>
@@ -232,50 +252,5 @@
             </div>
         </div>
     </div>
-
-
-    {{-- Paso 3 --}}
-    @if ($step == 3)
-        <h2 class="text-xl font-bold mb-3">3️⃣ Detalles de la Atención</h2>
-
-        <textarea wire:model="motivo" placeholder="Motivo de la consulta" class="w-full border rounded p-2 mb-3"></textarea>
-
-        <textarea wire:model="diagnostico" placeholder="Diagnóstico" class="w-full border rounded p-2 mb-3"></textarea>
-
-        <textarea wire:model="notas" placeholder="Notas adicionales" class="w-full border rounded p-2 mb-3"></textarea>
-
-        <div class="flex justify-between mt-4">
-            <button wire:click="prevStep" class="bg-gray-500 text-white px-4 py-2 rounded">
-                ← Atrás
-            </button>
-
-            <button wire:click="nextStep" class="bg-blue-600 text-white px-4 py-2 rounded">
-                Siguiente →
-            </button>
-        </div>
-    @endif
-
-
-    {{-- Paso 4 --}}
-    @if ($step == 4)
-        <h2 class="text-xl font-bold mb-3">4️⃣ Confirmación</h2>
-
-        <div class="bg-gray-100 p-4 rounded">
-            <p><strong>Paciente:</strong> {{ optional($pacientes->find($id_paciente))->name }}</p>
-            <p><strong>Servicio:</strong> {{ optional($servicios->find($id_servicio))->nombre_servicio }}</p>
-            <p><strong>Motivo:</strong> {{ $motivo }}</p>
-            <p><strong>Diagnóstico:</strong> {{ $diagnostico }}</p>
-        </div>
-
-        <div class="flex justify-between mt-4">
-            <button wire:click="prevStep" class="bg-gray-500 text-white px-4 py-2 rounded">
-                ← Atrás
-            </button>
-
-            <button wire:click="guardar" class="bg-green-600 text-white px-4 py-2 rounded">
-                Guardar Atención ✔
-            </button>
-        </div>
-    @endif
 
 </div>
