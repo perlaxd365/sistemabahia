@@ -14,12 +14,12 @@
                                     wire:click="cambiarTab('info')">Info</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'signos' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('signos')">Signos Vitales</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link {{ $tab == 'servicios' ? 'active' : '' }}"
                                     wire:click="cambiarTab('servicios')">Servicios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ $tab == 'signos' ? 'active' : '' }}"
+                                    wire:click="cambiarTab('signos')">Signos Vitales</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ $tab == 'consulta' ? 'active' : '' }}"

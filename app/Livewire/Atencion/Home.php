@@ -21,8 +21,8 @@ class Home extends Component
 
         $map = [
             'info'          => 'atencion.info-paciente',
-            'signos'        => 'atencion.signos-vitales',
             'servicios'     => 'atencion.servicios',
+            'signos'        => 'atencion.signos-vitales',
             'consulta'      => 'atencion.consulta',
             'medicamentos'  => 'atencion.medicamentos',
             'laboratorio'   => 'atencion.laboratorio',
