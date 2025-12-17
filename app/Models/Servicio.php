@@ -18,4 +18,9 @@ class Servicio extends Model
         'precio_servicio',
         'estado_servicio'
     ];
+
+    public function subtipo()
+    {
+        return $this->belongsTo(SubTipoServicio::class, 'id_subtipo_servicio');
+    }
 }

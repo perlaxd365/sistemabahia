@@ -42,7 +42,7 @@ class UserFactory extends Factory
             "nombre_cargo" =>  fake()->randomElement(['Administrador', 'Doctor','Enfermero', 'Recepcionista','Farmaceutico']),
             "especialidad_cargo" => 'Sin especialidad',
             "colegiatura_cargo" => 'Sin colegiatura',
-            "privilegio_cargo" => fake()->numberBetween(1, 4),
+            "privilegio_cargo" => fake()->numberBetween(1, 6),
             "direccion" => fake()->streetAddress(),
             "foto_url" => 'https://picsum.photos/300/300',
             "telefono" => fake()->phoneNumber(),

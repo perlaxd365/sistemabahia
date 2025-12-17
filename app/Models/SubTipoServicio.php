@@ -17,4 +17,14 @@ class SubTipoServicio extends Model
         'nombre_subtipo_servicio',
         'estado_subtipo_servicio'
     ];
+
+      public function tipo()
+    {
+        return $this->belongsTo(TipoServicio::class, 'id_tipo_servicio');
+    }
+
+    public function servicios()
+    {
+        return $this->hasMany(Servicio::class, 'id_subtipo_servicio');
+    }
 }

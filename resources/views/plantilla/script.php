@@ -1,5 +1,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<!-- jQuery (OBLIGATORIO) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <script>
@@ -17,11 +24,9 @@
 
 <script>
     window.addEventListener('gotoTop', event => {
-
         $("#top").animate({
             scrollTop: 0
         }, 500);
-
     })
 </script>
 <script>
@@ -80,7 +85,6 @@
 <script>
     function printEditor() {
         var contenido = CKEDITOR.instances.editor.getData();
-
         var ventana = window.open('', '', 'height=800,width=800');
         ventana.document.write('<html><head><title>Clinica Bahía</title>');
         ventana.document.write('</head><body>');
@@ -90,3 +94,10 @@
         ventana.print();
     }
 </script>
+
+    <script>
+        // In your Javascript (external .js resource or <script> tag)
+$(document).ready(function() {
+    $('.js-example-basic-single').select2();
+});
+    </script>
