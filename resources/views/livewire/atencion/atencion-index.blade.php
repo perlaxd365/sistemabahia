@@ -204,7 +204,7 @@
                                 type="button"><u>Atrás</u>
                             </button>
                             <button class="btn btn-sm nextBtn mt-3 float-right" wire:click="nextStep"
-                                type="button"><u>Siguiente</u> → </button>
+                                type="button"><u>Nueva Atención</u> → </button>
                         </div>
                     @endif
 

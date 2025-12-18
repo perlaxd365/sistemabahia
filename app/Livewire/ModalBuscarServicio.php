@@ -65,6 +65,7 @@ class ModalBuscarServicio extends Component
         
 
         // limpiar buscador
+        $this->buscar="";
         $this->reset(['buscar', 'resultados']);
     }
 

@@ -18,6 +18,8 @@ class Servicios extends Component
     public $buscar = '';
     public $servicioSeleccionado = null;
     public $nombre_paciente = '';
+    public $totalervicios = 0;
+    public $id_atencion_servicio;
 
     public function mount($id_atencion)
     {
@@ -25,6 +27,7 @@ class Servicios extends Component
         $atencion = Atencion::find($id_atencion);
         $paciente = User::find($atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
+        $this->getTotalServiciosProperty();
     }
 
 
@@ -32,19 +35,19 @@ class Servicios extends Component
     {
         $servicios = Servicio::all();
         $profesionales = User::where(function ($query) {
-                return $query
-                    ->orwhere('privilegio_cargo', 2)
-                    ->orwhere('privilegio_cargo', 3)
-                    ->orwhere('privilegio_cargo', 4)
-                    ->orwhere('privilegio_cargo', 6);
-            })
+            return $query
+                ->orwhere('privilegio_cargo', 2)
+                ->orwhere('privilegio_cargo', 3)
+                ->orwhere('privilegio_cargo', 4)
+                ->orwhere('privilegio_cargo', 6);
+        })
             ->orderBy('name')
             ->get();
         $atencion_servicios = AtencionServicio::where('atencion_servicios.id_atencion', $this->id_atencion)
-        ->join('atencions','atencions.id_atencion','atencions.id_atencion')
-        ->join('servicios','servicios.id_servicio','atencion_servicios.id_servicio')
-        ->join('users','users.id','atencion_servicios.id_profesional')
-        ->get();
+            ->join('atencions', 'atencions.id_atencion', 'atencion_servicios.id_atencion')
+            ->join('servicios', 'servicios.id_servicio', 'atencion_servicios.id_servicio')
+            ->leftjoin('users', 'users.id', 'atencion_servicios.id_profesional')
+            ->get();
         return view('livewire.atencion.servicios', compact('servicios', 'profesionales', 'atencion_servicios'));
     }
 
@@ -97,16 +100,42 @@ class Servicios extends Component
 
         $this->dispatch(
             'alert',
-            ['type' => 'success', 'title' => 'Se agrego el servicio a la atención de '. $this->nombre_paciente, 'message' => 'Exito']
+            ['type' => 'success', 'title' => 'Se agrego el servicio a la atención de ' . $this->nombre_paciente, 'message' => 'Exito']
         );
-
+        $this->getTotalServiciosProperty();
         $this->default();
     }
 
-    public function default(){
+    public function default()
+    {
         $this->servicioSeleccionado = [];
         $this->id_profesional = '';
         $this->cantidad = '';
         $this->precio_unitario = '';
+    }
+
+    public function getTotalServiciosProperty()
+    {
+        $this->totalervicios = AtencionServicio::where('atencion_servicios.id_atencion', $this->id_atencion)
+            ->join('atencions', 'atencions.id_atencion', 'atencion_servicios.id_atencion')
+            ->join('servicios', 'servicios.id_servicio', 'atencion_servicios.id_servicio')
+            ->leftjoin('users', 'users.id', 'atencion_servicios.id_profesional')
+            ->orderby('atencion_servicios.created_at', 'asc')
+            ->get();
+        $this->totalervicios =  collect($this->totalervicios)
+            ->sum(fn($s) => $s['cantidad'] * $s['precio_unitario']);
+    }
+
+    public function eliminar_atencion_servicio($id)
+    {
+        $this->id_atencion_servicio = $id;
+        $atencion_servicio = AtencionServicio::find($id);
+        $atencion_servicio->delete();
+        
+        $this->dispatch(
+            'alert',
+            ['type' => 'success', 'title' => 'Se eliminó servicio correctamente', 'message' => 'Exito']
+        );
+        $this->getTotalServiciosProperty();
     }
 }

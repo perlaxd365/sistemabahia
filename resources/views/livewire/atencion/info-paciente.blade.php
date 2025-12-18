@@ -71,6 +71,12 @@
                 </div>
 
                 <div>
+                    <p class="dato-label">Motivo de Atención</p>
+                    <p class="dato-valor">
+                        {!! $atencion->tipo_atencion !!}
+                    </p>
+                </div>
+                <div>
                     <p class="dato-label">Fecha de Fin</p>
                     <p class="dato-valor">
                         {{ $atencion->fecha_fin_atencion ?? '— En curso —' }}
