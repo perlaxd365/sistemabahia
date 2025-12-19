@@ -12,8 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('signos', function (Blueprint $table) {
-            $table->id();
+
+            $table->bigIncrements('id_signo');
+            $table->unsignedBigInteger('id_atencion')->nullable()->comment('id de la atencion');
+            $table->unsignedBigInteger('id_paciente')->nullable()->comment('id del paciente');
+
+            // Brazo derecho
+            $table->string('sistolica_derecha')->nullable();
+            $table->string('diastolica_derecha')->nullable();
+
+            // Brazo izquierdo
+            $table->string('sistolica_izquierda')->nullable();
+            $table->string('diastolica_izquierda')->nullable();
+
+            $table->string('frecuencia_cardiaca')->nullable();
+            $table->string('fecha_signo');
+            $table->boolean('estado_signo');
             $table->timestamps();
+
+
+            //foreign keys
+            $table->foreign('id_atencion')->references('id_atencion')->on('atencions');
+            $table->foreign('id_paciente')->references('id')->on('users');
         });
     }
 

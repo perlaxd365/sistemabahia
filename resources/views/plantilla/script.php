@@ -7,7 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     window.addEventListener('alert', event => {
@@ -95,9 +95,148 @@
     }
 </script>
 
-    <script>
-        // In your Javascript (external .js resource or <script> tag)
-$(document).ready(function() {
-    $('.js-example-basic-single').select2();
-});
-    </script>
+
+
+<script>
+    document.addEventListener('get-grafico-signo', () => {
+
+
+
+        const canvas = document.getElementById('graficoPresion');
+
+        if (!canvas) return;
+
+        // ✅ AQUÍ YA NO FALLA
+        const datos = JSON.parse(canvas.dataset.datos);
+
+        if (!datos || datos.length === 0) {
+            console.warn('No hay datos para el gráfico');
+            return;
+        }
+
+        const labels = datos.map(d =>
+            new Date(d.fecha_signo).toLocaleDateString()
+        );
+
+        const sistolica = datos.map(d => d.sistolica_derecha);
+        const diastolica = datos.map(d => d.diastolica_derecha);
+        const latidos = datos.map(d => d.frecuencia_cardiaca);
+
+
+      
+
+    const ctx = canvas.getContext('2d');
+        graficoPresion = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                        label: 'Sistólica',
+                        data: sistolica,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Diastólica',
+                        data: diastolica,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Lpm',
+                        data: latidos,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'lpm'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script>
+    function imprimirGrafico() {
+
+        const canvas = document.getElementById('graficoPresion');
+        if (!canvas) return;
+
+        const imagen = canvas.toDataURL('image/png');
+
+        const ventana = window.open('', '_blank');
+
+        ventana.document.write(`
+        <html>
+        <head>
+            <title>Reporte Clínico</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 30px;
+                }
+                h4 {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                img {
+                    max-width: 100%;
+                }
+            </style>
+        </head>
+        <body>
+            <h4>Evolución de Presión Arterial</h4>
+            <img id="imgGrafico" src="${imagen}">
+            <script>
+                const img = document.getElementById('imgGrafico');
+                img.onload = function () {
+                    window.print();
+                };
+                window.onafterprint = function () {
+                    window.close();
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+
+        ventana.document.close();
+    }
+</script>
+
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('actualizarGrafico', (datos) => {
+            console.log('DATOS:', datos);
+            actualizarGrafico(datos);
+        });
+    });
+</script>
+
+<script>
+    function actualizarGrafico(signos) {
+        console.log('🚀 actualizarGrafico ejecutado');
+        console.log('Signos:', signos);
+        console.log('graficoPresion:', graficoPresion);
+
+        if (!graficoPresion) {
+            console.error('❌ gráfico no creado');
+            return;
+        }
+        console.log('final:', graficoPresion.data.datasets)
+        
+       
+        graficoPresion.data.datasets[0].data =
+            signos.map(s => Number(s.sistolica_derecha));
+
+        graficoPresion.data.datasets[1].data =
+            signos.map(s => Number(s.diastolica_derecha));
+
+        graficoPresion.update();
+    }
+</script>
