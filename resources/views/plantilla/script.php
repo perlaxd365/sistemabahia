@@ -230,7 +230,10 @@
         }
         console.log('final:', graficoPresion.data.datasets)
         
-       
+        graficoPresion.data.labels = signos.map(s =>
+            new Date(s.fecha_signo.replace(' ', 'T')).toLocaleTimeString()
+        );
+
         graficoPresion.data.datasets[0].data =
             signos.map(s => Number(s.sistolica_derecha));
 
