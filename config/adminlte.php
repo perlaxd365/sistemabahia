@@ -345,6 +345,16 @@ return [
             'label_color' => 'warning',
             'can' => 'recepcion',
         ],
+        
+        ['header' => 'INTERNO'],
+        [
+            'text' => 'Farmacia',
+            'url' => 'farmacia',
+            'icon' => 'fas fa-pills',
+            'label' => 6,
+            'label_color' => 'success',
+        ],
+
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
@@ -394,11 +404,11 @@ return [
                 ],
             ],
         ],
-        ['header' => 'labels'],
+        ['header' => 'CONFIGURACION'],
         [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
+            'text' => 'Proveedor',
+            'icon_color' => 'green',
+            'url' => 'proveedor',
         ],
         [
             'text' => 'warning',
@@ -406,7 +416,7 @@ return [
             'url' => '#',
         ],
         [
-            'text' => 'Configuración',
+            'text' => 'Servicios',
             'icon_color' => 'cyan',
             'url' => 'configuracion',
         ],

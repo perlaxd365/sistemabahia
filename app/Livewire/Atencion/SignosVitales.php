@@ -31,6 +31,7 @@ class SignosVitales extends Component
         $atencion = Atencion::find($id_atencion);
         $paciente = User::find($atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
+        $this->id_paciente = $paciente->id;
         $this->cargarDatos();
     }
 

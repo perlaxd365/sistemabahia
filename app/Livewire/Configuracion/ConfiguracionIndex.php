@@ -18,7 +18,7 @@ class ConfiguracionIndex extends Component
 
     public function mount()
     {
-        $this->show = 20;
+        $this->show = 100;
     }
     public function render()
     {

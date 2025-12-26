@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AtencionController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -40,5 +42,9 @@ Route::group(['middleware' => ['auth']], function () {
     //ATENCION
     Route::get('atencion', [AtencionController::class, 'index'])->name('atencion');
     Route::get('atencion_general/{id}', [AtencionController::class, 'home'])->name('atencion_general');
+    //PROVEEDOR
+    Route::get('proveedor', [ProveedorController::class, 'index'])->name('proveedor');
+    //FARMACIA
+    Route::get('farmacia', [FarmaciaController::class, 'index'])->name('farmacia');
 
 });

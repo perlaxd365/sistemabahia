@@ -1447,4 +1447,61 @@
         font-weight: 700;
         margin: 0;
     }
+
+   /*  tabs clinico */
+    .nav-clinico .nav-link {
+        color: #0b3c5d;
+        font-weight: 600;
+        border-radius: 6px;
+        margin-right: 6px;
+    }
+
+    .nav-clinico .nav-link.active {
+        background-color: #0b3c5d;
+        color: #fff;
+    }
+    .text-clinico {
+    color: #0b3c5d;
+}
+
+.card-clinica {
+    border-radius: 10px;
+    border: 1px solid #e6edf2;
+}
+
+.table-clinica th {
+    background-color: #f4f7f9;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0b3c5d;
+}
+
+.table-clinica td {
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.btn-clinico {
+    background-color: #0b3c5d;
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-weight: 600;
+}
+
+.btn-clinico:hover {
+    background-color: #092f48;
+    color: #fff;
+}
+
+.btn-outline-clinico {
+    border: 1px solid #0b3c5d;
+    color: #0b3c5d;
+}
+
+.btn-outline-clinico:hover {
+    background-color: #0b3c5d;
+    color: #fff;
+}
+
 </style>
