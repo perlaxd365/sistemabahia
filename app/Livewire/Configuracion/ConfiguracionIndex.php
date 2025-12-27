@@ -15,7 +15,7 @@ class ConfiguracionIndex extends Component
     public $nombre_tipo_servicio, $id_tipo_servicio, $id_subtipo_servicio, $nombre_subtipo_servicio, $nombre_servicio, $precio_servicio;
     protected $paginationTheme = "bootstrap";
     public $show;
-
+    public $tabActivo = 'servicios';
     public function mount()
     {
         $this->show = 100;
@@ -60,6 +60,7 @@ class ConfiguracionIndex extends Component
             ['type' => 'success', 'title' => 'Se registro el tipo de servicio', 'message' => 'Exito']
         );
         $this->default();
+        $this->tabActivo = 'tipos'; // o el tab actual
     }
 
     public function default()
@@ -114,6 +115,7 @@ class ConfiguracionIndex extends Component
             ['type' => 'success', 'title' => 'Se registro el Sub tipo de servicio', 'message' => 'Exito']
         );
         $this->default();
+        $this->tabActivo = 'subtipos'; // o el tab actual
     }
 
     public function delete_subtipo_servicio($id_subtipo_servicio)
@@ -162,6 +164,7 @@ class ConfiguracionIndex extends Component
             ['type' => 'success', 'title' => 'Se registro el servicio correctamente', 'message' => 'Exito']
         );
         $this->default();
+        $this->tabActivo = 'servicios'; // o el tab actual
     }
 
     public function delete_servicio($id_servicio)

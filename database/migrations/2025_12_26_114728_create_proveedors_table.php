@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('proveedors', function (Blueprint $table) {
             $table->bigIncrements('id_proveedor');
             $table->string('razon_social');
-            $table->string('ruc', 11)->nullable();
+            $table->string('ruc', 12)->nullable();
             $table->string('telefono')->nullable();
             $table->string('email')->nullable();
             $table->string('direccion')->nullable();

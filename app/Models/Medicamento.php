@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Medicamento extends Model
 {
-    //  use HasFactory;
+    //  
+    use HasFactory;
     protected $name = "medicamentos";
     protected $primaryKey = 'id_medicamento';
     protected $fillable = [
@@ -14,6 +16,7 @@ class Medicamento extends Model
         'nombre',
         'presentacion',
         'concentracion',
+        'marca',
         'stock',
         'precio_venta',
         'fecha_vencimiento',

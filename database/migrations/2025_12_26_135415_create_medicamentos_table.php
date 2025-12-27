@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('concentracion')->nullable(); // 500mg, 5mg/ml
 
             $table->integer('stock')->nullable()->default(0);
-            $table->decimal('precio_venta', 10, 2)->default(0);
+            $table->decimal('precio_venta', 10, 2)->nullable()->default(0);
 
             $table->string('marca')->nullable();
             $table->string('fecha_vencimiento')->nullable();

@@ -6,13 +6,13 @@ use Livewire\Component;
 
 class FarmaciaIndex extends Component
 {
-    public $tab = 'medicamentos';
+    public $tab = 'dashboard';
 
     protected $queryString = ['tab'];
 
     public function mount()
     {
-        $this->tab = request()->query('tab', 'medicamentos');
+        $this->tab = request()->query('tab', 'dashboard');
     }
 
     public function setTab($tab)

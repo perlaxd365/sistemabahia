@@ -5,6 +5,13 @@
 
         <li class="nav-item">
             <a href="#"
+               class="nav-link {{ $tab === 'dashboard' ? 'active' : '' }}"
+               wire:click.prevent="setTab('dashboard')">
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#"
                class="nav-link {{ $tab === 'medicamentos' ? 'active' : '' }}"
                wire:click.prevent="setTab('medicamentos')">
                 Medicamentos
@@ -33,7 +40,9 @@
     <div class="card card-clinica">
         <div class="card-body">
 
-            @if($tab === 'medicamentos')
+            @if($tab === 'dashboard')
+                <livewire:farmacia.dashboard />
+            @elseif($tab === 'medicamentos')
                 <livewire:farmacia.medicamentos />
             @elseif($tab === 'proveedores')
                 <livewire:farmacia.proveedores />

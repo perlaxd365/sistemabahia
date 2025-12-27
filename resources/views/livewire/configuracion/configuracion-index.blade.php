@@ -2,27 +2,26 @@
     <div id="clasepadre">
         <div class="form-wrap">
             <form id="survey-form">
-                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <ul  class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home"
+                            <a class="nav-link {{ $tabActivo === 'servicios' ? 'active' : '' }}" id="pills-home-tab" data-toggle="pill" href="#pills-home"
                                 role="tab" aria-controls="pills-home" aria-selected="true">Servicios
                                 <b>({{ count($lista_servicios) }})</b></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile"
+                            <a class="nav-link {{ $tabActivo === 'subtipos' ? 'active' : '' }}" id="pills-profile-tab" data-toggle="pill" href="#pills-profile"
                                 role="tab" aria-controls="pills-profile" aria-selected="false">Sub Tipos de
                                 Servicios
                                 <b>({{ count($lista_sub_tipos_servicios) }})</b></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact"
+                            <a class="nav-link {{ $tabActivo === 'tipos' ? 'active' : '' }}" id="pills-contact-tab" data-toggle="pill" href="#pills-contact"
                                 role="tab" aria-controls="pills-contact" aria-selected="false"> Tipos de Servicios
                                 <b>({{ count($lista_tipos_servicios) }})</b></a>
                         </li>
                     </ul>
-
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                    <div wire:ignore.self class="tab-pane fade show {{ $tabActivo === 'servicios' ? 'active' : '' }}" id="pills-home" role="tabpanel"
                         aria-labelledby="pills-home-tab">
                         {{-- inicio de servicios --}}
                         <h4>Servicios</h4>
@@ -118,7 +117,7 @@
 
 
                     </div>
-                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                    <div wire:ignore.self class="tab-pane fade {{ $tabActivo === 'subtipos' ? 'active' : '' }}" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
                         {{-- Inicio de sub tipos de servicios --}}
                         <h4>Sub tipos de servicios</h4>
                         <hr>
@@ -198,7 +197,7 @@
 
 
                     </div>
-                    <div class="tab-pane fade" id="pills-contact" role="tabpanel"
+                    <div wire:ignore.self class="tab-pane fade {{ $tabActivo === 'tipos' ? 'active' : '' }}" id="pills-contact" role="tabpanel"
                         aria-labelledby="pills-contact-tab">
 
 
