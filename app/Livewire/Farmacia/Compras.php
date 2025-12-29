@@ -43,7 +43,7 @@ class Compras extends Component
                         ->orWhere('fecha_compra', 'like', '%' . $this->search . '%');
                 });
             })
-            ->orderBy('fecha_compra', 'desc')
+            ->orderBy('compras.created_at', 'desc')
             ->paginate($this->show);
         return view('livewire.farmacia.compras', compact('proveedores', 'medicamentos', 'compras'));
     }
@@ -126,16 +126,20 @@ class Compras extends Component
     public function guardarCompra()
     {
         foreach ($this->detalle as $i => $item) {
-            $cantidad = max(1, (int) $item['cantidad']);
-            $precio   = max(0, (float) $item['precio']);
 
-            if ($cantidad < 1 || $precio < 1) {
+            $cantidad = (int) $item['cantidad'];
+            $precio   = (float) $item['precio'];
 
+            if ($cantidad <= 0 || $precio <= 0) {
                 $this->dispatch(
                     'alert',
-                    ['type' => 'info', 'title' => "Por favor llenar las cantidades y precio de todos los productos", 'message' => 'Exito']
+                    [
+                        'type' => 'warning',
+                        'title' => 'Datos inválidos',
+                        'message' => 'La cantidad y el precio deben ser mayores a cero'
+                    ]
                 );
-                return; // 👈 CLAVE
+                return;
             }
         }
 
@@ -230,5 +234,64 @@ class Compras extends Component
                 'compra_' . $compra->fecha_compra . '.pdf'
             );
         }
+    }
+
+
+    public $mostrarModalAnular = false;
+    public $compraIdAnular;
+    public $motivoAnulacion = '';
+    public $compraAnular;
+    public $detalleAnular = [];
+
+    public function abrirModalAnular($idCompra)
+    {
+        $this->id_compra = $idCompra;
+        $this->compraAnular = Compra::with('detalles.medicamento')
+            ->where('id_compra', $idCompra)
+            ->firstOrFail();
+
+        $this->detalleAnular = $this->compraAnular->detalles;
+        $this->motivoAnulacion = '';
+        $this->mostrarModalAnular = true;
+    }
+
+
+
+    public function confirmarAnulacion()
+    {
+        if (!$this->motivoAnulacion) {
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'title' => 'Motivo requerido',
+                'message' => 'Debe ingresar un motivo de anulación'
+            ]);
+            return;
+        }
+
+        DB::transaction(function () {
+
+
+            foreach ($this->compraAnular->detalles as $det) {
+
+                $med = $det->medicamento;
+
+                $med->stock -= $det->cantidad; // ✅ RESTAR
+                $med->save();
+            }
+
+            $this->compraAnular->estado = 'ANULADA';
+            $this->compraAnular->motivo_anulacion = $this->motivoAnulacion;
+            $this->compraAnular->fecha_anulacion = now();
+            $this->compraAnular->user_anulacion = auth()->user()->id;
+            $this->compraAnular->save();
+        });
+
+        $this->mostrarModalAnular = false;
+
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'title' => 'Compra anulada',
+            'message' => 'El stock fue revertido correctamente'
+        ]);
     }
 }

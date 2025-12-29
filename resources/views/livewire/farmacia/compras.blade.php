@@ -153,7 +153,7 @@
                                     <th>Marca / Laboratorio</th>
                                     <th>Concentración</th>
                                     <th width="120">Cantidad</th>
-                                    <th width="140">Precio Compra</th>
+                                    <th width="140">Precio Unitario Compra</th>
                                     <th width="140">Subtotal</th>
                                     <th width="60"></th>
                                 </tr>
@@ -350,6 +350,12 @@
                                 <i class="fa fa-print"></i>
                                 PDF
                             </button>
+                            @if ($compra->estado === 'ACTIVA')
+                                <button class="btn btn-sm btn-outline-danger"
+                                    wire:click="abrirModalAnular({{ $compra->id_compra }})">
+                                    Anular
+                                </button>
+                            @endif
                         </td>
                     </tr>
 
@@ -388,9 +394,74 @@
             </tbody>
         </table>
         <div wire:ignore.self class="card-footer text-right">
-            {{$compras->links(data: ['scrollTo' => false]) }}
+            {{ $compras->links(data: ['scrollTo' => false]) }}
         </div>
 
+    @endif
+    @if ($mostrarModalAnular)
+        <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,.5)">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                    <!-- HEADER -->
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">⚠️ Anular Compra #{{ $compraAnular->id_compra }}</h5>
+                        <button type="button" class="btn-close"
+                            wire:click="$set('mostrarModalAnular', false)"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+
+                        <div class="alert alert-warning small">
+                            Esta acción revertirá el stock de los siguientes medicamentos.
+                        </div>
+
+                        <!-- TABLA DETALLE -->
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Medicamento</th>
+                                    <th class="text-center">Cantidad a revertir</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($detalleAnular as $det)
+                                    <tr>
+                                        <td>{{ $det->medicamento->nombre }}</td>
+                                        <td class="text-center fw-bold text-danger">
+                                            - {{ $det->cantidad }}
+                                        </td>
+                                        <td>{{ $det->precio }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <!-- MOTIVO -->
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">Motivo de anulación</label>
+                            <textarea class="form-control" rows="3" wire:model.defer="motivoAnulacion"
+                                placeholder="Ingrese el motivo obligatorio"></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" wire:click="$set('mostrarModalAnular', false)">
+                            Cancelar
+                        </button>
+
+                        <button class="btn btn-danger" wire:click="confirmarAnulacion">
+                            Confirmar Anulación
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     @endif
 
 

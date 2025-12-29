@@ -17,6 +17,9 @@ class Compra extends Model
         'fecha_compra',
         'tipo_documento',
         'nro_documento',
+        'motivo_anulacion',
+        'fecha_anulacion',
+        'user_anulacion',
         'estado',
         'total'
     ];

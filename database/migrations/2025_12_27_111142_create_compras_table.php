@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('nro_documento')->nullable();
             $table->decimal('total', 12, 2)->default(0);
             $table->enum('estado', ['ACTIVA', 'ANULADA'])->default('ACTIVA');
+            $table->string('user_anulacion')->nullable();
             $table->text('motivo_anulacion')->nullable();
             $table->timestamp('fecha_anulacion')->nullable();
             $table->timestamps();
