@@ -151,6 +151,29 @@ class Consulta extends Component
         );
     }
 
+    // Se ejecuta SOLO cuando cambia el peso
+    public function updatedPesoConsulta()
+    {
+        $this->calcularImc();
+    }
+
+    // Se ejecuta SOLO cuando cambia la talla
+    public function updatedTallaConsulta()
+    {
+        $this->calcularImc();
+    }
+
+    public function calcularImc()
+    {
+        if ($this->peso_consulta > 0 && $this->talla_consulta > 0) {
+            $this->imc_consulta = round(
+                $this->peso_consulta / ($this->talla_consulta * $this->talla_consulta),
+                2
+            );
+        } else {
+            $this->imc_consulta = null;
+        }
+    }
     public function printConsulta()
     {
 

@@ -113,18 +113,29 @@
             margin-left: 6px;
         }
     </style>
-    <div id="survey-form" class="container-fluid px-3 my-2 container">
 
-        <div class="card p-4">
-            <div class="card-header bg-white border-bottom">
-                <h6 class="mb-0 text-primary fw-semibold">
+<div class="card border-0 shadow-sm mt-3">
+
+        <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-clinico mr-2">
+                    <i class="fa fa-notes-medical fa-lg"></i> 
+                </div>
+
+                <div>
+                    <div class="fw-semibold text-clinico">
                     Consulta Médica para <b>{{ $nombre_paciente }}</b>
-                </h6>
-                <small class="text-muted">
-                    Control de Consulta
-                </small>
+                    </div>
+                    <div class="small text-muted">
+                        Registro histórico de medicamentos entregados en esta atención
+                    </div>
+                </div>
             </div>
+
         </div>
+<br>
+
         <!-- MOTIVO DE CONSULTA -->
         <div class="hc-card">
             <div class="hc-header">Enfermedad Actual</div>
@@ -184,11 +195,11 @@
             <div class="hc-body row g-2">
                 <div class="col-md-2">
                     <label>Peso</label>
-                    <input type="number" class="form-control vital" wire:model="peso_consulta">
+                    <input type="number" class="form-control vital" wire:model.live="peso_consulta">
                 </div>
                 <div class="col-md-2">
                     <label>Talla</label>
-                    <input type="number" class="form-control vital" wire:model="talla_consulta">
+                    <input type="number" class="form-control vital" wire:model.live="talla_consulta">
                 </div>
                 <div class="col-md-2">
                     <label>IMC</label>

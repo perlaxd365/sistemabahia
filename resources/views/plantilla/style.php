@@ -1504,4 +1504,34 @@
     color: #fff;
 }
 
+.text-clinico {
+    color: #0b3c5d; /* azul clínico */
+    letter-spacing: .2px;
+}
+
+.icon-clinico {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: #e9f2f9;
+    color: #0b3c5d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.btn-toggle-clinico {
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    border: 1px solid #cfe2f3;
+    background-color: #fff;
+    color: #0b3c5d;
+}
+
+.btn-toggle-clinico:hover {
+    background-color: #f1f7fb;
+}
+
 </style>
