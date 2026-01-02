@@ -4,9 +4,11 @@ namespace App\Livewire\Farmacia;
 
 use App\Models\Compra;
 use App\Models\DetalleCompra;
+use App\Models\KardexMedicamento;
 use App\Models\Medicamento;
 use App\Models\Proveedor;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -173,10 +175,32 @@ class Compras extends Component
                     'subtotal'       => $item['subtotal'],
                 ]);
 
+                $medicamento = Medicamento::find($item['id_medicamento']);
+
+
+                $stockAnterior = $medicamento->stock;
+                $stockNuevo    = $stockAnterior + $item['cantidad'];
+
+
                 // 3️⃣ ACTUALIZAR STOCK
                 Medicamento::where('id_medicamento', $item['id_medicamento'])
                     ->increment('stock', $item['cantidad']);
+
+                // Registrar kardex
+                KardexMedicamento::create([
+                    'id_medicamento'  => $item['id_medicamento'],
+                    'id_compra'       => $compra->id_compra,
+                    'tipo_movimiento' => 'ENTRADA',
+                    'cantidad'        => $cantidad,
+                    'stock_anterior'  => $stockAnterior,
+                    'stock_actual'    => $stockNuevo,
+                    'descripcion'     => 'Ingreso por compra',
+                    'user_id'         => auth()->user()->id,
+                ]);
             }
+
+            // ACTUALIZACION DE KARDEX
+
 
             DB::commit();
 
@@ -276,6 +300,36 @@ class Compras extends Component
                 $med = $det->medicamento;
 
                 $med->stock -= $det->cantidad; // ✅ RESTAR
+
+
+                
+            //kardex 
+            $medicamento = Medicamento::find($med->id_medicamento);
+
+            $stockAnterior = $medicamento->stock;
+
+            if ($stockAnterior < $det->cantidad) {
+                throw new Exception('Stock insuficiente');
+            }
+
+            $stockNuevo = $stockAnterior - $det->cantidad;
+
+            // Actualizar stock
+           
+            $stockAnterior = $medicamento->stock;
+            // Registrar kardex
+            KardexMedicamento::create([
+                'id_medicamento'  => $med->id_medicamento,
+                'id_compra'     => $this->id_compra,
+                'tipo_movimiento' => 'SALIDA',
+                'cantidad'        => $det->cantidad,
+                'stock_anterior'  => $stockAnterior,
+                'stock_actual'     => $stockNuevo,
+                'descripcion'     => 'Anulacion de compra',
+                'user_id'         => auth()->user()->id,
+            ]);
+
+
                 $med->save();
             }
 

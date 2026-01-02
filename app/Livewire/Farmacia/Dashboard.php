@@ -3,6 +3,7 @@
 namespace App\Livewire\Farmacia;
 
 use App\Models\Compra;
+use App\Models\KardexMedicamento;
 use App\Models\Medicamento;
 use App\Models\Proveedor;
 use Livewire\Component;
@@ -16,6 +17,7 @@ class Dashboard extends Component
             'stockBajo' => Medicamento::where('stock', '<=', 10)->count(),
             'comprasHoy' => Compra::whereDate('fecha_compra', today())->count(),
             'totalProveedores' => Proveedor::count(),
+            'totalKardex' => KardexMedicamento::count(),
             /* 'totalProveedores' => VentasHoy::count() */
             
         ]);

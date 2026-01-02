@@ -55,6 +55,18 @@
                 </div>
             </div>
 
+            <!-- KARDEX -->
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <small class="text-muted">Kardex</small>
+                        <h3 class="fw-bold text-secondary">
+                            {{ $totalKardex }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>

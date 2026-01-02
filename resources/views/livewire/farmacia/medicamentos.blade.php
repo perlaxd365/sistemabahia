@@ -131,7 +131,7 @@
                                 <tbody>
                                     @forelse ($medicamentos as $med)
                                         <tr>
-                                            <td>{{ $med->id }}</td>
+                                            <td>{{ $med->id_medicamento }}</td>
                                             <td class="fw-semibold">{{ $med->nombre }}</td>
                                             <td>{{ $med->presentacion }}</td>
                                             <td>{{ $med->marca }}</td>

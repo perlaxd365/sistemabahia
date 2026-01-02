@@ -34,6 +34,14 @@
             </a>
         </li>
 
+        <li class="nav-item">
+            <a href="#"
+               class="nav-link {{ $tab === 'kardex' ? 'active' : '' }}"
+               wire:click.prevent="setTab('kardex')">
+                Kardex
+            </a>
+        </li>
+
     </ul>
 
     <!-- ===== CONTENIDO DINÁMICO ===== -->
@@ -48,6 +56,8 @@
                 <livewire:farmacia.proveedores />
             @elseif($tab === 'compras')
                 <livewire:farmacia.compras />
+            @elseif($tab === 'kardex')
+                <livewire:farmacia.kardex />
             @endif
 
         </div>

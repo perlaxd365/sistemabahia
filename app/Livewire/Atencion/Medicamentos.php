@@ -5,8 +5,10 @@ namespace App\Livewire\Atencion;
 use App\Models\Atencion;
 use App\Models\AtencionMedicamento;
 use App\Models\Consulta;
+use App\Models\KardexMedicamento;
 use App\Models\Medicamento;
 use App\Models\User;
+use Exception;
 use Livewire\Component;
 
 class Medicamentos extends Component
@@ -126,8 +128,34 @@ class Medicamentos extends Component
                 'subtotal' => $item['subtotal'],
             ]);
 
+
+
+            //kardex 
+            $medicamento = Medicamento::find($item['id_medicamento']);
+
+            $stockAnterior = $medicamento->stock;
+
+            if ($stockAnterior < $item['cantidad']) {
+                throw new Exception('Stock insuficiente');
+            }
+
+            $stockNuevo = $stockAnterior - $item['cantidad'];
+
+            // Actualizar stock
             Medicamento::where('id_medicamento', $item['id_medicamento'])
                 ->decrement('stock', $item['cantidad']);
+
+            // Registrar kardex
+            KardexMedicamento::create([
+                'id_medicamento'  => $item['id_medicamento'],
+                'id_atencion'     => $this->id_atencion,
+                'tipo_movimiento' => 'SALIDA',
+                'cantidad'        => $item['cantidad'],
+                'stock_anterior'  => $stockAnterior,
+                'stock_actual'     => $stockNuevo,
+                'descripcion'     => 'Dispensación en atención médica',
+                'user_id'         => auth()->user()->id,
+            ]);
         }
 
         $this->detalle = [];

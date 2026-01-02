@@ -10,7 +10,7 @@
 
                 <div>
                     <div class="fw-semibold text-clinico">
-                        Tratamiento indicado por el médico para <b>{{$nombre_paciente}}</b>
+                        Tratamiento indicado por el médico para <b>{{$nombre_paciente}} </b>
                     </div>
                     <hr>
                     <div class="small text-muted">
