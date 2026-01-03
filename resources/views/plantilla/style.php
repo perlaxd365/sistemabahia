@@ -1448,7 +1448,7 @@
         margin: 0;
     }
 
-   /*  tabs clinico */
+    /*  tabs clinico */
     .nav-clinico .nav-link {
         color: #0b3c5d;
         font-weight: 600;
@@ -1460,78 +1460,107 @@
         background-color: #0b3c5d;
         color: #fff;
     }
+
     .text-clinico {
-    color: #0b3c5d;
-}
+        color: #0b3c5d;
+    }
 
-.card-clinica {
-    border-radius: 10px;
-    border: 1px solid #e6edf2;
-}
+    .card-clinica {
+        border-radius: 10px;
+        border: 1px solid #e6edf2;
+    }
 
-.table-clinica th {
-    background-color: #f4f7f9;
-    font-size: 13px;
-    font-weight: 600;
-    color: #0b3c5d;
-}
+    .table-clinica th {
+        background-color: #f4f7f9;
+        font-size: 13px;
+        font-weight: 600;
+        color: #0b3c5d;
+    }
 
-.table-clinica td {
-    font-size: 13px;
-    vertical-align: middle;
-}
+    .table-clinica td {
+        font-size: 13px;
+        vertical-align: middle;
+    }
 
-.btn-clinico {
-    background-color: #0b3c5d;
-    color: #fff;
-    border-radius: 6px;
-    padding: 6px 16px;
-    font-weight: 600;
-}
+    .btn-clinico {
+        background-color: #0b3c5d;
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 16px;
+        font-weight: 600;
+    }
 
-.btn-clinico:hover {
-    background-color: #092f48;
-    color: #fff;
-}
+    .btn-clinico:hover {
+        background-color: #092f48;
+        color: #fff;
+    }
 
-.btn-outline-clinico {
-    border: 1px solid #0b3c5d;
-    color: #0b3c5d;
-}
+    .btn-outline-clinico {
+        border: 1px solid #0b3c5d;
+        color: #0b3c5d;
+    }
 
-.btn-outline-clinico:hover {
-    background-color: #0b3c5d;
-    color: #fff;
-}
+    .btn-outline-clinico:hover {
+        background-color: #0b3c5d;
+        color: #fff;
+    }
 
-.text-clinico {
-    color: #0b3c5d; /* azul clínico */
-    letter-spacing: .2px;
-}
+    .text-clinico {
+        color: #0b3c5d;
+        /* azul clínico */
+        letter-spacing: .2px;
+    }
 
-.icon-clinico {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
-    background: #e9f2f9;
-    color: #0b3c5d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-}
+    .icon-clinico {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: #e9f2f9;
+        color: #0b3c5d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
 
-.btn-toggle-clinico {
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    border: 1px solid #cfe2f3;
-    background-color: #fff;
-    color: #0b3c5d;
-}
+    .btn-toggle-clinico {
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        border: 1px solid #cfe2f3;
+        background-color: #fff;
+        color: #0b3c5d;
+    }
 
-.btn-toggle-clinico:hover {
-    background-color: #f1f7fb;
-}
+    .btn-toggle-clinico:hover {
+        background-color: #f1f7fb;
+    }
 
+    /* laboratorio */
+    .orden-lab {
+        font-size: 13px;
+        background: white;
+    }
+
+    .orden-lab hr {
+        border-top: 1px solid #000;
+    }
+
+    .orden-lab .form-check {
+        margin-bottom: 3px;
+    }
+
+    .orden-lab strong {
+        font-size: 13px;
+    }
+
+    @media print {
+        body {
+            background: white;
+        }
+
+        .orden-lab {
+            padding: 0;
+        }
+    }
 </style>
