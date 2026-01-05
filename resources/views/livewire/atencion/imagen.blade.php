@@ -4,7 +4,7 @@
         {{-- ENCABEZADO --}}
         <div class="text-center mb-3">
             <img src="{{ asset('images/logo-clinica.png') }}" height="60">
-            <h4 class="mt-2 fw-bold">ORDEN DE LABORATORIO</h4>
+            <h4 class="mt-2 fw-bold">ORDEN DE IMAGEN</h4>
         </div>
 
         {{-- DATOS PACIENTE --}}

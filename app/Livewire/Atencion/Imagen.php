@@ -4,10 +4,10 @@ namespace App\Livewire\Atencion;
 
 use Livewire\Component;
 
-class Tomografia extends Component
+class Imagen extends Component
 {
     public function render()
     {
-        return view('livewire.atencion.tomografia');
+        return view('livewire.atencion.imagen');
     }
 }

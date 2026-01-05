@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\LaboratorioArea;
+use App\Models\LaboratorioExamen;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +15,6 @@ class LaboratorioExamenesSeeder extends Seeder
      */
     public function run(): void
     {
-         $areas = DB::table('laboratorio_areas')->pluck('id_area', 'nombre');
-
         $examenes = [
 
             // 🧪 BIOQUÍMICA
@@ -114,13 +114,59 @@ class LaboratorioExamenesSeeder extends Seeder
             ['area' => 'Otros', 'nombre' => 'Prueba de Parche'],
         ];
 
+        $areas = DB::table('laboratorio_areas')->pluck('id_area', 'nombre');
+
         foreach ($examenes as $examen) {
             DB::table('laboratorio_examens')->insert([
                 'id_area' => $areas[$examen['area']],
                 'nombre' => $examen['nombre'],
+                'tipo_examen' => 'LABORATORIO',
                 'activo' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ]);
+        }
+
+        $area = LaboratorioArea::firstOrCreate([
+            'nombre' => 'Rayos X',
+            'codigo' => 'RX',
+        ]);
+
+        $examenes = [
+            'RX Cráneo',
+            'RX Huesos propios de la nariz',
+            'RX Maxilares',
+            'RX Senos paranasales',
+            'RX Tórax',
+            'RX Esternón',
+            'RX Parrilla costal',
+            'RX Mano',
+            'RX Muñeca',
+            'RX Antebrazo',
+            'RX Codo',
+            'RX Columna vertebral',
+            'RX Columna dorsal',
+            'RX Columna cervical',
+            'RX Fémur',
+            'RX Húmero',
+            'RX Hombro y clavícula',
+            'RX Omóplato y clavícula',
+            'RX Pie',
+            'RX Tobillo',
+            'RX Rodilla',
+            'RX Rodilla COM',
+            'RX Pelvis',
+            'RX Cadera',
+            'RX Lumbosacro',
+            'RX Sacrococcígea',
+        ];
+
+        foreach ($examenes as $nombre) {
+            LaboratorioExamen::firstOrCreate([
+                'id_area' => $area->id_area,
+                'nombre' => $nombre,
+                'tipo_examen' => 'IMAGEN',
+                'activo' => true,
             ]);
         }
     }

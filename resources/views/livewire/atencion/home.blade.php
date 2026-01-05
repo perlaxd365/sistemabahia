@@ -34,16 +34,8 @@
                                     wire:click="cambiarTab('laboratorio')">Laboratorio</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'rayos' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('rayos')">Rayos X</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'ecografia' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('ecografia')">Ecografía</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'tomografia' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('tomografia')">Tomografía</a>
+                                <a class="nav-link {{ $tab == 'imagen' ? 'active' : '' }}"
+                                    wire:click="cambiarTab('imagen')">Imágen</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ $tab == 'insumos' ? 'active' : '' }}"
