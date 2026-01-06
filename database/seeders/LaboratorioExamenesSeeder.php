@@ -120,7 +120,6 @@ class LaboratorioExamenesSeeder extends Seeder
             DB::table('laboratorio_examens')->insert([
                 'id_area' => $areas[$examen['area']],
                 'nombre' => $examen['nombre'],
-                'tipo_examen' => 'LABORATORIO',
                 'activo' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -165,7 +164,6 @@ class LaboratorioExamenesSeeder extends Seeder
             LaboratorioExamen::firstOrCreate([
                 'id_area' => $area->id_area,
                 'nombre' => $nombre,
-                'tipo_examen' => 'IMAGEN',
                 'activo' => true,
             ]);
         }
