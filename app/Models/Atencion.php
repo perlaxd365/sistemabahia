@@ -22,4 +22,21 @@ class Atencion extends Model
         'fecha_fin_atencion',
         'estado_atencion'
     ];
+
+
+    public function paciente()
+    {
+        return $this->belongsTo(
+            User::class,
+            'id_paciente',
+            'id'
+        );
+    }
+    public function historia()
+    {
+        return $this->belongsTo(
+            Historia::class,
+            'id_historia'
+        );
+    }
 }

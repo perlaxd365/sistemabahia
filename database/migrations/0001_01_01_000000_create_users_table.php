@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('privilegio_cargo')->comment('privilegio del cargo');
             $table->text('direccion')->nullable();
             $table->string('foto_url')->nullable();
+            $table->string('firma_url')->nullable()->comment('Firma digital del médico / laboratorista');
             $table->string('telefono')->nullable();
             $table->string('password');
             $table->rememberToken();
@@ -33,11 +34,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->boolean('estado_user');
-             
-     
         });
 
-        
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

@@ -354,6 +354,13 @@ return [
             'label' => 6,
             'label_color' => 'success',
         ],
+        [
+            'text' => 'Laboratorio',
+            'url' => 'laboratorio/ordenes',
+            'icon' => 'fa fa-atom',
+            'label' => 3,
+            'label_color' => 'info',
+        ],
 
         ['header' => 'account_settings'],
         [

@@ -4,6 +4,7 @@ use App\Http\Controllers\AtencionController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\LaboratorioController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
@@ -46,5 +47,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('proveedor', [ProveedorController::class, 'index'])->name('proveedor');
     //FARMACIA
     Route::get('farmacia', [FarmaciaController::class, 'index'])->name('farmacia');
-
+    //LABORATORIO
+    Route::get('laboratorio/ordenes', [LaboratorioController::class, 'ordenes'])->name('laboratorio.ordenes');
+    Route::get('laboratorio/ordenes/{id_orden}/resultados', [LaboratorioController::class, 'resultados'])->name('laboratorio.resultados');
+    
 });

@@ -4,17 +4,19 @@
         {{-- ENCABEZADO --}}
         <div class="card border-0 shadow-sm mb-3">
 
-            <!-- CABECERA -->
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="mb-0 text-primary">
-                        <i class="fa fa-x-ray me-1"></i> Órdenes de Imágenes
-                    </h6>
-                    <small class="text-muted">
-                        Resumen de estudios solicitados en esta atención
-                    </small>
+            @if ($ordenesImagen->count())
+                <!-- CABECERA -->
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0 text-primary">
+                            <i class="fa fa-x-ray me-1"></i> Órdenes de Imágenes
+                        </h6>
+                        <small class="text-muted">
+                            Resumen de estudios solicitados en esta atención
+                        </small>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <div class="card-body p-2">
 
@@ -40,7 +42,7 @@
                                 </span>
                             </div>
                             <!-- ESTUDIOS -->
-                            
+
                             <p>- Diagnóstico: {{ $orden->diagnostico }}</p>
                             <p>- Examenes solicitados:</p>
                             <ul class="mt-2 mb-0 ps-3 small">

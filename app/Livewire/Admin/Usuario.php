@@ -16,9 +16,11 @@ class Usuario extends Component
     public $showDetail = false;
     public $privilegio_actual;
     ////// image
-
     public $file;
     public $url;
+
+    ////// firma
+    public $firma_url, $firma_url_update;
 
     use  WithPagination, WithoutUrlPagination, WithFileUploads;
     protected $paginationTheme = "bootstrap";
@@ -134,6 +136,15 @@ class Usuario extends Component
             $url = "";
         }
 
+        if ($this->firma_url) {
+
+            $path_firma = Storage::disk('cloudinary')->put('firma_url', $this->firma_url);
+
+            $url_firma = Storage::disk('cloudinary')->url($path_firma);
+        } else {
+            $url_firma = "";
+        }
+
         if ($this->privilegio_actual != 1) {
             # code...
             $this->email = $this->dni . "@clinicabahia.pe";
@@ -156,6 +167,7 @@ class Usuario extends Component
             'colegiatura_cargo' => $this->colegiatura_cargo,
             'privilegio_cargo' => $privilegio,
             'foto_url' => $url,
+            'firma_url' => $url_firma,
             'estado_user' => true,
         ]);
 
@@ -184,6 +196,8 @@ class Usuario extends Component
         $this->colegiatura_cargo = '';
         $this->foto_url = '';
         $this->foto_url_update = '';
+        $this->firma_url = '';
+        $this->firma_url_update = '';
         $this->table = true;
         $this->view = 'create';
         $this->dispatch('gotoTop');
@@ -214,6 +228,7 @@ class Usuario extends Component
         $this->especialidad_cargo = $user->especialidad_cargo;
         $this->colegiatura_cargo = $user->colegiatura_cargo;
         $this->foto_url = $user->foto_url;
+        $this->firma_url = $user->firma_url;
 
         $this->dispatch('gotoTop');
         $this->resetErrorBag();
@@ -297,6 +312,15 @@ class Usuario extends Component
             $url = Storage::disk('cloudinary')->url($path);
             $user->update([
                 'foto_url' => $url,
+            ]);
+        }
+
+        if ($this->firma_url_update) {
+
+            $path_firma = Storage::disk('cloudinary')->put('foto_perfil', $this->firma_url_update);
+            $url_firma = Storage::disk('cloudinary')->url($path_firma);
+            $user->update([
+                'firma_url' => $url_firma,
             ]);
         }
 

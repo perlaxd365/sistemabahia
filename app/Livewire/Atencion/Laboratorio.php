@@ -99,6 +99,7 @@ class Laboratorio extends Component
             $orden = OrdenLaboratorio::create([
                 'id_atencion' => $this->id_atencion,
                 'fecha'       => now(),
+                'solicitante' => auth()->user()->id,
                 'diagnostico' => $this->diagnostico ?? null,
                 'estado'      => 'PENDIENTE'
             ]);

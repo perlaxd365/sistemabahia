@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('diagnostico')->nullable();
             $table->enum('estado', ['PENDIENTE', 'PROCESO', 'FINALIZADO','ANULADO'])->default('PENDIENTE');
             $table->timestamps();
-
+            $table->string('solicitante')->nullable();
+            $table->string('profesional')->nullable();
             $table->foreign('id_atencion')
                 ->references('id_atencion')
                 ->on('atencions');

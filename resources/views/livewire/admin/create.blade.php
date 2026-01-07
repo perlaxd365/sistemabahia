@@ -57,6 +57,16 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="name-label" for="firma_url">Firma Profesional</label>
+                                <input type="file" wire:model='firma_url' accept="image/x-png,image/gif,image/jpeg"
+                                    placeholder="Adjuntar firma" class="form-control" required>
+                                @error('firma_url')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
                     @endif
 
                     <div class="col-md-6">

@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('laboratorio_resultados', function (Blueprint $table) {
             $table->bigIncrements('id_resultado');
             $table->unsignedBigInteger('id_detalle_laboratorio');
-            $table->string('resultado')->nullable();
+            $table->longText('resultado')->nullable();
             $table->string('observacion')->nullable();
             $table->date('fecha_resultado')->nullable();
             $table->timestamps();

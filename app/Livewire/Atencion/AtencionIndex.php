@@ -138,7 +138,8 @@ class AtencionIndex extends Component
         );
 
         $this->default();
-        $this->step = 1;
+        // ✅ Redireccionar a a tencion
+        
         return redirect()->route('atencion');
     }
 

@@ -83,6 +83,50 @@
 
 
 <script>
+    function iniciarCKEditors() {
+        document.querySelectorAll('textarea[id^="editor_"]').forEach(textarea => {
+
+            let id = textarea.id;
+
+            // SI NO EXISTE → CREAR
+            if (!CKEDITOR.instances[id]) {
+
+                CKEDITOR.replace(id);
+
+                CKEDITOR.instances[id].on('change', function() {
+
+                    let key = id.replace('editor_', '');
+
+                    let component = Livewire.find(
+                        textarea.closest('[wire\\:id]').getAttribute('wire:id')
+                    );
+
+                    component.set('resultados.' + key, this.getData());
+                });
+
+            }
+            // SI YA EXISTE → FORZAR CARGA DE DATOS
+            else {  
+                CKEDITOR.instances[id].setData(textarea.value);
+            }
+        });
+
+        CKEDITOR.config.versionCheck = false;
+    }
+
+    // Al cargar
+    document.addEventListener('DOMContentLoaded', iniciarCKEditors);
+
+    // DESPUÉS de cada render de Livewire
+    document.addEventListener('livewire:load', () => {
+        Livewire.hook('message.processed', () => {
+            iniciarCKEditors();
+        });
+    });
+    iniciarCKEditors();
+</script>
+</script>
+<script>
     function printEditor() {
         var contenido = CKEDITOR.instances.editor.getData();
         var ventana = window.open('', '', 'height=800,width=800');
@@ -123,9 +167,9 @@
         const latidos = datos.map(d => d.frecuencia_cardiaca);
 
 
-      
 
-    const ctx = canvas.getContext('2d');
+
+        const ctx = canvas.getContext('2d');
         graficoPresion = new Chart(canvas, {
             type: 'line',
             data: {
@@ -229,7 +273,7 @@
             return;
         }
         console.log('final:', graficoPresion.data.datasets)
-        
+
         graficoPresion.data.labels = signos.map(s =>
             new Date(s.fecha_signo.replace(' ', 'T')).toLocaleTimeString()
         );

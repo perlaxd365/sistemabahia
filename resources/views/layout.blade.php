@@ -4,10 +4,10 @@
 
 @section('content_header')
     @include('plantilla.style')
-    <header class="header" >
+    <header class="header">
         @include('plantilla.link')
-        <h1 id="title" class="text-center"> <a href="{{ route(Route::currentRouteName(), request()->route('id')) }}">@yield('title')</a>
-        </h1>   
+        <h1 id="title" class="text-center"> <a href="#">@yield('title')</a>
+        </h1>
         <p id="description" class="text-center">
             @yield('desc')
         </p>
@@ -25,7 +25,6 @@
 @section('css')
 
 @stop
-
 @section('js')
 
     @include('plantilla.script')
@@ -35,5 +34,6 @@
         console.log("Hi, I'm using the Laravel-AdminLTE package!");
     </script>
 
-@livewireScripts
+    @stack('scripts')
+    @livewireScripts
 @stop

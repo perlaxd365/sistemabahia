@@ -10,7 +10,7 @@ class LaboratorioExamen extends Model
 {
     //  
     use HasFactory;
-   
+
     protected $table = 'laboratorio_examens';
     protected $primaryKey = 'id_examen';
 
@@ -25,5 +25,10 @@ class LaboratorioExamen extends Model
     public function areas()
     {
         return $this->belongsTo(LaboratorioArea::class, 'id_area', 'id_area');
+    }
+    
+    public function getNombreExamenAttribute()
+    {
+        return $this->examenes?->nombre ?? $this->descripcion_manual;
     }
 }

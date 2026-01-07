@@ -38,6 +38,7 @@ class User extends Authenticatable
         'direccion',
         'telefono',
         'foto_url',
+        'firma_url',
         'password',
         'estado_user',
     ];

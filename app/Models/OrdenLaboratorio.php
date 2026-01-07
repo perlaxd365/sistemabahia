@@ -13,9 +13,20 @@ class OrdenLaboratorio extends Model
         'id_atencion',
         'fecha',
         'diagnostico',
+        'solicitante',
+        'profesional',
         'estado'
     ];
 
+    public function atencion()
+    {
+        return $this->belongsTo(
+            Atencion::class,
+            'id_atencion'
+        );
+    }
+
+    
     public function detalles()
     {
         return $this->hasMany(
@@ -24,3 +35,4 @@ class OrdenLaboratorio extends Model
         );
     }
 }
+
