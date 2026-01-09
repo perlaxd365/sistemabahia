@@ -45,7 +45,8 @@
         },
         "files": [
             "app/Util/DateUtil.php",
-            "app/Util/PacienteUtil.php"
+            "app/Util/PacienteUtil.php",
+            "app/Util/UserUtil.php"
         ]
     },
     "scripts": {

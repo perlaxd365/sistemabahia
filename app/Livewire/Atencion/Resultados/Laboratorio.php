@@ -6,6 +6,7 @@ use App\Models\Atencion;
 use App\Models\OrdenLaboratorio;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
+use UserUtil;
 
 class Laboratorio extends Component
 {
@@ -37,16 +38,29 @@ class Laboratorio extends Component
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
         //firma de laboratorista
-        
-        $path_firma = public_path('images/logo-clinica.png');
-        $type_firma = pathinfo($path_firma, PATHINFO_EXTENSION);
-        $data_firma = file_get_contents($path_firma);
-        $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+        $profesional = UserUtil::getUserByID($orden->profesional);
+
+        $firma_img = null;
+
+        if ($profesional && $profesional->firma_url) {
+
+            try {
+                $url = $profesional->firma_url;
+
+                $data_firma = file_get_contents($url);
+
+                $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+
+                $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+            } catch (\Exception $e) {
+                $firma_img = null;
+            }
+        }
 
         $pdf = Pdf::loadView(
             'reportes.resultados-laboratorio',
-            compact('orden','base64', 'paciente','base64')
-        )->setPaper('A4', 'landscape');
+            compact('orden', 'base64', 'paciente', 'base64', 'firma_img')
+        )->setPaper('A4'/* , 'landscape' */);
 
         return response()->streamDownload(
             fn() => print($pdf->output()),

@@ -61,6 +61,7 @@ class Imagen extends Component
 
             $orden = ImagenOrden::create([
                 'id_atencion' => $this->id_atencion,
+                'solicitante' => auth()->user()->id,
                 'fecha' => now(),
                 'diagnostico' => $this->diagnostico,
             ]);

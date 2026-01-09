@@ -114,18 +114,18 @@
         }
     </style>
 
-<div class="card border-0 shadow-sm mt-3">
+    <div class="card border-0 shadow-sm mt-3">
 
         <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
 
             <div class="d-flex align-items-center gap-3">
                 <div class="icon-clinico mr-2">
-                    <i class="fa fa-notes-medical fa-lg"></i> 
+                    <i class="fa fa-notes-medical fa-lg"></i>
                 </div>
 
                 <div>
                     <div class="fw-semibold text-clinico">
-                    Consulta Médica para <b>{{ $nombre_paciente }}</b>
+                        Consulta Médica para <b>{{ $nombre_paciente }}</b>
                     </div>
                     <div class="small text-muted">
                         Registro histórico de medicamentos entregados en esta atención
@@ -134,7 +134,7 @@
             </div>
 
         </div>
-<br>
+        <br>
 
         <!-- MOTIVO DE CONSULTA -->
         <div class="hc-card">

@@ -62,9 +62,9 @@
                         </div>
 
                         <div class="col-12">
-                            <div class="text-muted text-uppercase">Médico Solicitante</div>
+                            <div class="text-muted text-uppercase">Solicitante</div>
                             <div class="fw-semibold">
-                                {{ $atencion->medico->nombre ?? '—' }}
+                                {{ UserUtil::getUserbyID($orden->solicitante)->name ??  '—' }} / {{UserUtil::getUserbyID($orden->solicitante)->nombre_cargo ??  '—'}}
                             </div>
                         </div>
                     </div>

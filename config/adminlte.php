@@ -361,6 +361,13 @@ return [
             'label' => 3,
             'label_color' => 'info',
         ],
+        [
+            'text' => 'Imágen',
+            'url' => 'imagen/ordenes',
+            'icon' => 'fa fa-image',
+            'label' => 5,
+            'label_color' => 'dark',
+        ],
 
         ['header' => 'account_settings'],
         [

@@ -15,7 +15,9 @@ return new class extends Migration
             $table->bigIncrements('id_orden_imagen');
             $table->unsignedBigInteger('id_atencion');
             $table->date('fecha');
-            $table->string('diagnostico')->nullable();
+            $table->text('diagnostico')->nullable();
+            $table->string('solicitante')->nullable();
+            $table->string('profesional')->nullable();
             $table->enum('estado', ['PENDIENTE', 'INFORMADO'])->default('PENDIENTE');
             $table->timestamps();
 

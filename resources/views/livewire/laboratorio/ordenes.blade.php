@@ -26,7 +26,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-uppercase small">
                     <tr>
-                        <th>Paciente</th>
+                        <th>Solicitante</th>
                         <th>Historia</th>
                         <th>Fecha</th>
                         <th>Exámenes</th>
@@ -41,10 +41,10 @@
                             <!-- PACIENTE -->
                             <td>
                                 <strong class="text-clinico">
-                                    {{ $orden->atencion->paciente->nombres }}
+                                    {{ UserUtil::getUserByID($orden->solicitante)->name }}
                                 </strong>
                                 <div class="small text-muted">
-                                    DNI: {{ $orden->atencion->paciente->dni }}
+                                    Cargo: {{ UserUtil::getUserByID($orden->solicitante)->nombre_cargo }}
                                 </div>
                             </td>
 

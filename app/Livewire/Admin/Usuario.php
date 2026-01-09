@@ -364,4 +364,18 @@ class Usuario extends Component
             ['type' => 'success', 'title' => 'Se habilitó a ' . $usuario->name, 'message' => 'Exito']
         );
     }
+
+    /**
+     * Ir a atencion
+     * $id es el id_paciente
+     */
+    public function link_atencion($id)
+    {
+        // ✅ Redireccionar a a tencion
+        $user = User::find($id);
+        $this->default();
+        return redirect()->route('atencion', [
+            'dni' => $user->dni
+        ]);
+    }
 }

@@ -11,7 +11,7 @@
                                 placeholder="Buscador" />
                         </div>
                         <div class=" col-1 input-group-append">
-                            <i wire:target="search"  wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            <i wire:target="search" wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
                         </div>
                     </div>
                 </div>
@@ -66,9 +66,11 @@
 
                                     </td>
                                     <td>
-                                        <a href="#"
-                                            wire:click='edit({{ $usuario->id }})'><u>Editar</u></a>
+                                        <a class="text-success" href="#"
+                                            wire:click='link_atencion({{ $usuario->id }})'><u>Atenciones</u></a>
+                                        <a href="#" wire:click='edit({{ $usuario->id }})'><u>Editar</u></a>
                                         &nbsp;
+
                                         @if ($usuario->estado_user)
                                             <a class="text-danger" href="#"
                                                 wire:click='desactivar_usuario({{ $usuario->id }})'><u>Deshabilitar</u></a>

@@ -132,7 +132,7 @@
             text-align: left;
         }
     </style>
-    
+
 </head>
 
 <body>
@@ -155,35 +155,43 @@
             </div>
             <div>
                 <span class="label">Fecha de nacimiento:</span>
-                <span class="value">{{ $paciente->fecha_nacimiento }}</span>
+                <span class="value">{{ DateUtil::getFechaSimple($paciente->fecha_nacimiento) }}</span>
             </div>
             <div>
-                <span class="label">Teléfono:</span>
-                <span class="value">{{ $paciente->telefono }}</span>
+                <span class="label">Número de Historia:</span>
+                <span class="value">{{ $orden->atencion->historia->nro_historia }}</span>
             </div>
             <div>
-                <span class="label">Dirección:</span>
-                <span class="value">{{ $paciente->direccion }}</span>
+                <span class="label">Orden:</span>
+                <span class="value"> {{ $orden->id_orden }}</span>
+            </div>
+            <div>
+                <span class="label">Fecha:</span>
+                <span class="value"> {{ DateUtil::getFechaSimple($orden->fecha) }}</span>
             </div>
         </div>
     </div>
-        <div class="orden">
-            <strong>Orden:</strong> {{ $orden->id_orden }} <br>
-            <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}
-            <br>
-            <br><br>
-            @foreach ($orden->detalles as $det)
-                <div> {{ $det->examenes->areas->nombre ?? 'Manual' }} -
-                    {{ $det->examenes->nombre ?? $det->examen_manual }}</div>
-                <br>
-                <div class="resultado-ckeditor"> {!! $det->resultados->resultado ?? '' !!}</div>
-                <br><br>
-            @endforeach
+    <div class="section">
+        <div class="section-title">Resultados</div>
+        <div class="info">
+            <div class="orden">
+                @foreach ($orden->detalles as $det)
+                    <div> {{ $det->examenes->areas->nombre ?? 'Manual' }} -
+                        {{ $det->examenes->nombre ?? $det->examen_manual }}</div>
+                    <br>
+                    <div class="resultado-ckeditor"> {!! $det->resultados->resultado ?? '' !!}</div>
+                    <br><br>
+                @endforeach
+            </div>
         </div>
 
-    <div class="firma">
-        ___________________________<br>
-        Laboratorio Clínico
+        <div class="firma">
+            @if ($firma_img)
+                <img src="{{ $firma_img }}" style="height:70px; width:auto; max-width:200px;">
+                <br> ___________________________<br>
+                Laboratorio Clínico
+            @endif
+        </div>
     </div>
 
 </body>

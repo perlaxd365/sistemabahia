@@ -1,30 +1,33 @@
 <div>
     <div class="container">
 
-        {{-- TÍTULO PRINCIPAL --}}
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold text-primary">
-                🧾 Resultados de la Atención
-            </h4>
 
-            <span class="badge bg-secondary">
-                Historia Clínica
-            </span>
-        </div>
 
-        {{-- DATOS DEL PACIENTE --}}
-        <div class="card shadow-sm mb-4">
-            <div class="card-body py-3">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Paciente:</strong> {{ $nombre_paciente }}
+        <div class="card border-0 shadow-sm mt-3">
+
+            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-clinico mr-2">
+                        <i class="fa fa-check fa-lg"></i>
                     </div>
-                    <div class="col-md-6">
-                        <strong>Fecha Nacimiento:</strong> {{ DateUtil::getFechaSimple($fecha_nacimiento) }}
+
+                    <div>
+                        <div class="fw-semibold text-clinico">
+                            Resultados de la Atención de <b>{{ $nombre_paciente }}</b>
+                        </div>
+                        <div class="small text-muted">
+                            Resultados de Laboratorio e Imagen
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
+        <br>
+
+
+
 
         {{-- RESULTADOS DE LABORATORIO --}}
         <div class="card shadow-sm mb-4 border-start border-4 border-primary">
@@ -59,6 +62,7 @@
                 </p>
 
 
+                <livewire:atencion.resultados.imagen :id_atencion="$id_atencion" />
             </div>
         </div>
 

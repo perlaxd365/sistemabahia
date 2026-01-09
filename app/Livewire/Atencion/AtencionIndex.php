@@ -10,6 +10,7 @@ use DateUtil;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use PacienteUtil;
+use Symfony\Component\HttpFoundation\Request;
 
 class AtencionIndex extends Component
 {
@@ -17,8 +18,18 @@ class AtencionIndex extends Component
     public $show;
     public $dni, $name, $fecha_nacimiento, $telefono;
     public $tipo_atencion;
-    public function mount()
+    public function mount(Request $request)
     {
+        if ($request->dni) {
+            $this->dni = $request->dni;
+            $this->step = 2;
+            $paciente = User::where('dni', $this->dni)->where('privilegio_cargo', 7)->first();
+            $this->id_paciente = $paciente->id;
+            $this->dni = $paciente->dni;
+            $this->name = $paciente->name;
+            $this->telefono = $paciente->telefono;
+            $this->fecha_nacimiento = $paciente->fecha_nacimiento;
+        }
         $this->show = 20;
     }
     public function render()
@@ -136,11 +147,12 @@ class AtencionIndex extends Component
             'alert',
             ['type' => 'success', 'title' => 'Se registro la atencion de ' . $this->name . ' correctamente', 'message' => 'Exito']
         );
-
-        $this->default();
         // ✅ Redireccionar a a tencion
-        
-        return redirect()->route('atencion');
+        $user = User::find($this->id_paciente);
+        $this->default();
+        return redirect()->route('atencion', [
+            'dni' => $user->dni
+        ]);
     }
 
 
@@ -153,9 +165,9 @@ class AtencionIndex extends Component
     public function exportarPDF()
     {
 
-            $id_historia = PacienteUtil::getHistoria($this->id_paciente);
-            $atenciones = Atencion::where('id_historia', $id_historia)->get();
-        if (count($atenciones)>0) {
+        $id_historia = PacienteUtil::getHistoria($this->id_paciente);
+        $atenciones = Atencion::where('id_historia', $id_historia)->get();
+        if (count($atenciones) > 0) {
             $name = $this->name;
 
             $pdf = Pdf::loadView('reportes.atenciones', compact('atenciones', 'name'));
@@ -167,9 +179,9 @@ class AtencionIndex extends Component
         } else {
 
             $this->dispatch(
-            'alert',
-            ['type' => 'info', 'title' => 'No se encontraron atenciones', 'message' => 'Sin atenciones']
-        );
+                'alert',
+                ['type' => 'info', 'title' => 'No se encontraron atenciones', 'message' => 'Sin atenciones']
+            );
         }
     }
 }

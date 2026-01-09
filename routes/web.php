@@ -3,6 +3,7 @@
 use App\Http\Controllers\AtencionController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\FarmaciaController;
+use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\LaboratorioController;
 use App\Http\Controllers\ProveedorController;
@@ -50,5 +51,8 @@ Route::group(['middleware' => ['auth']], function () {
     //LABORATORIO
     Route::get('laboratorio/ordenes', [LaboratorioController::class, 'ordenes'])->name('laboratorio.ordenes');
     Route::get('laboratorio/ordenes/{id_orden}/resultados', [LaboratorioController::class, 'resultados'])->name('laboratorio.resultados');
+    //IMAGEN
+    Route::get('imagen/ordenes', [ImagenController::class, 'ordenes'])->name('imagen.ordenes');
+    Route::get('imagen/ordenes/{id_orden}/resultados', [ImagenController::class, 'resultados'])->name('imagen.resultados');
     
 });
