@@ -17,9 +17,16 @@ return new class extends Migration
             $table->string('nombre_servicio');
             $table->decimal('precio_servicio', 6, 2);
             $table->boolean('estado_servicio');
+
+            //sunat 
+            $table->string('codigo_sunat')->nullable();
+            $table->string('unidad_sunat', 10)->default('NIU');
+            $table->decimal('precio', 10, 2);
+
+
             $table->timestamps();
 
-            
+
             //foreign keys
             $table->foreign('id_subtipo_servicio')->references('id_subtipo_servicio')->on('sub_tipo_servicios');
         });

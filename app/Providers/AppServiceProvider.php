@@ -13,12 +13,27 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-        Gate::define('admin', function ($user) {
+        Gate::define('Administrador', function ($user) {
             return $user->privilegio_cargo === 1;
         });
         //
-        Gate::define('recepcion', function ($user) {
-            return $user->privilegio_cargo >= 1;
+        Gate::define('Doctor', function ($user) {
+            return $user->privilegio_cargo === 2;
+        });
+        Gate::define('Enfermero', function ($user) {
+            return $user->privilegio_cargo === 3;
+        });
+        Gate::define('Laboratorio', function ($user) {
+            return $user->privilegio_cargo === 4;
+        });
+        Gate::define('Recepcionista', function ($user) {
+            return $user->privilegio_cargo === 5;
+        });
+        Gate::define('Farmaceutico', function ($user) {
+            return $user->privilegio_cargo === 6;
+        });
+        Gate::define('Paciente', function ($user) {
+            return $user->privilegio_cargo === 7;
         });
     }
 

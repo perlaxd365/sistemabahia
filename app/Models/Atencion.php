@@ -13,14 +13,14 @@ class Atencion extends Model
     protected $primaryKey = 'id_atencion';
     protected $fillable = [
         'id_paciente',
-        'id_responsable',
+        'id_medico',
         'id_atencion',
         'id_historia',
         'id_responsable',
         'tipo_atencion',
         'fecha_inicio_atencion',
         'fecha_fin_atencion',
-        'estado_atencion'
+        'estado'
     ];
 
 
@@ -32,11 +32,56 @@ class Atencion extends Model
             'id'
         );
     }
+    public function medico()
+    {
+        return $this->belongsTo(
+            User::class,
+            'id_medico',
+            'id'
+        );
+    }
     public function historia()
     {
         return $this->belongsTo(
             Historia::class,
             'id_historia'
+        );
+    }
+
+    // Servicios médicos
+    public function servicios()
+    {
+        return $this->belongsToMany(
+            Servicio::class,
+            'atencion_servicios',
+            'id_atencion',
+            'id_servicio'
+        )->withTimestamps();
+    }
+
+    // Medicamentos recetados / vendidos en atención
+    public function medicamentos()
+    {
+        return $this->belongsToMany(
+            Medicamento::class,
+            'atencion_medicamentos',
+            'id_atencion',
+            'id_medicamento'
+        )
+            ->withTimestamps();
+    }
+
+    /* =====================================================
+     |  FACTURACIÓN
+     ===================================================== */
+
+    // Un comprobante por atención
+    public function comprobante()
+    {
+        return $this->hasOne(
+            Comprobante::class,
+            'id_atencion',
+            'id_atencion'
         );
     }
 }

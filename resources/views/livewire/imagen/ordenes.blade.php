@@ -27,6 +27,7 @@
                 <thead class="table-light text-uppercase small">
 
                     <tr>
+                        <th>ID</th>
                         <th>Fecha</th>
                         <th>Paciente</th>
                         <th>Área</th>
@@ -39,6 +40,7 @@
                 <tbody>
                     @foreach ($ordenes as $orden)
                         <tr>
+                            <td>{{ $orden->id_orden_imagen }}</td>
                             <td>{{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</td>
                             <td>{{ $orden->atencion->paciente->name }}</td>
                             <td>

@@ -115,162 +115,164 @@
     </style>
 
     <div class="card border-0 shadow-sm mt-3">
+        @if ($medico_responsable)
+            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
 
-        <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
-
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-clinico mr-2">
-                    <i class="fa fa-notes-medical fa-lg"></i>
-                </div>
-
-                <div>
-                    <div class="fw-semibold text-clinico">
-                        Consulta Médica para <b>{{ $nombre_paciente }}</b>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-clinico mr-2">
+                        <i class="fa fa-notes-medical fa-lg"></i>
                     </div>
-                    <div class="small text-muted">
-                        Registro histórico de medicamentos entregados en esta atención
+
+                    <div>
+                        <div class="fw-semibold text-clinico">
+                            Consulta Médica para <b>{{ $nombre_paciente }}</b>
+                        </div>
+                        <div class="small text-muted">
+                            Registro histórico de medicamentos entregados en esta atención
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br>
+
+            <!-- MOTIVO DE CONSULTA -->
+            <div class="hc-card">
+                <div class="hc-header">Enfermedad Actual</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-5">
+                        <label>Molestia principal</label>
+                        <input type="text" class="form-control" wire:model="molestia_consulta">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Tiempo</label>
+                        <input type="text" class="form-control" wire:model="tiempo_consulta">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Inicio</label>
+                        <select class="form-control" wire:model="inicio_consulta">
+                            <option>Brusco</option>
+                            <option>Progresivo</option>
+                            <option>Insidioso</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Curso</label>
+                        <select class="form-control" wire:model="curso_consulta">
+                            <option>Estacionario</option>
+                            <option>Progresivo</option>
+                            <option>Intermitente</option>
+                            <option>Mejoría</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label>Enfermedad Actual</label>
+                        <textarea class="form-control" rows="2" wire:model="enfermedad_consulta"></textarea>
+
                     </div>
                 </div>
             </div>
 
-        </div>
-        <br>
 
-        <!-- MOTIVO DE CONSULTA -->
-        <div class="hc-card">
-            <div class="hc-header">Enfermedad Actual</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-5">
-                    <label>Molestia principal</label>
-                    <input type="text" class="form-control" wire:model="molestia_consulta">
-                </div>
-                <div class="col-md-2">
-                    <label>Tiempo</label>
-                    <input type="text" class="form-control" wire:model="tiempo_consulta">
-                </div>
-                <div class="col-md-2">
-                    <label>Inicio</label>
-                    <select class="form-control" wire:model="inicio_consulta">
-                        <option>Brusco</option>
-                        <option>Progresivo</option>
-                        <option>Insidioso</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label>Curso</label>
-                    <select class="form-control" wire:model="curso_consulta">
-                        <option>Estacionario</option>
-                        <option>Progresivo</option>
-                        <option>Intermitente</option>
-                        <option>Mejoría</option>
-                    </select>
-                </div>
-                <div class="col-md-12">
-                    <label>Enfermedad Actual</label>
-                    <textarea class="form-control" rows="2" wire:model="enfermedad_consulta"></textarea>
-
+            <!-- ANTECEDENTES -->
+            <div class="hc-card">
+                <div class="hc-header">Antecedentes</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-6">
+                        <label>Familiares</label>
+                        <textarea class="form-control" rows="2" wire:model="atecedente_familiar_consulta"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Patológicos</label>
+                        <textarea class="form-control" rows="2" wire:model="atecedente_patologico_consulta"></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
 
-
-        <!-- ANTECEDENTES -->
-        <div class="hc-card">
-            <div class="hc-header">Antecedentes</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-6">
-                    <label>Familiares</label>
-                    <textarea class="form-control" rows="2" wire:model="atecedente_familiar_consulta"></textarea>
-                </div>
-                <div class="col-md-6">
-                    <label>Patológicos</label>
-                    <textarea class="form-control" rows="2" wire:model="atecedente_patologico_consulta"></textarea>
+            <!-- ANTROPOMETRÍA -->
+            <div class="hc-card">
+                <div class="hc-header">Somatometría</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-2">
+                        <label>Peso</label>
+                        <input type="number" class="form-control vital" wire:model.live="peso_consulta">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Talla</label>
+                        <input type="number" class="form-control vital" wire:model.live="talla_consulta">
+                    </div>
+                    <div class="col-md-2">
+                        <label>IMC</label>
+                        <input type="text" class="form-control vital" wire:model="imc_consulta">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- ANTROPOMETRÍA -->
-        <div class="hc-card">
-            <div class="hc-header">Somatometría</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-2">
-                    <label>Peso</label>
-                    <input type="number" class="form-control vital" wire:model.live="peso_consulta">
-                </div>
-                <div class="col-md-2">
-                    <label>Talla</label>
-                    <input type="number" class="form-control vital" wire:model.live="talla_consulta">
-                </div>
-                <div class="col-md-2">
-                    <label>IMC</label>
-                    <input type="text" class="form-control vital" wire:model="imc_consulta">
+            <!-- SIGNOS VITALES -->
+            <div class="hc-card">
+                <div class="hc-header">Funciones Vitales</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-2">
+                        <label>Temp °C</label>
+                        <input type="number" step="0.1" class="form-control vital"
+                            wire:model="temperatura_consulta">
+                    </div>
+                    <div class="col-md-3">
+                        <label>PA</label>
+                        <input type="text" class="form-control vital" wire:model="presion_consulta"
+                            placeholder="120/80">
+                    </div>
+                    <div class="col-md-2">
+                        <label>FC</label>
+                        <input type="number" class="form-control vital" wire:model="frecuencia_consulta">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Sat O₂ %</label>
+                        <input type="number" class="form-control vital" wire:model="saturacion_consulta">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- SIGNOS VITALES -->
-        <div class="hc-card">
-            <div class="hc-header">Funciones Vitales</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-2">
-                    <label>Temp °C</label>
-                    <input type="number" step="0.1" class="form-control vital" wire:model="temperatura_consulta">
-                </div>
-                <div class="col-md-3">
-                    <label>PA</label>
-                    <input type="text" class="form-control vital" wire:model="presion_consulta" placeholder="120/80">
-                </div>
-                <div class="col-md-2">
-                    <label>FC</label>
-                    <input type="number" class="form-control vital" wire:model="frecuencia_consulta">
-                </div>
-                <div class="col-md-2">
-                    <label>Sat O₂ %</label>
-                    <input type="number" class="form-control vital" wire:model="saturacion_consulta">
+            <!-- EXAMEN -->
+            <div class="hc-card">
+                <div class="hc-header">Examen Físico</div>
+                <div class="hc-body">
+                    <textarea class="form-control" rows="2" wire:model="examen_consulta"></textarea>
                 </div>
             </div>
-        </div>
 
-        <!-- EXAMEN -->
-        <div class="hc-card">
-            <div class="hc-header">Examen Físico</div>
-            <div class="hc-body">
-                <textarea class="form-control" rows="2" wire:model="examen_consulta"></textarea>
-            </div>
-        </div>
-
-        <!-- DIAGNÓSTICO -->
-        <div class="hc-card">
-            <div class="hc-header">Impresión</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-12">
-                    <label>Impresión diagnóstica</label>
-                    <textarea class="form-control" rows="2" wire:model="impresion_consulta"></textarea>
+            <!-- DIAGNÓSTICO -->
+            <div class="hc-card">
+                <div class="hc-header">Impresión</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-12">
+                        <label>Impresión diagnóstica</label>
+                        <textarea class="form-control" rows="2" wire:model="impresion_consulta"></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- DIAGNÓSTICO -->
-        <div class="hc-card">
-            <div class="hc-header">Plan</div>
-            <div class="hc-body row g-2">
-                <div class="col-md-12">
-                    <label>Exámenes auxiliares</label>
-                    <textarea class="form-control" rows="2" wire:model="examen_auxiliar_consulta"></textarea>
-                </div>
-                <div class="col-md-12">
-                    <label>Tratamiento</label>
-                    <textarea class="form-control" rows="2" wire:model="tratamiento_consulta"></textarea>
+            <!-- DIAGNÓSTICO -->
+            <div class="hc-card">
+                <div class="hc-header">Plan</div>
+                <div class="hc-body row g-2">
+                    <div class="col-md-12">
+                        <label>Exámenes auxiliares</label>
+                        <textarea class="form-control" rows="2" wire:model="examen_auxiliar_consulta"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label>Tratamiento</label>
+                        <textarea class="form-control" rows="2" wire:model="tratamiento_consulta"></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- BOTÓN -->
-        <div class="text-end mt-3">
-            <button type="button" wire:click="agregarConsulta" class="btn btn-clinico">
-                Guardar Consulta
-            </button>
-        </div>
-
+            <!-- BOTÓN -->
+            <div class="text-end mt-3">
+                <button type="button" wire:click="agregarConsulta" class="btn btn-clinico">
+                    Guardar Consulta
+                </button>
+            </div>
+        @endif
 
         <!-- BOTÓN -->
         <div class="text-end mt-2">

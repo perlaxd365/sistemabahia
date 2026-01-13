@@ -20,9 +20,11 @@
                     <div>
                         <strong>Orden #{{ $orden->id_orden_imagen }}</strong><br>
                         <small class="text-muted">
-                            Fecha: {{ $orden->fecha }} 
-                    <span class="badge {{ $orden->estado === 'FINALIZADO' ? 'bg-success' : 'bg-warning text-dark' }}"> {{ $orden->estado }}
-                    </span>
+                            Fecha: {{ $orden->fecha }}
+                            <span
+                                class="badge {{ $orden->estado === 'FINALIZADO' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                {{ $orden->estado }}
+                            </span>
                         </small>
                     </div>
 
@@ -30,49 +32,44 @@
 
                 {{-- DETALLES --}}
                 <div class="container">
-                    
-                <table class="table table-bordered table-sm mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 30%">Examen</th>
-                            <th style="width: 20%">Área</th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
-                        @foreach ($orden->detalles as $det)
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="table-light">
                             <tr>
-                                {{-- EXAMEN --}}
-                                <td class="fw-semibold">
-                                    {{ $det->examenes->nombre ?? $det->examen_manual }}
-                                </td>
-
-                                {{-- ÁREA --}}
-                                <td class="text-muted small">
-                                    {{ $det->examenes->areas->nombre ?? 'Manual' }}
-                                </td>
+                                <th style="width: 30%">Examen</th>
+                                <th style="width: 20%">Área</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($orden->detalles as $det)
+                                <tr>
+                                    {{-- EXAMEN --}}
+                                    <td class="fw-semibold">
+                                        {{ $det->examenes->nombre ?? $det->examen_manual }}
+                                    </td>
+
+                                    {{-- ÁREA --}}
+                                    <td class="text-muted small">
+                                        {{ $det->examenes->areas->nombre ?? 'Manual' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
 
 
 
                 {{-- ACCIONES (opcional, para luego) --}}
-                <div class="card-footer bg-white text-end small text-muted">
-                    <button type="button" class="btn text-end btn-sm"
-                        wire:click="imprimirResultados({{ $orden->id_orden }})">
-                        <i class="fa fa-print me-1"></i> Imprimir
-                    </button>
+                <div class="card-footer">
+
+                    - <a href="javascript:void(0)" wire:click='imprimirResultados({{ $orden->id_orden }})' class="badge text-primary">
+                        <i class="fa fa-file"></i> Descargar Informe
+                    </a>
                 </div>
             </div>
         @endforeach
 
     </div>
 </div>
-
-
-
-
-

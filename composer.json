@@ -46,7 +46,8 @@
         "files": [
             "app/Util/DateUtil.php",
             "app/Util/PacienteUtil.php",
-            "app/Util/UserUtil.php"
+            "app/Util/UserUtil.php",
+            "app/Services/NubeFactService.php"
         ]
     },
     "scripts": {

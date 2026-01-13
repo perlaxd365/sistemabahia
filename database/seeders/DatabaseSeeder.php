@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LaboratorioExamenesSeeder::class);
         $this->call(ImagenAreasSeeder::class);
         $this->call(ImagenEstudiosSeeder::class);
+        $this->call(NubeFactSeeder::class);
     }
 }

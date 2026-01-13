@@ -20,15 +20,12 @@
                     <div>
                         <strong>Orden #{{ $orden->id_orden_imagen }}</strong><br>
                         <small class="text-muted">
-                            Fecha: {{ $orden->fecha }}
+                            Fecha: {{ $orden->fecha }} <span
+                                class="badge {{ $orden->estado === 'INFORMADO' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                {{ $orden->estado }}
+                            </span>
                         </small>
                     </div>
-
-                    <span
-                        class="badge
-                        {{ $orden->estado === 'INFORMADO' ? 'bg-success' : 'bg-warning text-dark' }}">
-                        {{ $orden->estado }}
-                    </span>
                 </div>
 
                 {{-- DETALLES --}}
@@ -53,9 +50,11 @@
                                 @endif
 
                                 @if (!empty($detalle->informe->archivo))
-                                    - <a href="{{ $detalle->informe->archivo }}" target="_blank" class="badge">
-                                        <i class="fa fa-file"></i> Descargar Informe
-                                    </a>
+                                    <div class="card-footer">
+                                        - <a href="{{ $detalle->informe->archivo }}" target="_blank" class="badge">
+                                            <i class="fa fa-file"></i> Descargar Informe
+                                        </a>
+                                    </div>
                                 @else
                                     Sin Informe
                                 @endif

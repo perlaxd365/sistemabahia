@@ -38,7 +38,7 @@
 
                 <div>
                     <p class="dato-label">Fecha de Nacimiento</p>
-                    <p class="dato-valor">{{ DateUtil::getFechaSimple($paciente->fecha_nacimiento )}}</p>
+                    <p class="dato-valor">{{ DateUtil::getFechaSimple($paciente->fecha_nacimiento) }}</p>
                 </div>
 
                 <div>
@@ -91,13 +91,14 @@
                 <div>
                     <p class="dato-label">Estado</p>
                     <p class="dato-valor">
-                        @if ($atencion->estado_atencion == true)
+                        @if ($atencion->estado == 'PROCESO')
                             <span class="badge bg-success">Activa</span>
-                        @elseif($atencion->estado_atencion == false)
-                            <span class="badge bg-secondary">Finalizada</span>
+                        @elseif($atencion->estado == 'FINALIZADO')
+                            <span class="badge bg-secondary">Finalizado</span>
                         @else
-                            <span class="badge bg-warning">Pendiente</span>
+                            <span class="badge bg-warning">ANULADO</span>
                         @endif
+
                     </p>
                 </div>
 

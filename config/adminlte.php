@@ -327,7 +327,7 @@ return [
             'icon' => 'fas fa-fw fa-users',
             'label' => 5,
             'label_color' => 'success',
-            'can' => 'admin',
+            'can' => 'Administrador',
         ],
         [
             'text' => 'Pacientes',
@@ -335,7 +335,7 @@ return [
             'icon' => 'fas fa-fw fa-users',
             'label' => 5,
             'label_color' => 'success',
-            'can' => 'recepcion',
+            'can' => 'Recepcionista',
         ],
         [
             'text' => 'Atención',
@@ -343,7 +343,7 @@ return [
             'icon' => 'fas fa-fw fa-file',
             'label' => 1,
             'label_color' => 'warning',
-            'can' => 'recepcion',
+            'can' => 'Recepcionista',
         ],
         
         ['header' => 'INTERNO'],

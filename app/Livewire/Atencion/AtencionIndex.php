@@ -138,7 +138,7 @@ class AtencionIndex extends Component
             'id_historia' => $id_historia,
             'tipo_atencion' => $this->tipo_atencion,
             'fecha_inicio_atencion' => now(),
-            'estado_atencion' => true,
+            'estado' => "PROCESO",
         ]);
 
         // show alert

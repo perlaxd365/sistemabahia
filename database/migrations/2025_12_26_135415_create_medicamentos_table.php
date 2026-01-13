@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('medicamentos', function (Blueprint $table) {
-             $table->bigIncrements('id_medicamento');
-           
+            $table->bigIncrements('id_medicamento');
+
             $table->string('nombre');
             $table->string('presentacion')->nullable(); // Tableta, jarabe, ampolla
             $table->string('concentracion')->nullable(); // 500mg, 5mg/ml
@@ -25,6 +25,17 @@ return new class extends Migration
             $table->string('fecha_vencimiento')->nullable();
 
             $table->boolean('estado')->default(true);
+
+
+
+
+            //sunat 
+            $table->string('codigo_sunat')->nullable();
+            $table->string('unidad_sunat', 10)->default('NIU');
+            $table->decimal('precio', 10, 2);
+
+
+
             $table->timestamps();
         });
     }

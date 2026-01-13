@@ -38,6 +38,9 @@ class Consulta extends Component
         $examen_auxiliar_consulta,
         $tratamiento_consulta;
 
+    //medico responsable de la consulta
+
+    public $medico_responsable = false;
     public $nombre_paciente;
 
     public function mount($id_atencion)
@@ -71,6 +74,10 @@ class Consulta extends Component
             $this->impresion_consulta = $consulta->impresion_consulta;
             $this->examen_auxiliar_consulta = $consulta->examen_auxiliar_consulta;
             $this->tratamiento_consulta = $consulta->tratamiento_consulta;
+        }
+
+        if ($atencion->id_medico && $atencion->id_medico == auth()->user()->id) {
+            $this->medico_responsable = true;
         }
     }
     public function render()
@@ -202,7 +209,7 @@ class Consulta extends Component
 
             $this->dispatch(
                 'alert',
-                ['type' => 'info', 'title' => 'No se encontró registro, por favor guarda antes de imprimir', 'message' => 'Sin registro']
+                ['type' => 'info', 'title' => 'No se resgitró historia.', 'message' => 'Sin registro']
             );
         }
     }

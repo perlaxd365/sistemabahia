@@ -16,16 +16,18 @@ return new class extends Migration
             $table->unsignedBigInteger('id_paciente')->comment('id del paciente');
             $table->unsignedBigInteger('id_historia')->comment('id de la historia');
             $table->unsignedBigInteger('id_responsable')->comment('id del responsable');
+            $table->unsignedBigInteger('id_medico')->nullable()->comment('id del medico');
             $table->longText('tipo_atencion');
             $table->string('fecha_inicio_atencion');
             $table->string('fecha_fin_atencion')->nullable();
-            $table->boolean('estado_atencion');
+            $table->enum('estado', ['PROCESO', 'FINALIZADO','ANULADO'])->default('PROCESO');
             $table->timestamps();
 
             //foreign keys
             $table->foreign('id_historia')->references('id_historia')->on('historias');
             $table->foreign('id_paciente')->references('id')->on('users');
             $table->foreign('id_responsable')->references('id')->on('users');
+            $table->foreign('id_medico')->references('id')->on('users');
         });
     }
 

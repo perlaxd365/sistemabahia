@@ -6,27 +6,29 @@ use Livewire\Component;
 
 class Home extends Component
 {
-    
+
     public $id_atencion;
     public $tab = 'info';  // tab activa
     public $componente = 'atencion.InfoPaciente'; // componente activo
-
-     public function mount($id_atencion)
+    public $privilegio;
+    public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
+        $this->privilegio = auth()->user()->privilegio_cargo;
     }
-     public function cambiarTab($tab)
+    public function cambiarTab($tab)
     {
         $this->tab = $tab;
 
         $map = [
             'info'          => 'atencion.info-paciente',
+            'medico'        => 'atencion.medico',
             'servicios'     => 'atencion.servicios',
             'signos'        => 'atencion.signos-vitales',
             'consulta'      => 'atencion.consulta',
             'medicamentos'  => 'atencion.medicamentos',
             'laboratorio'   => 'atencion.laboratorio',
-            'imagen'         => 'atencion.imagen',
+            'imagen'        => 'atencion.imagen',
             'resultados'    => 'atencion.resultados',
             'insumos'       => 'atencion.insumos',
             'facturacion'   => 'atencion.facturacion',
