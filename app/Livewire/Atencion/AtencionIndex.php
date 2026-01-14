@@ -132,7 +132,7 @@ class AtencionIndex extends Component
         ]);
 
         $id_historia = PacienteUtil::addHistoria($this->id_paciente);
-        Atencion::create([
+        $atencion = Atencion::create([
             'id_paciente' => $this->id_paciente,
             'id_responsable' => auth()->user()->id,
             'id_historia' => $id_historia,
@@ -150,8 +150,8 @@ class AtencionIndex extends Component
         // ✅ Redireccionar a a tencion
         $user = User::find($this->id_paciente);
         $this->default();
-        return redirect()->route('atencion', [
-            'dni' => $user->dni
+        return redirect()->route('atencion_general', [
+            'id' => $atencion->id_atencion
         ]);
     }
 

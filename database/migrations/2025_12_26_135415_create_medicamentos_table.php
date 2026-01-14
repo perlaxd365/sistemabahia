@@ -32,7 +32,6 @@ return new class extends Migration
             //sunat 
             $table->string('codigo_sunat')->nullable();
             $table->string('unidad_sunat', 10)->default('NIU');
-            $table->decimal('precio', 10, 2);
 
 
 

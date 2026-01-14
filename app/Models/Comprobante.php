@@ -21,6 +21,7 @@ class Comprobante extends Model
         'fecha_emision',
         'subtotal',
         'igv',
+        'con_igv',
         'total',
         'estado',
         'sunat_codigo',
@@ -32,4 +33,16 @@ class Comprobante extends Model
         'pdf_url'
     ];
     //
+    public function detalles()
+    {
+        return $this->hasMany(
+            ComprobanteDetalle::class,
+            'id_comprobante',
+            'id_comprobante'
+        );
+    }
+    public function cliente()
+{
+    return $this->belongsTo(Cliente::class, 'id_cliente');
+}
 }

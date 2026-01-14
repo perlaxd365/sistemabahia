@@ -56,9 +56,9 @@ class Atencion extends Model
             'atencion_servicios',
             'id_atencion',
             'id_servicio'
-        )->withTimestamps();
+        )->withPivot(['precio_unitario', 'cantidad'])
+            ->withTimestamps();
     }
-
     // Medicamentos recetados / vendidos en atención
     public function medicamentos()
     {
@@ -67,7 +67,7 @@ class Atencion extends Model
             'atencion_medicamentos',
             'id_atencion',
             'id_medicamento'
-        )
+        )->withPivot(['precio', 'cantidad'])
             ->withTimestamps();
     }
 

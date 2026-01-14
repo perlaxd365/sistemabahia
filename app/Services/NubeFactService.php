@@ -12,16 +12,17 @@ class NubeFactService
     protected string $ruta;
     protected string $token;
 
+    protected $config;
     public function __construct()
     {
-        $config = NubefactConfig::where('activo', true)->first();
+        $this->config = NubefactConfig::where('activo', true)->first();
 
-        if (!$config) {
+        if (!$this->config) {
             throw new Exception('No existe configuración activa de NubeFact');
         }
 
-        $this->ruta  = $config->ruta;
-        $this->token = $config->token;
+        $this->ruta  = $this->config->ruta;
+        $this->token = $this->config->token;
     }
 
     /**
@@ -152,4 +153,45 @@ class NubeFactService
 
         return $res;
     }
+
+    /**
+     * Consultar RUC en SUNAT vía NubeFact
+     */
+
+    public function consultarRuc(string $ruc): ?array
+    {
+        $token = 'sk_12854.9I7yGiw8UMPISAyV9OThCBRQBC8KZkqF';
+        // Iniciar llamada a API
+        $curl = curl_init();
+
+        // Buscar ruc sunat
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.decolecta.com/v1/sunat/ruc?numero=' . $ruc,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Referer: http://apis.net.pe/api-ruc',
+                'Authorization: Bearer ' . $token
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        // Datos de empresas según padron reducido
+        $empresa = json_decode($response);
+        
+        return [
+            'razon_social' => $empresa->razon_social ?? null,
+            'direccion'    => $empresa->direccion ?? null,
+            'estado'    => $empresa->estado ?? null,
+        ];
+    }
+
+    
 }

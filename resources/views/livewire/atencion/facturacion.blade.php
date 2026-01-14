@@ -36,7 +36,7 @@
                         Esta atención aún no tiene comprobante generado.
                     </p>
 
-                    <button wire:click="crearBorrador" class="btn btn-primary px-4">
+                    <button wire:click="crearBorrador" type="button" class="btn btn-primary px-4">
                         ➕ Crear comprobante
                     </button>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <strong>Paciente:</strong><br>
-                        {{ $atencion->paciente->nombre_completo }}
+                        {{ $atencion->paciente->name }}
                     </div>
                     <div class="col-md-4">
                         <strong>Documento:</strong><br>
@@ -53,10 +53,76 @@
                     </div>
                     <div class="col-md-4">
                         <strong>Fecha:</strong><br>
-                        {{ $comprobante->fecha_emision->format('d/m/Y') }}
+                        {{ DateUtil::getFechaSimple($comprobante->fecha_emision) }}
+                    </div>
+
+                </div>
+                <div class="row g-3">
+
+                    {{-- Tipo de comprobante --}}
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tipo de comprobante</label>
+                        <select class="form-control" wire:model.live="tipo_comprobante"
+                            wire:change="actualizarTipoComprobante">
+                            <option value="TICKET">🟡 Ticket de venta</option>
+                            <option value="BOLETA">🟢 Boleta</option>
+                            <option value="FACTURA">🔵 Factura</option>
+                        </select>
+                    </div>
+
+                    {{-- IGV --}}
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Aplicar IGV</label>
+                        <select class="form-control" wire:model.live="con_igv"
+                            @if ($tipo_comprobante === 'FACTURA') disabled @endif>
+                            <option value="1">Con IGV (18%)</option>
+                            <option value="0">Sin IGV</option>
+                        </select>
+
+                        @if ($tipo_comprobante === 'FACTURA')
+                            <small class="text-muted">
+                                La factura siempre incluye IGV
+                            </small>
+                        @endif
                     </div>
                 </div>
+                @if ($tipo_comprobante === 'FACTURA')
+                    <div class="card mt-3 border-primary">
+                        <div class="card-header fw-semibold text-primary">
+                            🏢 Datos del cliente (Factura)
+                        </div>
 
+                        <div class="card-body row g-2">
+
+                            <div class="row g-2">
+
+                                <div class="col-md-4">
+                                    <label>RUC</label>
+                                    <div class="input-group">
+                                        <input type="text"  class="form-control" wire:model.live="cliente_ruc"
+                                            maxlength="11">
+
+                                        <button class="btn btn-outline-primary" type="button" wire:click="buscarRuc"
+                                            @if (strlen($cliente_ruc) !== 11) disabled @endif> 🔍</button>
+        
+                                    </div>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <label>Razón Social</label>
+                                    <input type="text" disabled class="form-control" wire:model="cliente_razon">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Dirección</label>
+                                    <input type="text" disabled class="form-control" wire:model="cliente_direccion">
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                @endif
                 {{-- TABLA ITEMS --}}
                 <div class="table-responsive">
                     <table class="table table-sm align-middle">
@@ -111,7 +177,7 @@
                 {{-- ACCIONES --}}
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     @if ($comprobante->estado === 'BORRADOR')
-                        <button wire:click="emitir" class="btn btn-success px-4">
+                        <button wire:click="emitir" type="button" class="btn btn-success px-4">
                             🚀 Emitir comprobante
                         </button>
                     @endif

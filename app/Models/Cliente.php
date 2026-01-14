@@ -14,7 +14,6 @@ class Cliente extends Model
     protected $fillable = [
         'ruc',
         'razon_social',
-        'direccion',
-        'email'
+        'direccion'
     ];
-}
+}   

@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('clientes', function (Blueprint $table) {
             $table->bigIncrements('id_cliente');
 
-            $table->string('ruc', 11)->unique();
-            $table->string('razon_social');
+            $table->string('tipo_documento'); // DNI | RUC | SIN_DOC
+            $table->string('numero_documento')->nullable();
+            $table->string('razon_social')->nullable();
+            $table->string('nombres')->nullable();
             $table->string('direccion')->nullable();
-            $table->string('email')->nullable();
 
             $table->timestamps();
         });
