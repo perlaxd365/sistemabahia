@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id_comprobante');
 
             // SUNAT / NubeFact
-            $table->enum('tipo_comprobante', ['TICKET','BOLETA', 'FACTURA', 'NOTA_CREDITO']);
+            $table->enum('tipo_comprobante', ['TICKET', 'BOLETA', 'FACTURA', 'NOTA_CREDITO']);
             $table->string('serie', 4);
             $table->integer('numero')->nullable(); // se asigna al emitir
 
@@ -31,9 +31,8 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('igv', 10, 2)->default(0);
             $table->decimal('total', 10, 2)->default(0);
-
             // Fechas
-            $table->boolean('con_igv')->nullable();
+            $table->boolean('con_igv')->nullable()->default(false);
             // Estados
             $table->enum('estado', [
                 'BORRADOR',
@@ -45,12 +44,16 @@ return new class extends Migration
 
             // Respuesta SUNAT / NubeFact
             $table->string('sunat_codigo')->nullable();        // 0 = aceptado
-            $table->string('sunat_descripcion')->nullable();
+            $table->text('sunat_descripcion')->nullable();
             $table->string('sunat_hash')->nullable();
-            $table->string('sunat_qr')->nullable();
+            $table->text('sunat_qr')->nullable();
+            $table->json('sunat_respuesta')->nullable();
             $table->string('xml_url')->nullable();
             $table->string('cdr_url')->nullable();
             $table->string('pdf_url')->nullable();
+
+
+
 
             $table->timestamps();
         });

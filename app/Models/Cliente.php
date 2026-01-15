@@ -12,8 +12,12 @@ class Cliente extends Model
     protected $name = "clientes";
     protected $primaryKey = 'id_cliente';
     protected $fillable = [
-        'ruc',
+        'tipo_documento',
+        'numero_documento',
         'razon_social',
+        'nombres',
         'direccion'
     ];
+
+    
 }   

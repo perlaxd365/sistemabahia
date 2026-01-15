@@ -73,7 +73,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $atencion->paciente->name ?? '-' }}</td>
                                     <td>{{ $atencion->paciente->dni ?? '-' }}</td>
-                                    <td>{{ $atencion->medico->nombre ?? '-' }}</td>
+                                    <td>{{ $atencion->medico->name ?? '-' }}</td>
                                     <td>{{ $atencion->created_at->format('d/m/Y H:i') }}</td>
 
                                     <td class="text-center">

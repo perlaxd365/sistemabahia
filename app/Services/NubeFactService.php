@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use App\Models\Comprobante;
 use App\Models\NubefactConfig;
+use DateUtil;
 use Exception;
 
 class NubeFactService
@@ -49,52 +50,51 @@ class NubeFactService
      */
     protected function buildJson(Comprobante $c): array
     {
-        $cliente = $c->tipo_comprobante === 'FACTURA'
-            ? $c->cliente
-            : $c->paciente;
+        
 
+        $items   = $this->buildItems($c);
+        $totales = $this->calcularTotales($items);
         return [
             'operacion' => 'generar_comprobante',
 
-            // 1 = Factura | 2 = Boleta | 3 = Nota de crédito
+            // 1 = Factura | 2 = Boleta
             'tipo_de_comprobante' =>
-            $c->tipo_comprobante === 'FACTURA' ? 1 : ($c->tipo_comprobante === 'BOLETA' ? 2 : 3),
-
-            'serie'  => $c->serie,
-            'numero' => $c->numero,
-
+            $c->tipo_comprobante === 'FACTURA' ? 1 : 2,
+            // ✅ SERIES REALES DE TU CUENTA
+            'serie' => $c->tipo_comprobante === 'FACTURA'
+                ? 'FFF1'
+                : 'BBB1',
+            'numero' => null,
+            'codigo_unico' => 'CB-' . $c->id_comprobante,
             'sunat_transaction' => 1,
 
-            // Cliente
+            // 🔴 CLIENTE CORRECTO
             'cliente_tipo_de_documento' =>
             $c->tipo_comprobante === 'FACTURA' ? 6 : 1,
 
             'cliente_numero_de_documento' =>
-            $c->tipo_comprobante === 'FACTURA'
-                ? $cliente->ruc
-                : $cliente->dni,
+            $c->cliente->numero_documento,
 
             'cliente_denominacion' =>
-            $cliente->razon_social ?? $cliente->nombre_completo,
+            $c->cliente->razon_social ?? $c->cliente->nombres,
 
-            'cliente_direccion' => $cliente->direccion ?? '',
-            'cliente_email'     => $cliente->email ?? '',
+            'cliente_direccion' => $c->cliente->direccion ?? '',
+            'cliente_email'     => $c->cliente->email ?? '',
 
-            // Fechas y moneda
-            'fecha_de_emision' => $c->fecha_emision->format('d-m-Y'),
-            'moneda' => 1, // PEN
+            // Fechas
+            'fecha_de_emision' => DateUtil::getFechaSimpleGuion($c->fecha_emision),
+            'moneda' => 1,
 
-            // Totales
+            // 🔴 TOTALES CALCULADOS (NO BD)
             'porcentaje_de_igv' => 18.00,
-            'total_gravada' => $c->subtotal,
-            'total_igv'     => $c->igv,
-            'total'         => $c->total,
+            'total_gravada'     => $totales['total_gravada'],
+            'total_igv'         => $totales['total_igv'],
+            'total'             => $totales['total'],
 
-            // Envíos
             'enviar_automaticamente_a_la_sunat' => true,
             'enviar_automaticamente_al_cliente' => false,
 
-            'items' => $this->buildItems($c),
+            'items' => $items,
         ];
     }
 
@@ -104,26 +104,93 @@ class NubeFactService
     protected function buildItems(Comprobante $c): array
     {
         return $c->detalles->map(function ($d) {
+
+            $cantidad = (float) $d->cantidad;
+            $precioConIgv = (float) $d->precio_unitario;
+
+            $valorUnitario = round($precioConIgv / 1.18, 2);
+            $subtotal      = round($valorUnitario * $cantidad, 2);
+            $igv           = round($subtotal * 0.18, 2);
+            $total         = $subtotal + $igv;
+
             return [
-                'unidad_de_medida' => $d->unidad,
-                'codigo' => $d->codigo,
-                'descripcion' => $d->descripcion,
-                'cantidad' => $d->cantidad,
+                'unidad_de_medida' => $d->unidad ?? 'NIU',
+                'codigo'           => $d->codigo ?? '',
+                'descripcion'      => $d->descripcion,
+                'cantidad'         => $cantidad,
 
-                // Valores SIN IGV
-                'valor_unitario' => round($d->precio_unitario / 1.18, 2),
-                'subtotal' => round($d->subtotal / 1.18, 2),
+                'valor_unitario'   => $valorUnitario,
+                'subtotal'         => $subtotal,
+                'precio_unitario'  => $precioConIgv,
+                'igv'              => $igv,
+                'total'            => $total,
 
-                // Valores CON IGV
-                'precio_unitario' => $d->precio_unitario,
-                'igv' => $d->igv,
-                'total' => $d->subtotal + $d->igv,
-
-                'tipo_de_igv' => 1, // Gravado
-                'anticipo_regularizacion' => false,
+                'tipo_de_igv'    => 1,
+                'codigo_tributo' => '1000',
+                'nombre_tributo' => 'IGV',
+                'tipo_tributo'   => 'VAT',
             ];
         })->toArray();
     }
+
+    protected function calcularTotales(array $items): array
+    {
+        $gravada = 0;
+        $igv = 0;
+
+        foreach ($items as $item) {
+            $gravada += $item['subtotal'];
+            $igv     += $item['igv'];
+        }
+
+        $gravada = round($gravada, 2);
+        $igv     = round($igv, 2);
+
+        return [
+            'total_gravada' => $gravada,
+            'total_igv'     => $igv,
+            'total'         => $gravada + $igv,
+        ];
+    }
+
+    protected function getSerie(Comprobante $c): string
+    {
+        return $c->tipo_comprobante === 'FACTURA'
+            ? 'FFF1'
+            : 'BBB1';
+    }
+
+    protected function buildPayload(Comprobante $c): array
+    {
+        $items = $this->buildItems($c);
+        $totales = $this->calcularTotales($items);
+        $cliente = $c->cliente;
+
+        return [
+            'operacion'           => 'generar_comprobante',
+            'tipo_de_comprobante' => $c->tipo_comprobante === 'FACTURA' ? '1' : '2',
+
+            'serie'  => $this->getSerie($c),
+            'numero' => null, // 🔴 deja que NubeFact maneje correlativo
+
+            // CLIENTE
+            'cliente_tipo_de_documento'   => $c->tipo_comprobante === 'FACTURA' ? '6' : '1',
+            'cliente_numero_de_documento' => $cliente->numero_documento,
+            'cliente_denominacion'        => $cliente->razon_social ?? $cliente->nombres,
+            'cliente_direccion'           => $cliente->direccion ?? '',
+
+            'moneda' => '1',
+
+            // 🔴 TOTALES CORRECTOS
+            'total_gravada' => $totales['total_gravada'],
+            'total_igv'     => $totales['total_igv'],
+            'total'         => $totales['total'],
+
+            'items' => $items,
+        ];
+    }
+
+
 
     /**
      * Procesar respuesta SUNAT
@@ -153,11 +220,9 @@ class NubeFactService
 
         return $res;
     }
-
     /**
      * Consultar RUC en SUNAT vía NubeFact
      */
-
     public function consultarRuc(string $ruc): ?array
     {
         $token = 'sk_12854.9I7yGiw8UMPISAyV9OThCBRQBC8KZkqF';
@@ -185,13 +250,43 @@ class NubeFactService
         curl_close($curl);
         // Datos de empresas según padron reducido
         $empresa = json_decode($response);
-        
+
         return [
             'razon_social' => $empresa->razon_social ?? null,
             'direccion'    => $empresa->direccion ?? null,
             'estado'    => $empresa->estado ?? null,
         ];
     }
+    /**CONSULTA DNI */
+    public function consultarDni(string $dni): ?array
+    {
+        $token = 'sk_12854.9I7yGiw8UMPISAyV9OThCBRQBC8KZkqF';
+        // Iniciar llamada a API
+        $curl = curl_init();
 
-    
+        // Buscar ruc sunat
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.decolecta.com/v1/reniec/dni?numero=' . $dni,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Referer: http://apis.net.pe/api-ruc',
+                'Authorization: Bearer ' . $token
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        // Datos de empresas según padron reducido
+        $persona = json_decode($response);
+        return [
+            'nombres' => $persona->full_name ?? null,
+        ];
+    }
 }

@@ -29,7 +29,6 @@ class Facturacion extends Component
             ->with('detalles')
             ->first();
     }
-
     public function crearBorrador()
     {
         // 1️⃣ Evitar duplicar comprobante
@@ -41,64 +40,89 @@ class Facturacion extends Component
 
             // 2️⃣ Crear comprobante BORRADOR
             $this->comprobante = Comprobante::create([
-                'id_atencion'   => $this->atencion->id_atencion,
-                'id_paciente'   => $this->atencion->id_paciente,
-                'tipo_comprobante' => 'BOLETA',
-                'serie'         => 'B001',
-                'numero'        => null,
-                'fecha_emision' => now(),
-                'subtotal'      => 0,
-                'igv'           => 0,
-                'total'         => 0,
-                'estado'        => 'BORRADOR',
+                'id_atencion'      => $this->atencion->id_atencion,
+                'id_paciente'      => $this->atencion->id_paciente,
+                'tipo_comprobante' => 'TICKET',
+                'serie'            => 'T001',
+                'numero'           => null,
+                'fecha_emision'    => now(),
+                'subtotal'         => 0, // gravada
+                'igv'              => 0,
+                'total'            => 0,
+                'estado'           => 'BORRADOR',
             ]);
 
-            // 3️⃣ SERVICIOS (precio_unitario desde atencion_servicios)
+            // 3️⃣ SERVICIOS
             foreach ($this->atencion->servicios as $servicio) {
 
-                $precio = $servicio->pivot->precio_unitario;
-                $cantidad = $servicio->pivot->cantidad ?? 1;
+                $precioConIgv = (float) $servicio->pivot->precio_unitario;
+                $cantidad     = (float) ($servicio->pivot->cantidad ?? 1);
 
-                $subtotal = $precio * $cantidad;
-                $igv = round($subtotal * 0.18, 2);
+                // 🔴 CÁLCULO SUNAT
+                $valorUnitario = round($precioConIgv / 1.18, 2);
+                $subtotal      = round($valorUnitario * $cantidad, 2); // SIN IGV
+                $igv           = round($subtotal * 0.18, 2);
 
                 ComprobanteDetalle::create([
-                    'id_comprobante' => $this->comprobante->id_comprobante,
-                    'descripcion'    => $servicio->nombre_servicio,
-                    'cantidad'       => $cantidad,
-                    'precio_unitario' => $precio,
-                    'subtotal'       => $subtotal,
-                    'igv'            => $igv,
-                    'unidad'         => 'NIU',
+                    'id_comprobante'  => $this->comprobante->id_comprobante,
+                    'descripcion'     => $servicio->nombre_servicio,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precioConIgv, // CON IGV
+                    'subtotal'        => $subtotal,      // SIN IGV
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => '10', // Gravado
                 ]);
             }
 
-            // 4️⃣ MEDICAMENTOS (precio desde atencion_medicamentos)
+            // 4️⃣ MEDICAMENTOS
             foreach ($this->atencion->medicamentos as $medicamento) {
 
-                $precio = $medicamento->pivot->precio;
-                $cantidad = $medicamento->pivot->cantidad ?? 1;
+                $precioConIgv = (float) $medicamento->pivot->precio;
+                $cantidad     = (float) ($medicamento->pivot->cantidad ?? 1);
 
-                $subtotal = $precio * $cantidad;
-                $igv = round($subtotal * 0.18, 2);
+                // 🔴 CÁLCULO SUNAT
+                $valorUnitario = round($precioConIgv / 1.18, 2);
+                $subtotal      = round($valorUnitario * $cantidad, 2);
+                $igv           = round($subtotal * 0.18, 2);
 
                 ComprobanteDetalle::create([
-                    'id_comprobante' => $this->comprobante->id_comprobante,
-                    'descripcion'    => $medicamento->nombre,
-                    'cantidad'       => $cantidad,
-                    'precio_unitario' => $precio,
-                    'subtotal'       => $subtotal,
-                    'igv'            => $igv,
-                    'unidad'         => 'NIU',
+                    'id_comprobante'  => $this->comprobante->id_comprobante,
+                    'descripcion'     => $medicamento->nombre,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precioConIgv,
+                    'subtotal'        => $subtotal,
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => '10',
                 ]);
             }
 
-            // 5️⃣ Recalcular totales
-            $this->recalcularTotales();
+            // 5️⃣ Recalcular totales SUNAT
+            $this->recalcularTotalesSunat();
 
             // 6️⃣ Refrescar relación
             $this->comprobante->load('detalles');
         });
+    }
+    protected function recalcularTotalesSunat()
+    {
+        $this->comprobante->subtotal = round(
+            $this->comprobante->detalles->sum('subtotal'),
+            2
+        );
+
+        $this->comprobante->igv = round(
+            $this->comprobante->detalles->sum('igv'),
+            2
+        );
+
+        $this->comprobante->total = round(
+            $this->comprobante->subtotal + $this->comprobante->igv,
+            2
+        );
+
+        $this->comprobante->save();
     }
     public function cargarItems()
     {
@@ -195,6 +219,10 @@ class Facturacion extends Component
 
     public function actualizarTipoComprobante()
     {
+        $this->numero_documento = "";
+        $this->cliente_nombre = "";
+        $this->cliente_direccion = "";
+        $this->cliente_razon = "";
         // Factura siempre con IGV
         if ($this->tipo_comprobante === 'FACTURA') {
             $this->con_igv = true;
@@ -221,7 +249,8 @@ class Facturacion extends Component
         $this->recalcularTotales();
     }
 
-    public $cliente_ruc;
+    public $numero_documento;
+    public $cliente_nombre;
     public $cliente_razon;
     public $cliente_direccion;
     public $cliente_estado;
@@ -229,10 +258,11 @@ class Facturacion extends Component
     {
         if ($this->tipo_comprobante === 'FACTURA') {
 
+
             $cliente = Cliente::updateOrCreate(
                 [
                     'tipo_documento'   => 'RUC',
-                    'numero_documento' => $this->cliente_ruc,
+                    'numero_documento' => $this->numero_documento,
                 ],
                 [
                     'razon_social' => $this->cliente_razon,
@@ -250,7 +280,7 @@ class Facturacion extends Component
             $cliente = Cliente::updateOrCreate(
                 [
                     'tipo_documento'   => 'DNI',
-                    'numero_documento' => $this->cliente_dni,
+                    'numero_documento' => $this->numero_documento,
                 ],
                 [
                     'nombres' => $this->cliente_nombre,
@@ -267,17 +297,17 @@ class Facturacion extends Component
     public function buscarRuc()
     {
         $this->validate([
-            'cliente_ruc' => 'required|digits:11',
+            'numero_documento' => 'required|digits:11',
         ]);
-        $data = app(NubeFactService::class)->consultarRuc($this->cliente_ruc);
+        $data = app(NubeFactService::class)->consultarRuc($this->numero_documento);
 
         if (!$data) {
-            $this->addError('cliente_ruc', 'RUC no encontrado');
+            $this->addError('numero_documento', 'RUC no encontrado');
             return;
         }
         if ($data['estado'] !== 'ACTIVO') {
 
-            $this->addError('cliente_ruc', 'RUC no activo en SUNAT');
+            $this->addError('numero_documento', 'RUC no activo en SUNAT');
             $this->dispatch(
                 'alert',
                 ['type' => 'error', 'title' => 'RUC no activo en SUNAT', 'message' => 'Exito']
@@ -292,17 +322,52 @@ class Facturacion extends Component
         $this->cliente_direccion = $data['direccion'];
     }
 
+    public function buscarDni()
+    {
+
+        $this->validate([
+            'numero_documento' => 'required|digits:8',
+        ]);
+        $data = app(NubeFactService::class)->consultarDni($this->numero_documento);
+
+        if (!$data) {
+            $this->addError('numero_documento', 'DNI no encontrado');
+            return;
+        }
+        $this->dispatch(
+            'alert',
+            ['type' => 'success', 'title' => 'Cliente encontrado con éxito "' . $data['nombres'] . '"', 'message' => 'Exito']
+        );
+        $this->cliente_nombre = $data['nombres'];
+    }
+
     //enviara a sunat
 
     public function emitir()
     {
+        if ($this->comprobante->tipo_comprobante === "TICKET") {
+            # code...
+            $this->registrarTicket();
+
+            $this->dispatch(
+                'alert',
+                ['type' => 'success', 'title' => 'Ticket registrado correctamente', 'message' => 'Exito']
+            );
+            return;
+        }
         if (!$this->comprobante) {
-            $this->addError('general', 'No existe comprobante');
+            $this->dispatch(
+                'alert',
+                ['type' => 'error', 'title' => 'No existe comprobante', 'message' => 'Error']
+            );
             return;
         }
 
         if ($this->comprobante->estado === 'EMITIDO') {
-            $this->addError('general', 'El comprobante ya fue emitido');
+            $this->dispatch(
+                'alert',
+                ['type' => 'error', 'title' => 'El comprobante ya fue emitido', 'message' => 'Error']
+            );
             return;
         }
 
@@ -315,24 +380,56 @@ class Facturacion extends Component
 
             // 2️⃣ Guardar / asignar cliente
             $this->guardarCliente();
-
             // 3️⃣ Recalcular totales (por seguridad)
             $this->recalcularTotales();
 
-            // 4️⃣ Construir JSON para NubeFact
-            $payload = $this->construirJsonNubeFact();
-
             // 5️⃣ Enviar a NubeFact
-            $respuesta = app(NubeFactService::class)->emitir($payload);
+            $respuesta = app(NubeFactService::class)
+                ->emitir($this->comprobante);
 
-            if (!$respuesta || !isset($respuesta['aceptada_por_sunat'])) {
-                throw new \Exception('Respuesta inválida de NubeFact');
+            if (!$respuesta || !is_array($respuesta)) {
+                throw new \Exception('Respuesta vacía o inválida de NubeFact');
             }
 
-            if ($respuesta['aceptada_por_sunat'] !== true) {
-                throw new \Exception($respuesta['sunat_description'] ?? 'SUNAT rechazó el comprobante');
+            // ❌ Error técnico de NubeFact
+            if (!empty($respuesta['errors'])) {
+                throw new \Exception(
+                    is_array($respuesta['errors'])
+                        ? implode(', ', $respuesta['errors'])
+                        : $respuesta['errors']
+                );
             }
 
+            // ⏳ PENDIENTE SUNAT (aún sin CDR)
+            if (
+                array_key_exists('aceptada_por_sunat', $respuesta)
+                && $respuesta['aceptada_por_sunat'] === false
+                && empty($respuesta['cdr'])
+            ) {
+
+                $this->dispatch(
+                    'alert',
+                    ['type' => 'success', 'title' => 'Comprobante enviado a SUNAT, esperando CDR', 'message' => 'PENDIENTE']
+                );
+            }
+
+            // ❌ RECHAZADO SUNAT (ya hay CDR)
+            if (
+                array_key_exists('aceptada_por_sunat', $respuesta)
+                && $respuesta['aceptada_por_sunat'] === false
+            ) {
+                throw new \Exception(
+                    $respuesta['sunat_description']
+                        ?? 'SUNAT rechazó el comprobante'
+                );
+            }
+
+            // ❓ Respuesta inválida
+            if (!array_key_exists('aceptada_por_sunat', $respuesta)) {
+                throw new \Exception('Respuesta inesperada de NubeFact');
+            }
+            // ✅ Aceptado
+            // continuar flujo..
             // 6️⃣ Guardar respuesta y marcar emitido
             $this->comprobante->update([
                 'estado'            => 'EMITIDO',
@@ -345,11 +442,118 @@ class Facturacion extends Component
 
             DB::commit();
 
-            session()->flash('success', 'Comprobante emitido correctamente');
+            $this->dispatch(
+                'alert',
+                ['type' => 'success', 'title' => 'Comprobante emitido correctamente', 'message' => 'Exito']
+            );
         } catch (\Exception $e) {
+
             DB::rollBack();
+            dd($e);
             $this->addError('general', $e->getMessage());
         }
+    }
+
+    protected function siguienteNumeroTicket(): int
+    {
+        return (Comprobante::where('tipo_comprobante', 'TICKET')->max('numero') ?? 0) + 1;
+    }
+
+    protected function recalcularTotalesTicket()
+    {
+        if ($this->comprobante->estado === 'EMITIDO') {
+            return;
+        }
+
+        $total = round($this->comprobante->detalles->sum('subtotal'), 2);
+
+        if ($this->comprobante->con_igv) {
+
+            $base = round($total / 1.18, 2);
+            $igv  = round($total - $base, 2);
+
+            $this->comprobante->update([
+                'subtotal' => $base,
+                'igv'      => $igv,
+                'total'    => $total,
+            ]);
+        } else {
+
+            $this->comprobante->update([
+                'subtotal' => $total,
+                'igv'      => 0,
+                'total'    => $total,
+            ]);
+        }
+    }
+
+    public function registrarTicket()
+    {
+        if (!$this->comprobante) {
+            return;
+        }
+
+        DB::transaction(function () {
+
+            // 1️⃣ Actualizar datos base (RESPETANDO con_igv)
+            $this->comprobante->update([
+                'tipo_comprobante' => 'TICKET',
+                'serie'            => 'TCK',
+                'numero'           => $this->comprobante->numero
+                    ?? $this->siguienteNumeroTicket(),
+                'fecha_emision'    => now(),
+                'con_igv'          => (bool) $this->con_igv, // ✅ CLAVE
+            ]);
+
+            // 2️⃣ Limpiar detalles
+            $this->comprobante->detalles()->delete();
+
+            // 3️⃣ Servicios
+            foreach ($this->atencion->servicios as $servicio) {
+
+                $precio   = (float) $servicio->pivot->precio_unitario;
+                $cantidad = (float) ($servicio->pivot->cantidad ?? 1);
+                $subtotal = round($precio * $cantidad, 2);
+
+                ComprobanteDetalle::create([
+                    'id_comprobante'  => $this->comprobante->id_comprobante,
+                    'descripcion'     => $servicio->nombre_servicio,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precio,
+                    'subtotal'        => $subtotal,
+                    'igv'             => 0,
+                    'unidad'          => 'NIU',
+                ]);
+            }
+
+            // 4️⃣ Medicamentos
+            foreach ($this->atencion->medicamentos as $med) {
+
+                $precio   = (float) $med->pivot->precio;
+                $cantidad = (float) ($med->pivot->cantidad ?? 1);
+                $subtotal = round($precio * $cantidad, 2);
+
+                ComprobanteDetalle::create([
+                    'id_comprobante'  => $this->comprobante->id_comprobante,
+                    'descripcion'     => $med->nombre,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precio,
+                    'subtotal'        => $subtotal,
+                    'igv'             => 0,
+                    'unidad'          => 'NIU',
+                ]);
+            }
+
+            // 5️⃣ Recalcular totales (USA con_igv REAL)
+            $this->recalcularTotalesTicket();
+
+            // 6️⃣ Emitir
+            $this->comprobante->update([
+                'estado' => 'EMITIDO',
+            ]);
+
+            $this->comprobante->load('detalles');
+        });
     }
 
     /**
@@ -359,8 +563,15 @@ class Facturacion extends Component
     {
         if ($this->tipo_comprobante === 'FACTURA') {
             $this->validate([
-                'cliente_ruc'   => 'required|digits:11',
-                'cliente_razon' => 'required|min:3',
+                'tipo_comprobante' => 'required',
+                'numero_documento' => 'required|digits:11',
+            ]);
+        } elseif ($this->tipo_comprobante === 'BOLETA') {
+
+            $this->validate([
+                'tipo_comprobante' => 'required',
+                'numero_documento' => 'required|digits:8',
+                'cliente_nombre' => 'required',
             ]);
         }
     }
@@ -388,7 +599,6 @@ class Facturacion extends Component
                 'total'           => $detalle->subtotal + ($this->con_igv ? round($detalle->subtotal * 0.18, 2) : 0),
             ];
         }
-
         return [
             'operacion'                  => 'generar_comprobante',
             'tipo_de_comprobante'        => $this->tipo_comprobante === 'FACTURA' ? '1' : '2',
@@ -402,6 +612,7 @@ class Facturacion extends Component
             'total_gravada'              => $this->con_igv ? $this->comprobante->subtotal : 0,
             'total_igv'                  => $this->comprobante->igv,
             'total'                      => $this->comprobante->total,
+            'estado'                     => $this->comprobante->estado,
             'items'                      => $items,
         ];
     }

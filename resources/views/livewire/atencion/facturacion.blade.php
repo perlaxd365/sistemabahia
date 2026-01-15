@@ -1,4 +1,7 @@
 <div>
+    @php
+        $bloqueado = $comprobante && $comprobante->estado === 'EMITIDO';
+    @endphp
     <div class="card shadow-sm border-0 mt-4">
         {{-- HEADER --}}
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -63,7 +66,7 @@
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Tipo de comprobante</label>
                         <select class="form-control" wire:model.live="tipo_comprobante"
-                            wire:change="actualizarTipoComprobante">
+                            @if ($bloqueado) disabled @endif wire:change="actualizarTipoComprobante">
                             <option value="TICKET">🟡 Ticket de venta</option>
                             <option value="BOLETA">🟢 Boleta</option>
                             <option value="FACTURA">🔵 Factura</option>
@@ -74,6 +77,7 @@
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Aplicar IGV</label>
                         <select class="form-control" wire:model.live="con_igv"
+                            @if ($bloqueado) disabled @endif
                             @if ($tipo_comprobante === 'FACTURA') disabled @endif>
                             <option value="1">Con IGV (18%)</option>
                             <option value="0">Sin IGV</option>
@@ -86,37 +90,73 @@
                         @endif
                     </div>
                 </div>
-                @if ($tipo_comprobante === 'FACTURA')
+                @if ($tipo_comprobante === 'FACTURA' || $tipo_comprobante === 'BOLETA')
                     <div class="card mt-3 border-primary">
                         <div class="card-header fw-semibold text-primary">
-                            🏢 Datos del cliente (Factura)
+                            🏢 Datos del cliente
+                            {{ $tipo_comprobante === 'FACTURA' ? '(Factura)' : '(Boleta)' }}
                         </div>
-
                         <div class="card-body row g-2">
-
                             <div class="row g-2">
 
-                                <div class="col-md-4">
-                                    <label>RUC</label>
-                                    <div class="input-group">
-                                        <input type="text"  class="form-control" wire:model.live="cliente_ruc"
-                                            maxlength="11">
-
-                                        <button class="btn btn-outline-primary" type="button" wire:click="buscarRuc"
-                                            @if (strlen($cliente_ruc) !== 11) disabled @endif> 🔍</button>
-        
+                                @if ($tipo_comprobante === 'FACTURA')
+                                    <div class="col-md-4">
+                                        <label>
+                                            FACTURA
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control"
+                                                wire:model.defer="numero_documento"
+                                                placeholder="Ingrese RUC (11 dígitos)">
+                                            <button class="btn btn-outline-primary" type="button"
+                                                wire:click="buscarRuc"
+                                                @if (strlen($numero_documento) !== 11) disabled @endif> 🔍</button>
+                                            @error('numero_documento')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-8">
+                                        <label>Razón Social</label>
+                                        <input type="text" disabled class="form-control" wire:model="cliente_razon">
+                                        @error('cliente_razon')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label>Dirección</label>
+                                        <input type="text" disabled class="form-control"
+                                            wire:model="cliente_direccion">
+                                        @error('cliente_direccion')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                @elseif($tipo_comprobante === 'BOLETA')
+                                    <div class="col-md-6">
+                                        <label>
+                                            DNI
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control"
+                                                wire:model.live="numero_documento"
+                                                placeholder="Ingrese DNI (8 dígitos)">
+                                            <button class="btn btn-outline-primary" type="button"
+                                                wire:click="buscarDni"
+                                                @if (strlen($numero_documento) !== 8) disabled @endif> 🔍</button>
+                                            @error('numero_documento')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Nombres</label>
+                                        <input type="text" disabled class="form-control" wire:model="cliente_nombre">
+                                        @error('cliente_nombre')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                @endif
 
-                                <div class="col-md-8">
-                                    <label>Razón Social</label>
-                                    <input type="text" disabled class="form-control" wire:model="cliente_razon">
-                                </div>
-
-                                <div class="col-md-12">
-                                    <label>Dirección</label>
-                                    <input type="text" disabled class="form-control" wire:model="cliente_direccion">
-                                </div>
 
                             </div>
 
@@ -177,14 +217,25 @@
                 {{-- ACCIONES --}}
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     @if ($comprobante->estado === 'BORRADOR')
-                        <button wire:click="emitir" type="button" class="btn btn-success px-4">
-                            🚀 Emitir comprobante
-                        </button>
+                
+                         <button wire:click="emitir" wire:loading.attr="disabled" class="btn btn-success btn-sm"
+                            type="button"> <i class="fa fa-plus-circle"></i> <i wire:target="emitir"
+                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>  🚀 Emitir comprobante
+                            Usuario</button>
                     @endif
 
-                    @if ($comprobante->estado === 'EMITIDO')
+                    @if (
+                        $comprobante->estado === 'EMITIDO' &&
+                            ($comprobante->tipo_comprobante === 'BOLETA' || $comprobante->tipo_comprobante === 'FACTURA'))
                         <a href="{{ $comprobante->pdf_url }}" target="_blank" class="btn btn-outline-primary">
                             📄 Ver PDF
+                        </a>
+                    @endif
+
+                    @if ($comprobante && $comprobante->tipo_comprobante === 'TICKET' && $comprobante->estado === 'EMITIDO')
+                        <a href="{{ route('tickets.imprimir', $comprobante) }}" target="_blank"
+                            class="btn btn-secondary">
+                            🧾 Imprimir Ticket
                         </a>
                     @endif
                 </div>

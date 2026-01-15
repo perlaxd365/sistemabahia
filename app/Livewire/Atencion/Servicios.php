@@ -88,7 +88,7 @@ class Servicios extends Component
         AtencionServicio::create([
             'id_servicio' => $this->id_servicio,
             'id_atencion' => $this->id_atencion,
-            'id_profesional' => $this->id_profesional,
+            'id_profesional' => $this->id_profesional ?? 0,
             'id_responsable' => auth()->user()->id,
             'cantidad' => $this->cantidad,
             'precio_unitario' => $this->precio_unitario,
@@ -131,7 +131,7 @@ class Servicios extends Component
         $this->id_atencion_servicio = $id;
         $atencion_servicio = AtencionServicio::find($id);
         $atencion_servicio->delete();
-        
+
         $this->dispatch(
             'alert',
             ['type' => 'success', 'title' => 'Se eliminó servicio correctamente', 'message' => 'Exito']

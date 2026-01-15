@@ -17,12 +17,12 @@
                         <div class="card-body d-flex align-items-center justify-content-between">
 
                             <div class="d-flex align-items-center gap-3">
-                                <div class="bg-success bg-opacity-10 rounded-circle p-2">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-2">
                                     <img class="rounded-circle" src="{{ $atencion->medico->foto_url }}" width="50px" height="50px" alt="">
                                 </div>
 
                                 <div class="pl-2">
-                                    <h6 class="mb-1 text-success fw-bold">
+                                    <h6 class="mb-1 text-info fw-bold">
                                         Médico asignado
                                     </h6>
 

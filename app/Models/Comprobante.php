@@ -27,6 +27,7 @@ class Comprobante extends Model
         'sunat_codigo',
         'sunat_descripcion',
         'sunat_hash',
+        'sunat_descripcion',
         'sunat_qr',
         'xml_url',
         'cdr_url',
@@ -42,7 +43,15 @@ class Comprobante extends Model
         );
     }
     public function cliente()
-{
-    return $this->belongsTo(Cliente::class, 'id_cliente');
-}
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente');
+    }
+    public function paciente()
+    {
+        return $this->belongsTo(User::class, 'id_paciente');
+    }
+    public function atencion()
+    {
+        return $this->belongsTo(Atencion::class, 'id_atencion');
+    }
 }

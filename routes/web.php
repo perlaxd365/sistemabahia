@@ -7,6 +7,7 @@ use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\LaboratorioController;
 use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -14,6 +15,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -54,5 +56,5 @@ Route::group(['middleware' => ['auth']], function () {
     //IMAGEN
     Route::get('imagen/ordenes', [ImagenController::class, 'ordenes'])->name('imagen.ordenes');
     Route::get('imagen/ordenes/{id_orden}/resultados', [ImagenController::class, 'resultados'])->name('imagen.resultados');
-    
+    Route::get('/tickets/{comprobante}/imprimir', [TicketController::class, 'imprimir'])->name('tickets.imprimir');
 });
