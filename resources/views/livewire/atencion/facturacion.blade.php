@@ -61,34 +61,36 @@
 
                 </div>
                 <div class="row g-3">
+                    @if ($comprobante->estado === 'BORRADOR')
+                        {{-- Tipo de comprobante --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tipo de comprobante</label>
+                            <select class="form-control" wire:model.live="tipo_comprobante"
+                                @if ($bloqueado) disabled @endif
+                                wire:change="actualizarTipoComprobante">
+                                <option value="TICKET">🟡 Ticket de venta</option>
+                                <option value="BOLETA">🟢 Boleta</option>
+                                <option value="FACTURA">🔵 Factura</option>
+                            </select>
+                        </div>
 
-                    {{-- Tipo de comprobante --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Tipo de comprobante</label>
-                        <select class="form-control" wire:model.live="tipo_comprobante"
-                            @if ($bloqueado) disabled @endif wire:change="actualizarTipoComprobante">
-                            <option value="TICKET">🟡 Ticket de venta</option>
-                            <option value="BOLETA">🟢 Boleta</option>
-                            <option value="FACTURA">🔵 Factura</option>
-                        </select>
-                    </div>
+                        {{-- IGV --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Aplicar IGV</label>
+                            <select class="form-control" wire:model.live="con_igv"
+                                @if ($bloqueado) disabled @endif
+                                @if ($tipo_comprobante === 'FACTURA') disabled @endif>
+                                <option value="1">Con IGV (18%)</option>
+                                <option value="0">Sin IGV</option>
+                            </select>
 
-                    {{-- IGV --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Aplicar IGV</label>
-                        <select class="form-control" wire:model.live="con_igv"
-                            @if ($bloqueado) disabled @endif
-                            @if ($tipo_comprobante === 'FACTURA') disabled @endif>
-                            <option value="1">Con IGV (18%)</option>
-                            <option value="0">Sin IGV</option>
-                        </select>
-
-                        @if ($tipo_comprobante === 'FACTURA')
-                            <small class="text-muted">
-                                La factura siempre incluye IGV
-                            </small>
-                        @endif
-                    </div>
+                            @if ($tipo_comprobante === 'FACTURA')
+                                <small class="text-muted">
+                                    La factura siempre incluye IGV
+                                </small>
+                            @endif
+                        </div>
+                    @endif
                 </div>
                 @if ($tipo_comprobante === 'FACTURA' || $tipo_comprobante === 'BOLETA')
                     <div class="card mt-3 border-primary">
@@ -138,7 +140,7 @@
                                         </label>
                                         <div class="input-group">
                                             <input type="number" class="form-control"
-                                                wire:model.live="numero_documento"
+                                                wire:model.live="numero_documento" value="73888312"
                                                 placeholder="Ingrese DNI (8 dígitos)">
                                             <button class="btn btn-outline-primary" type="button"
                                                 wire:click="buscarDni"
@@ -150,7 +152,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label>Nombres</label>
-                                        <input type="text" disabled class="form-control" wire:model="cliente_nombre">
+                                        <input type="text" class="form-control" value="Cesar Raul Baca"
+                                            wire:model="cliente_nombre">
                                         @error('cliente_nombre')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -217,15 +220,14 @@
                 {{-- ACCIONES --}}
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     @if ($comprobante->estado === 'BORRADOR')
-                
-                         <button wire:click="emitir" wire:loading.attr="disabled" class="btn btn-success btn-sm"
+                        <button wire:click="emitir" wire:loading.attr="disabled" class="btn btn-success btn-sm"
                             type="button"> <i class="fa fa-plus-circle"></i> <i wire:target="emitir"
-                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>  🚀 Emitir comprobante
+                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> 🚀 Emitir comprobante
                             Usuario</button>
                     @endif
 
                     @if (
-                        $comprobante->estado === 'EMITIDO' &&
+                        ($comprobante->estado === 'EMITIDO' || $comprobante->estado === 'PENDIENTE') &&
                             ($comprobante->tipo_comprobante === 'BOLETA' || $comprobante->tipo_comprobante === 'FACTURA'))
                         <a href="{{ $comprobante->pdf_url }}" target="_blank" class="btn btn-outline-primary">
                             📄 Ver PDF

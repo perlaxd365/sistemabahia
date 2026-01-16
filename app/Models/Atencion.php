@@ -84,4 +84,11 @@ class Atencion extends Model
             'id_atencion'
         );
     }
+
+    public function estaBloqueada(): bool
+    {
+        return $this->comprobante()
+            ->whereIn('estado', ['EMITIDO', 'PENDIENTE'])
+            ->exists();
+    }
 }

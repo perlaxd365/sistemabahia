@@ -1,7 +1,6 @@
 <div>
     <!DOCTYPE html>
     <html lang="es">
-
     <head>
         <meta charset="UTF-8">
         <style>
@@ -34,14 +33,11 @@
             }
 
             img {
-                max-width: 120px;
-                margin-bottom: 5px;
+                max-width: 150px;
             }
         </style>
     </head>
-
     <body>
-
         <div class="center">
             {{-- LOGO --}}
             <img src="{{ public_path('images/logo-clinica.png') }}" alt="Logo">

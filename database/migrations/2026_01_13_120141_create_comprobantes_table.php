@@ -37,6 +37,7 @@ return new class extends Migration
             $table->enum('estado', [
                 'BORRADOR',
                 'EMITIDO',
+                'PENDIENTE',
                 'ANULADO',
                 'CERRADO',
                 'RECHAZADO'

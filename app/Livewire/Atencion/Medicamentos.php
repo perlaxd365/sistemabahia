@@ -20,10 +20,11 @@ class Medicamentos extends Component
     public $resultados = [];
 
     public $detalle = [];
-
+    public $atencion;
     protected $listeners = ['cargarAtencion'];
     public $tratamiento;
     public $nombre_paciente;
+    public $dni;
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
@@ -35,9 +36,10 @@ class Medicamentos extends Component
         $this->historial();
 
         //nombre paciente
-        $atencion = Atencion::find($id_atencion);
-        $paciente = User::find($atencion->id_paciente);
+        $this->atencion = Atencion::find($id_atencion);
+        $paciente = User::find($this->atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
+        $this->dni = $paciente->dni;
     }
     public function render()
     {
@@ -114,6 +116,15 @@ class Medicamentos extends Component
     // 💾 Guardar y descontar stock
     public function guardarMedicamentos()
     {
+        if ($this->atencion->estaBloqueada()) {
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Atención finalizada',
+                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : '.$this->dni
+            ]);
+            return;
+        }
         if (!$this->id_atencion || count($this->detalle) == 0) {
             return;
         }

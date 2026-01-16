@@ -345,8 +345,9 @@ class Facturacion extends Component
 
     public function emitir()
     {
-        if ($this->comprobante->tipo_comprobante === "TICKET") {
+        if ($this->tipo_comprobante === "TICKET") {
             # code...
+
             $this->registrarTicket();
 
             $this->dispatch(
@@ -375,15 +376,16 @@ class Facturacion extends Component
 
         try {
 
-            // 1️⃣ Validaciones por tipo
+            // 1️⃣ Validaciones
             $this->validarAntesDeEmitir();
 
-            // 2️⃣ Guardar / asignar cliente
+            // 2️⃣ Cliente
             $this->guardarCliente();
-            // 3️⃣ Recalcular totales (por seguridad)
+
+            // 3️⃣ Totales
             $this->recalcularTotales();
 
-            // 5️⃣ Enviar a NubeFact
+            // 4️⃣ Enviar a NubeFact
             $respuesta = app(NubeFactService::class)
                 ->emitir($this->comprobante);
 
@@ -391,7 +393,7 @@ class Facturacion extends Component
                 throw new \Exception('Respuesta vacía o inválida de NubeFact');
             }
 
-            // ❌ Error técnico de NubeFact
+            // ❌ Error técnico
             if (!empty($respuesta['errors'])) {
                 throw new \Exception(
                     is_array($respuesta['errors'])
@@ -400,56 +402,89 @@ class Facturacion extends Component
                 );
             }
 
-            // ⏳ PENDIENTE SUNAT (aún sin CDR)
+            // 🔑 Datos base (SIEMPRE guardar)
+            $dataBase = [
+                'serie'           => $respuesta['serie'] ?? null,
+                'numero'          => $respuesta['numero'] ?? null,
+                'hash'            => $respuesta['codigo_hash'] ?? null,
+                'enlace_pdf'      => $respuesta['enlace_del_pdf'] ?? null,
+                'respuesta_sunat' => json_encode($respuesta),
+            ];
+
+            // ⏳ PENDIENTE CDR (CASO BOLETA)
             if (
                 array_key_exists('aceptada_por_sunat', $respuesta)
                 && $respuesta['aceptada_por_sunat'] === false
-                && empty($respuesta['cdr'])
+                && empty($respuesta['cdr_zip_base64'])
+                && empty($respuesta['sunat_responsecode'])
+                && empty($respuesta['sunat_soap_error'])
             ) {
 
-                $this->dispatch(
-                    'alert',
-                    ['type' => 'success', 'title' => 'Comprobante enviado a SUNAT, esperando CDR', 'message' => 'PENDIENTE']
+                $this->comprobante->update(
+                    array_merge($dataBase, [
+                        'estado' => 'PENDIENTE'
+                    ])
                 );
+
+                DB::commit();
+
+                $this->dispatch('alert', [
+                    'type' => 'success',
+                    'title' => 'Boleta enviada',
+                    'message' => 'SUNAT aún no envía CDR (PENDIENTE)'
+                ]);
+
+                return;
             }
 
-            // ❌ RECHAZADO SUNAT (ya hay CDR)
+            // ❌ RECHAZADO REAL SUNAT
             if (
-                array_key_exists('aceptada_por_sunat', $respuesta)
-                && $respuesta['aceptada_por_sunat'] === false
+                $respuesta['aceptada_por_sunat'] === false &&
+                (
+                    !empty($respuesta['sunat_responsecode']) ||
+                    !empty($respuesta['sunat_soap_error'])
+                )
             ) {
+
+                $this->comprobante->update(
+                    array_merge($dataBase, [
+                        'estado' => 'RECHAZADO'
+                    ])
+                );
+
+                DB::commit();
+
                 throw new \Exception(
                     $respuesta['sunat_description']
+                        ?? $respuesta['sunat_soap_error']
                         ?? 'SUNAT rechazó el comprobante'
                 );
             }
 
-            // ❓ Respuesta inválida
-            if (!array_key_exists('aceptada_por_sunat', $respuesta)) {
-                throw new \Exception('Respuesta inesperada de NubeFact');
+            // ✅ ACEPTADO
+            if ($respuesta['aceptada_por_sunat'] === true) {
+
+                $this->comprobante->update(
+                    array_merge($dataBase, [
+                        'estado' => 'EMITIDO'
+                    ])
+                );
+
+                DB::commit();
+
+                $this->dispatch('alert', [
+                    'type' => 'success',
+                    'title' => 'Comprobante emitido',
+                    'message' => 'Aceptado por SUNAT'
+                ]);
+
+                return;
             }
-            // ✅ Aceptado
-            // continuar flujo..
-            // 6️⃣ Guardar respuesta y marcar emitido
-            $this->comprobante->update([
-                'estado'            => 'EMITIDO',
-                'serie'             => $respuesta['serie'] ?? null,
-                'numero'            => $respuesta['numero'] ?? null,
-                'hash'              => $respuesta['hash'] ?? null,
-                'enlace_pdf'        => $respuesta['enlace'] ?? null,
-                'respuesta_sunat'   => json_encode($respuesta),
-            ]);
 
-            DB::commit();
-
-            $this->dispatch(
-                'alert',
-                ['type' => 'success', 'title' => 'Comprobante emitido correctamente', 'message' => 'Exito']
-            );
+            throw new \Exception('Estado SUNAT no reconocido');
         } catch (\Exception $e) {
 
             DB::rollBack();
-            dd($e);
             $this->addError('general', $e->getMessage());
         }
     }

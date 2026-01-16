@@ -13,20 +13,23 @@ use Livewire\Component;
 class Servicios extends Component
 {
     public $id_atencion;
+    public $atencion;
     public $id_servicio, $id_profesional, $cantidad, $precio_unitario;
 
     public $buscar = '';
     public $servicioSeleccionado = null;
     public $nombre_paciente = '';
+    public $dni = '';
     public $totalervicios = 0;
     public $id_atencion_servicio;
 
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
-        $atencion = Atencion::find($id_atencion);
-        $paciente = User::find($atencion->id_paciente);
+        $this->atencion = Atencion::find($id_atencion);
+        $paciente = User::find($this->atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
+        $this->dni = $paciente->dni;
         $this->getTotalServiciosProperty();
     }
 
@@ -68,7 +71,15 @@ class Servicios extends Component
     }
     public function agregarServicio()
     {
+        if ($this->atencion->estaBloqueada()) {
 
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Atención finalizada',
+                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : ' . $this->dni
+            ]);
+            return;
+        }
         $messages = [
             'id_servicio.required' => 'Por favor seleccionar el servicio',
             'precio_unitario.required' => 'Por favor ingresar la cantidad de servicios',
