@@ -22,7 +22,6 @@ class Laboratorio extends Component
             'detalles.resultados'
         ])
             ->where('id_atencion', $id_atencion)
-            ->where('estado', 'FINALIZADO')
             ->orderBy('fecha', 'desc')
             ->get();
     }
@@ -59,7 +58,7 @@ class Laboratorio extends Component
 
         $pdf = Pdf::loadView(
             'reportes.resultados-laboratorio',
-            compact('orden', 'base64', 'paciente', 'base64', 'firma_img')
+            compact('orden', 'base64', 'paciente', 'base64', 'firma_img','profesional')
         )->setPaper('A4'/* , 'landscape' */);
 
         return response()->streamDownload(

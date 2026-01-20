@@ -18,7 +18,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- STOCK BAJO -->
             <div class="col-md-3">
                 <div class="card shadow-sm border-0">
@@ -30,7 +29,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- COMPRAS HOY -->
             <div class="col-md-3">
                 <div class="card shadow-sm border-0">

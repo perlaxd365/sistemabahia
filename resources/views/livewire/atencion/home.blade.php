@@ -9,65 +9,86 @@
 
                         {{-- TABS BOOTSTRAP --}}
                         <ul class="nav nav-tabs tabs-clinica" id="atencionTabs">
-                            <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'info' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('info')">Info </a>
-                            </li>
-                            @if ($privilegio == 5)
+
+                            {{-- INFO (todos menos paciente) --}}
+                            @if ($this->puedeVer([1, 2, 3, 4, 5, 6]))
                                 <li class="nav-item">
-                                    <a class="nav-link {{ $tab == 'medico' ? 'active' : '' }}"
-                                        wire:click="cambiarTab('medico')">Medico</a>
+                                    <a class="nav-link {{ $tab == 'info' ? 'active' : '' }}"
+                                        wire:click="cambiarTab('info')">Info</a>
                                 </li>
                             @endif
 
-                            @if ($privilegio == 5)
+                            {{-- MÉDICO --}}
+                            @if ($this->puedeVer([1,5]))
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $tab == 'medico' ? 'active' : '' }}"
+                                        wire:click="cambiarTab('medico')">Médico</a>
+                                </li>
+                            @endif
+
+                            {{-- SERVICIOS --}}
+                            @if ($this->puedeVer([1,5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'servicios' ? 'active' : '' }}"
                                         wire:click="cambiarTab('servicios')">Servicios</a>
                                 </li>
                             @endif
-                            <li class="nav-item">
-                                <a class="nav-link {{ $tab == 'signos' ? 'active' : '' }}"
-                                    wire:click="cambiarTab('signos')">Signos Vitales</a>
-                            </li>
-                            @if ($privilegio == 2 || $privilegio == 5)
+
+                            {{-- SIGNOS VITALES --}}
+                            @if ($this->puedeVer([1,5, 3, 2]))
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $tab == 'signos' ? 'active' : '' }}"
+                                        wire:click="cambiarTab('signos')">Signos Vitales</a>
+                                </li>
+                            @endif
+
+                            {{-- CONSULTA --}}
+                            @if ($this->puedeVer([1,2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'consulta' ? 'active' : '' }}"
                                         wire:click="cambiarTab('consulta')">Consulta</a>
                                 </li>
                             @endif
-                            @if ($privilegio == 2 || $privilegio == 5)
+
+                            {{-- MEDICAMENTOS --}}
+                            @if ($this->puedeVer([1, 5, 6]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'medicamentos' ? 'active' : '' }}"
                                         wire:click="cambiarTab('medicamentos')">Medicamentos</a>
                                 </li>
+                            @endif
+
+                            {{-- LABORATORIO + IMAGEN --}}
+                            @if ($this->puedeVer([1,2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'laboratorio' ? 'active' : '' }}"
                                         wire:click="cambiarTab('laboratorio')">Laboratorio</a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'imagen' ? 'active' : '' }}"
-                                        wire:click="cambiarTab('imagen')">Imágen</a>
+                                        wire:click="cambiarTab('imagen')">Imagen</a>
                                 </li>
                             @endif
-                            @if ($privilegio == 2)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ $tab == 'insumos' ? 'active' : '' }}"
-                                        wire:click="cambiarTab('insumos')">Insumos</a>
-                                </li>
-                            @endif
-                            @if ($privilegio == 2 || $privilegio == 5)
+
+                            {{-- INSUMOS --}}
+
+                            {{-- RESULTADOS --}}
+                            @if ($this->puedeVer([1,2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'resultados' ? 'active' : '' }}"
                                         wire:click="cambiarTab('resultados')">Resultados</a>
                                 </li>
                             @endif
-                            @if ($privilegio == 5)
+
+                            {{-- FACTURACIÓN --}}
+                            @if ($this->puedeVer([1,5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'facturacion' ? 'active' : '' }}"
                                         wire:click="cambiarTab('facturacion')">Facturación</a>
                                 </li>
                             @endif
+
                         </ul>
 
                         <div class="mt-3">

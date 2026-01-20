@@ -36,6 +36,10 @@ class Medicamentos extends Component
             ->paginate($this->show);
         return view('livewire.farmacia.medicamentos', compact('medicamentos'));
     }
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
     public function agregar()
     {

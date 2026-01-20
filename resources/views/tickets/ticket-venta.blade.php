@@ -1,6 +1,7 @@
 <div>
     <!DOCTYPE html>
     <html lang="es">
+
     <head>
         <meta charset="UTF-8">
         <style>
@@ -33,10 +34,24 @@
             }
 
             img {
-                max-width: 150px;
+                max-width: 160px;
+            }
+
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body {
+                width: 70mm;
+                margin-left: 7% ;
+                padding-top: 7% ;
+                font-family: Arial, sans-serif;
+                font-size: 12px;
             }
         </style>
     </head>
+
     <body>
         <div class="center">
             {{-- LOGO --}}

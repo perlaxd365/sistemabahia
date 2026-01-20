@@ -6,6 +6,7 @@ use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\LaboratorioController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsuarioController;
@@ -57,4 +58,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('imagen/ordenes', [ImagenController::class, 'ordenes'])->name('imagen.ordenes');
     Route::get('imagen/ordenes/{id_orden}/resultados', [ImagenController::class, 'resultados'])->name('imagen.resultados');
     Route::get('/tickets/{comprobante}/imprimir', [TicketController::class, 'imprimir'])->name('tickets.imprimir');
+
+    
+    //PERFIL
+    Route::get('perfil', [PerfilController::class, 'index'])->name('perfil');
 });

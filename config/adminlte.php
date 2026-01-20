@@ -316,11 +316,25 @@ return [
             'text' => 'search',
         ],
         [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
+            'header' => 'INICIO',
+            'can' => 'ver-inicio'
         ],
-        ['header' => 'PACIENTE'],
+        [
+            'text' => 'Home',
+            'url' => 'index',
+            'icon' => 'fas fa-home',
+            'label' => 6,
+            'label_color' => 'warning',
+            'can' => 'ver-inicio',
+        ],
+        [
+            'header' => 'PERSONAS',
+            'can' => 'Administrador'
+        ],
+        [
+            'header' => 'PACIENTE',
+            'can' => 'Recepcionista',
+        ],
         [
             'text' => 'Usuarios',
             'url' => 'usuario',
@@ -345,7 +359,7 @@ return [
             'label_color' => 'warning',
             'can' => 'Recepcionista',
         ],
-        
+
         ['header' => 'INTERNO'],
         [
             'text' => 'Farmacia',
@@ -353,6 +367,7 @@ return [
             'icon' => 'fas fa-pills',
             'label' => 6,
             'label_color' => 'success',
+            'can' => 'ver-farmacia',
         ],
         [
             'text' => 'Laboratorio',
@@ -360,6 +375,7 @@ return [
             'icon' => 'fa fa-atom',
             'label' => 3,
             'label_color' => 'info',
+            'can' => 'ver-laboratorio',
         ],
         [
             'text' => 'Imágen',
@@ -367,20 +383,16 @@ return [
             'icon' => 'fa fa-image',
             'label' => 5,
             'label_color' => 'dark',
+            'can' => 'ver-imagen',
         ],
 
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
+            'text' => 'Perfil',
+            'url' => 'perfil',
             'icon' => 'fas fa-fw fa-user',
         ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
+        /* [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',
             'submenu' => [
@@ -417,7 +429,7 @@ return [
                     'url' => '#',
                 ],
             ],
-        ],
+        ], */
         ['header' => 'CONFIGURACION'],
         [
             'text' => 'Proveedor',
@@ -425,13 +437,8 @@ return [
             'url' => 'proveedor',
         ],
         [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
             'text' => 'Servicios',
-            'icon_color' => 'cyan',
+            'icon_color' => 'yellow',
             'url' => 'configuracion',
         ],
     ],

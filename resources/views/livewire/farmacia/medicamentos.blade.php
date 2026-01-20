@@ -10,92 +10,92 @@
         </div>
 
         <div class="row">
-
-            <!-- ===== FORMULARIO ===== -->
-            <div class="col-md-4">
-                <div class="card card-clinica shadow-sm">
-                    <div class="card-header bg-white">
-                        <strong class="text-clinico">Registro de Medicamento</strong>
-                    </div>
-
-                    <div class="card-body">
-
-                        <div class="mb-2">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control form-control-sm" wire:model.defer="nombre">
-                            @error('nombre')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+            @can('editar-farmacia')
+                <!-- ===== FORMULARIO ===== -->
+                <div class="col-md-4">
+                    <div class="card card-clinica shadow-sm">
+                        <div class="card-header bg-white">
+                            <strong class="text-clinico">Registro de Medicamento</strong>
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label">Presentación</label>
-                            <input type="text" class="form-control form-control-sm"
-                                placeholder="Tableta, jarabe, ampolla" wire:model.defer="presentacion">
-                        </div>
+                        <div class="card-body">
 
-                        <div class="mb-2">
-                            <label class="form-label">Concentración</label>
-                            <input type="text" class="form-control form-control-sm" placeholder="500 mg, 5 mg/ml"
-                                wire:model.defer="concentracion">
-                        </div>
-
-                        <div class="row">
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Precio Venta</label>
-                                <input type="number" step="0.01" class="form-control form-control-sm" min="0"
-                                    step="0.01" wire:model.defer="precio_venta">
-                                @error('precio_venta')
+                            <div class="mb-2">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control form-control-sm" wire:model.defer="nombre">
+                                @error('nombre')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Stock Inicial</label>
-                                <input type="number" class="form-control form-control-sm" min="0" step="0.01"
-                                    wire:model.defer="stock">
-                                @error('stock')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Marca / Laboratorio</label>
-                                <input type="text" class="form-control form-control-sm" wire:model.defer="marca">
+                            <div class="mb-2">
+                                <label class="form-label">Presentación</label>
+                                <input type="text" class="form-control form-control-sm"
+                                    placeholder="Tableta, jarabe, ampolla" wire:model.defer="presentacion">
                             </div>
 
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Fecha Vencimiento</label>
-                                <input type="date" class="form-control form-control-sm"
-                                    wire:model.defer="fecha_vencimiento">
+                            <div class="mb-2">
+                                <label class="form-label">Concentración</label>
+                                <input type="text" class="form-control form-control-sm" placeholder="500 mg, 5 mg/ml"
+                                    wire:model.defer="concentracion">
                             </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-2">
+                                    <label class="form-label">Precio Venta</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm" min="0"
+                                        step="0.01" wire:model.defer="precio_venta">
+                                    @error('precio_venta')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="col-6 mb-2">
+                                    <label class="form-label">Stock Inicial</label>
+                                    <input type="number" class="form-control form-control-sm" min="0" step="0.01"
+                                        wire:model.defer="stock">
+                                    @error('stock')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-2">
+                                    <label class="form-label">Marca / Laboratorio</label>
+                                    <input type="text" class="form-control form-control-sm" wire:model.defer="marca">
+                                </div>
+
+                                <div class="col-6 mb-2">
+                                    <label class="form-label">Fecha Vencimiento</label>
+                                    <input type="date" class="form-control form-control-sm"
+                                        wire:model.defer="fecha_vencimiento">
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                @if ($edicion)
+                                    <button wire:click="actualizar" wire:loading.attr="disabled"
+                                        class="btn btn-clinico btn-sm">
+                                        <i class="fa fa-edit"></i> <i wire:target="actualizar"
+                                            wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> Actualizar
+                                        Medicamento
+                                    </button>
+                                @else
+                                    <button wire:click="agregar" wire:loading.attr="disabled"
+                                        class="btn btn-clinico btn-sm">
+                                        <i class="fa fa-plus-circle"></i> <i wire:target="agregar"
+                                            wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> Guardar
+                                    </button>
+                                @endif
+
+
+                            </div>
+
                         </div>
-
-                        <div class="text-end mt-3">
-                            @if ($edicion)
-                                <button wire:click="actualizar" wire:loading.attr="disabled"
-                                    class="btn btn-clinico btn-sm">
-                                    <i class="fa fa-edit"></i> <i wire:target="actualizar"
-                                        wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> Actualizar
-                                    Medicamento
-                                </button>
-                            @else
-                                <button wire:click="agregar" wire:loading.attr="disabled"
-                                    class="btn btn-clinico btn-sm">
-                                    <i class="fa fa-plus-circle"></i> <i wire:target="agregar"
-                                        wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> Guardar
-                                </button>
-                            @endif
-
-
-                        </div>
-
                     </div>
                 </div>
-            </div>
-
+            @endcan
             <!-- ===== LISTADO ===== -->
             <div class="col-md-8">
                 <div class="card card-clinica shadow-sm">
@@ -125,7 +125,9 @@
                                         <th>Precio</th>
                                         <th>Vencimiento</th>
                                         <th>Estado</th>
-                                        <th class="text-end">Acciones</th>
+                                        @can('editar-farmacia')
+                                            <th class="text-end">Acciones</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -153,22 +155,22 @@
                                                     <span class="badge bg-danger-subtle text-danger">Inactivo</span>
                                                 @endif
                                             </td>
-
-                                            <td class="text-end">
-                                                <a href="javascrip:void(0)"
-                                                    wire:click="editar({{ $med->id_medicamento }})"
-                                                    class="text-dark"><u>Editar</u></a>
-
-                                                @if ($med->estado)
+                                            @can('editar-farmacia')
+                                                <td class="text-end">
                                                     <a href="javascrip:void(0)"
-                                                        wire:click="eliminar({{ $med->id_medicamento }})"
-                                                        class="text-danger"><u>Eliminar</u></a>
-                                                @else
-                                                    <a href="javascrip:void(0)"
-                                                        wire:click="habilitar({{ $med->id_medicamento }})"
-                                                        class="text-success"><u>Habilitar</u></a>
-                                                @endif
+                                                        wire:click="editar({{ $med->id_medicamento }})"
+                                                        class="text-dark"><u>Editar</u></a>
 
+                                                    @if ($med->estado)
+                                                        <a href="javascrip:void(0)"
+                                                            wire:click="eliminar({{ $med->id_medicamento }})"
+                                                            class="text-danger"><u>Eliminar</u></a>
+                                                    @else
+                                                        <a href="javascrip:void(0)"
+                                                            wire:click="habilitar({{ $med->id_medicamento }})"
+                                                            class="text-success"><u>Habilitar</u></a>
+                                                    @endif
+                                                @endcan
                                             </td>
 
                                         </tr>

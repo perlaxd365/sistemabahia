@@ -35,6 +35,67 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('Paciente', function ($user) {
             return $user->privilegio_cargo === 7;
         });
+
+        //Farmacia 
+
+        //ver
+        Gate::define('ver-farmacia', function ($user) {
+            return in_array($user->privilegio_cargo, [1, 3, 5, 6]);
+        });
+        //editar 
+        Gate::define('editar-farmacia', function ($user) {
+            return in_array($user->privilegio_cargo,  [1, 6]);
+        });
+
+        //Laboratorio 
+
+        //ver
+        Gate::define('ver-laboratorio', function ($user) {
+            return in_array($user->privilegio_cargo, [1,  4]);
+        });
+        Gate::define('editar-laboratorio', function ($user) {
+            return in_array($user->privilegio_cargo,  [1, 4]);
+        });
+
+        //IMAGEN
+        //ver
+        Gate::define('ver-imagen', function ($user) {
+            return in_array($user->privilegio_cargo, [1, 4]);
+        });
+        Gate::define('editar-imagen', function ($user) {
+            return in_array($user->privilegio_cargo,  [1, 4]);
+        });
+
+        //CONFIGURACIONES
+        //ver
+        Gate::define('ver-configuracion', function ($user) {
+            return in_array($user->privilegio_cargo, [1]);
+        });
+        //editar 
+        Gate::define('editar-configuracion', function ($user) {
+            return in_array($user->privilegio_cargo,  [1]);
+        });
+
+        //INICIO
+        //ver
+        Gate::define('ver-inicio', function ($user) {
+            return in_array($user->privilegio_cargo, [1, 2, 3, 4, 5, 6]);
+        });
+        //editar 
+        Gate::define('editar-inicio', function ($user) {
+            return in_array($user->privilegio_cargo,  [1, 6]);
+        });
+
+        
+        //RESULTADOS
+        //ver
+        Gate::define('ver-resultados', function ($user) {
+            return in_array($user->privilegio_cargo, [1,2, 5]);
+        });
+        //editar 
+        Gate::define('editar-resultados', function ($user) {
+            return in_array($user->privilegio_cargo,  [1,2, 5]);
+        });
     }
 
     /**

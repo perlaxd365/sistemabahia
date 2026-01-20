@@ -31,7 +31,9 @@
                         <th>Fecha</th>
                         <th>Exámenes</th>
                         <th>Estado</th>
-                        <th class="text-end">Acción</th>
+                        @can('editar-laboratorio')
+                            <th class="text-end">Acción</th>
+                        @endcan
                     </tr>
                 </thead>
 
@@ -91,21 +93,23 @@
 
                             <!-- ACCIÓN -->
                             <td class="text-end">
-                                @if ($orden->estado === 'PENDIENTE')
-                                    <a href="{{ route('laboratorio.resultados', $orden->id_orden) }}"
-                                        class="btn btn-sm btn-primary">
-                                        🧪 Subir resultados
-                                    </a>
-                                @elseif($orden->estado === 'PROCESO')
-                                    <a href="{{ route('laboratorio.resultados', $orden->id_orden) }}"
-                                        class="btn btn-sm btn-primary">
-                                        🧪 Editar resultados
-                                    </a>
-                                @else
-                                    <button class="btn btn-sm btn-outline-secondary" disabled>
-                                        🔒 Cerrado
-                                    </button>
-                                @endif
+                                @can('editar-laboratorio')
+                                    @if ($orden->estado === 'PENDIENTE')
+                                        <a href="{{ route('laboratorio.resultados', $orden->id_orden) }}"
+                                            class="btn btn-sm btn-primary">
+                                            🧪 Subir resultados
+                                        </a>
+                                    @elseif($orden->estado === 'PROCESO')
+                                        <a href="{{ route('laboratorio.resultados', $orden->id_orden) }}"
+                                            class="btn btn-sm btn-primary">
+                                            🧪 Editar resultados
+                                        </a>
+                                    @else
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            🔒 Cerrado
+                                        </button>
+                                    @endif
+                                @endcan
                             </td>
                         </tr>
                     @empty

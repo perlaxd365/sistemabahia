@@ -28,26 +28,36 @@
 
                     <tr>
                         <th>ID</th>
-                        <th>Fecha</th>
                         <th>Paciente</th>
+                        <th>Fecha</th>
                         <th>Área</th>
                         <th>Estudios</th>
                         <th>Diagnóstico</th>
                         <th>Estado</th>
-                        <th></th>
+                        @can('editar-laboratorio')
+                            <th>Acciones</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($ordenes as $orden)
                         <tr>
                             <td>{{ $orden->id_orden_imagen }}</td>
+                            <td>
+                                <strong class="text-clinico">
+                                    {{ UserUtil::getUserByID($orden->atencion->paciente->id)->name }}
+                                </strong>
+                                <div class="small text-muted">
+                                    {{ UserUtil::getUserByID($orden->atencion->paciente->id)->nombre_cargo }}
+                                </div>
+                            </td>
                             <td>{{ \Carbon\Carbon::parse($orden->fecha)->format('d/m/Y') }}</td>
-                            <td>{{ $orden->atencion->paciente->name }}</td>
                             <td>
                                 {{ $orden->detalles->first()->estudio->area->nombre ?? '-' }}
                             </td>
                             <td>{{ $orden->detalles->count() }}</td>
                             <td>{{ $orden->diagnostico ?? '-' }}</td>
+
                             <td>
                                 @if ($orden->estado === 'PENDIENTE')
                                     <span class="badge bg-warning">Pendiente</span>
@@ -55,18 +65,20 @@
                                     <span class="badge bg-success">Informado</span>
                                 @endif
                             </td>
-                            <td>
-                                @if ($orden->estado === 'PENDIENTE')
-                                    <a href="{{ route('imagen.resultados', $orden->id_orden_imagen) }}"
-                                        class="btn btn-sm btn-secondary">
-                                        🖼️ Subir resultados
-                                    </a>
-                                @elseif($orden->estado === 'INFORMADO')
-                                    <button class="btn btn-sm btn-outline-secondary" disabled>
-                                        🔒 Cerrado
-                                    </button>
-                                @endif
-                            </td>
+                            @can('editar-laboratorio')
+                                <td>
+                                    @if ($orden->estado === 'PENDIENTE')
+                                        <a href="{{ route('imagen.resultados', $orden->id_orden_imagen) }}"
+                                            class="btn btn-sm btn-secondary">
+                                            🖼️ Subir resultados
+                                        </a>
+                                    @elseif($orden->estado === 'INFORMADO')
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            🔒 Cerrado
+                                        </button>
+                                    @endif
+                                </td>
+                            @endcan
                         </tr>
                     @endforeach
                 </tbody>

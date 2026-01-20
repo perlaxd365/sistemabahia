@@ -62,7 +62,7 @@ class Usuario extends Component
 
     public function showDetailCargo()
     {
-        if ($this->nombre_cargo == "Doctor") {
+        if ($this->nombre_cargo == "Doctor" || $this->nombre_cargo == "Laboratorio") {
             $this->showDetail = true;
             $this->especialidad_cargo = '';
             $this->colegiatura_cargo = '';
@@ -317,7 +317,7 @@ class Usuario extends Component
 
         if ($this->firma_url_update) {
 
-            $path_firma = Storage::disk('cloudinary')->put('foto_perfil', $this->firma_url_update);
+            $path_firma = Storage::disk('cloudinary')->put('firma_perfil', $this->firma_url_update);
             $url_firma = Storage::disk('cloudinary')->url($path_firma);
             $user->update([
                 'firma_url' => $url_firma,

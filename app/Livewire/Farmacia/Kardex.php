@@ -13,11 +13,17 @@ class Kardex extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = "bootstrap";
     public $buscarMedicamento = '';
     public $fechaInicio;
     public $fechaFin;
     public $tipoMovimiento = ''; // ENTRADA | SALIDA
     public $perPage = 10;
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
 
     public function updated($property)

@@ -259,8 +259,36 @@
                         <label>Exámenes auxiliares</label>
                         <textarea class="form-control" rows="2" wire:model="examen_auxiliar_consulta"></textarea>
                     </div>
-                    <div class="col-md-12">
-                        <label>Tratamiento</label>
+                    <br>
+                    <div class="container">
+<br>
+                        <div class="col-md-12">
+                            <div class="alert alert-primary border-0 shadow-sm" style="background-color:#f1f7ff;">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3 fs-4 text-primary">
+                                        💊
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-primary">
+                                            Tratamiento farmacológico
+                                        </h6>
+                                        <p class="mb-0 text-secondary small">
+                                            En este apartado registre los medicamentos indicados al paciente,
+                                            especificando <strong>dosis</strong>, <strong>vía de
+                                                administración</strong>,
+                                            <strong>frecuencia</strong> y <strong>duración del tratamiento</strong>
+                                            según criterio médico.
+                                        </p>
+                                        <br>
+                                        <p class="mb-0 text-secondary small">
+                                            Lo indicado será recibido por farmacia</p>
+                                        <ul class="text-primary small">
+                                            <li>Solo se emitirá al paciente los farmacos disponibles.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <textarea class="form-control" rows="2" wire:model="tratamiento_consulta"></textarea>
                     </div>
                 </div>

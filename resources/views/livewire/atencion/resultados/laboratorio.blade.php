@@ -1,7 +1,7 @@
 <div class="hc-card">
 
     <div class="hc-header">
-        Órdenes de Imagen
+        Órdenes de Laboratorio
     </div>
     <br>
     <div class="hc-body">
@@ -63,10 +63,15 @@
 
                 {{-- ACCIONES (opcional, para luego) --}}
                 <div class="card-footer">
+                    @if ($orden->estado == 'FINALIZADO')
+                        - <a href="javascript:void(0)" wire:click='imprimirResultados({{ $orden->id_orden }})'
+                            class="badge text-primary">
+                            <i class="fa fa-file"></i> Descargar Informe
+                        </a>
+                    @else
+                        - <p class="badge">Espera de resultados</p>
+                    @endif
 
-                    - <a href="javascript:void(0)" wire:click='imprimirResultados({{ $orden->id_orden }})' class="badge text-primary">
-                        <i class="fa fa-file"></i> Descargar Informe
-                    </a>
                 </div>
             </div>
         @endforeach

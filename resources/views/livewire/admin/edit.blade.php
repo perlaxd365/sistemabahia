@@ -63,6 +63,22 @@
                                 <img src="{{ $foto_url }}" width="150" height="150" />
                             </div>
                         </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label id="name-label" for="firma_url_update">Firma Profesional</label>
+                                <input type="file" wire:model='firma_url_update' accept="image/x-png,image/gif,image/jpeg"
+                                    placeholder="Adjuntar firma" class="form-control" required>
+                                @error('firma_url_update')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <img src="{{ $firma_url }}" width="150" height="150" />
+                            </div>
+                        </div>
                     @endif
                     <div class="col-md-6">
                         <div class="form-group">
@@ -104,8 +120,10 @@
                                     <option value="Administrador">Administrador</option>
                                     <option value="Doctor">Doctor (a)</option>
                                     <option value="Enfermero">Enfermero (a)</option>
+                                    <option value="Laboratorio">Laboratorio</option>
                                     <option value="Recepcionista">Recepcionista</option>
                                     <option value="Farmaceutico">Farmaceutico (a)</option>
+                                    <option value="Paciente">Paciente (a)</option>
 
                                 </select>
                                 @error('nombre_cargo')

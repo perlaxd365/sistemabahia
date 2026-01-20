@@ -8,6 +8,7 @@ use App\Models\OrdenLaboratorio;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Livewire\Component;
+use UserUtil;
 
 class Resultados extends Component
 {
@@ -82,15 +83,8 @@ class Resultados extends Component
 
     public function vista_previa()
     {
-        $ordenes = OrdenLaboratorio::with([
 
-            'detalles.examenes.areas',
-            'detalles.resultados'
-        ])
-            ->where('id_atencion', $this->atencion->id_atencion)
-            ->where('estado', 'FINALIZADO')
-            ->orderBy('fecha', 'desc')
-            ->get();
+        $orden = OrdenLaboratorio::find($this->id_orden);
         $paciente = $this->atencion->paciente;
         //imagen
         $path = public_path('images/logo-clinica.png');
@@ -99,10 +93,28 @@ class Resultados extends Component
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
 
+        //firma de laboratorista
+        $profesional = UserUtil::getUserByID($orden->profesional);
+        $firma_img = null;
+
+        if ($profesional && $profesional->firma_url) {
+
+            try {
+                $url = $profesional->firma_url;
+
+                $data_firma = file_get_contents($url);
+
+                $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+
+                $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+            } catch (\Exception $e) {
+                $firma_img = null;
+            }
+        }
         $pdf = Pdf::loadView(
             'reportes.resultados-laboratorio',
-            compact('ordenes', 'base64', 'paciente', 'base64')
-        )->setPaper('A4', 'landscape');
+            compact('orden', 'base64', 'paciente', 'base64', 'firma_img','profesional')
+        )->setPaper('A4');
 
         return response()->streamDownload(
             fn() => print($pdf->output()),

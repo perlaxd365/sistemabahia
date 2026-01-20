@@ -9,13 +9,14 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DateUtil;
 use Livewire\Component;
+use UserUtil;
 
 class Consulta extends Component
 {
     public $id_consulta,
         $id_atencion,
         $id_paciente,
-
+        $atencion,
         $molestia_consulta,
         $tiempo_consulta,
         $inicio_consulta,
@@ -42,13 +43,16 @@ class Consulta extends Component
 
     public $medico_responsable = false;
     public $nombre_paciente;
+    public $dni;
 
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
         $atencion = Atencion::find($id_atencion);
+        $this->atencion = $atencion;
         $paciente = User::find($atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
+        $this->dni = $paciente->dni;
         $this->id_paciente = $atencion->id_paciente;
         $consulta = ModelsConsulta::where("id_atencion", $atencion->id_atencion)->first();
         if ($consulta) {
@@ -88,6 +92,15 @@ class Consulta extends Component
 
     public function agregarConsulta()
     {
+        if ($this->atencion->estaBloqueada()) {
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Atención finalizada',
+                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : ' . $this->dni
+            ]);
+            return;
+        }
         if ($this->id_consulta) {
             $consulta = ModelsConsulta::find($this->id_consulta);
             $consulta->update([
@@ -198,8 +211,26 @@ class Consulta extends Component
             $atencion = Atencion::find($this->id_atencion);
             $historia = Historia::find($atencion->id_historia);
 
+            //firma de doctor
+            $profesional = UserUtil::getUserByID($atencion->id_medico);
 
-            $pdf = Pdf::loadView('reportes.print-consulta', compact('base64', 'consulta', 'paciente', 'historia'));
+            $firma_img = null;
+
+            if ($profesional && $profesional->firma_url) {
+
+                try {
+                    $url = $profesional->firma_url;
+
+                    $data_firma = file_get_contents($url);
+
+                    $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+
+                    $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+                } catch (\Exception $e) {
+                    $firma_img = null;
+                }
+            }
+            $pdf = Pdf::loadView('reportes.print-consulta', compact('base64', 'consulta', 'paciente', 'historia', 'firma_img', 'profesional'));
 
             return response()->streamDownload(
                 fn() => print($pdf->output()),

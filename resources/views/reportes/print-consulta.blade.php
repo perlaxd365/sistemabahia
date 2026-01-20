@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Historia Clínica</title>
@@ -113,130 +114,139 @@
 
 <body>
 
-<!-- ===== PORTADA ===== -->
-<div class="header">
-    <img src="{{ $base64 }}" alt="Clínica Bahía">
-    <div class="titulo">HISTORIA CLÍNICA</div>
-    <div class="subtitulo">Consulta Médica</div>
-</div>
+    <!-- ===== PORTADA ===== -->
+    <div class="header">
+        <img src="{{ $base64 }}" alt="Clínica Bahía">
+        <div class="titulo">HISTORIA CLÍNICA</div>
+        <div class="subtitulo">Consulta Médica</div>
+    </div>
 
-<hr>
+    <hr>
 
-<!-- ===== DATOS DE PACIENTE ===== -->
-<div class="section">
-    <div class="section-title">Datos del Paciente</div>
-    <div class="info">
-        <div>
-            <span class="label">Nombres completos:</span>
-            <span class="value">{{ $paciente->name }}</span>
-        </div>
-        <div>
-            <span class="label">Fecha de nacimiento:</span>
-            <span class="value">{{ $paciente->fecha_nacimiento }}</span>
-        </div>
-        <div>
-            <span class="label">Teléfono:</span>
-            <span class="value">{{ $paciente->telefono }}</span>
-        </div>
-        <div>
-            <span class="label">Dirección:</span>
-            <span class="value">{{ $paciente->direccion }}</span>
+    <!-- ===== DATOS DE PACIENTE ===== -->
+    <div class="section">
+        <div class="section-title">Datos del Paciente</div>
+        <div class="info">
+            <div>
+                <span class="label">Nombres completos:</span>
+                <span class="value">{{ $paciente->name }}</span>
+            </div>
+            <div>
+                <span class="label">Fecha de nacimiento:</span>
+                <span class="value">{{ $paciente->fecha_nacimiento }}</span>
+            </div>
+            <div>
+                <span class="label">Teléfono:</span>
+                <span class="value">{{ $paciente->telefono }}</span>
+            </div>
+            <div>
+                <span class="label">Dirección:</span>
+                <span class="value">{{ $paciente->direccion }}</span>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===== DATOS DE ATENCIÓN ===== -->
-<div class="section">
-    <div class="section-title">Datos de Atención</div>
-    <div class="info">
-        <div>
-            <span class="label">N° Historia Clínica:</span>
-            <span class="value">{{ $historia->nro_historia }}</span>
-        </div>
-        <div>
-            <span class="label">Fecha de Consulta:</span>
-            <span class="value">{{ $consulta->fecha_consulta }}</span>
+    <!-- ===== DATOS DE ATENCIÓN ===== -->
+    <div class="section">
+        <div class="section-title">Datos de Atención</div>
+        <div class="info">
+            <div>
+                <span class="label">N° Historia Clínica:</span>
+                <span class="value">{{ $historia->nro_historia }}</span>
+            </div>
+            <div>
+                <span class="label">Fecha de Consulta:</span>
+                <span class="value">{{ $consulta->fecha_consulta }}</span>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===== MOTIVO DE CONSULTA ===== -->
-<div class="section">
-    <div class="section-title">Motivo de Consulta</div>
-    <div><span class="label">Molestia principal:</span><span class="value">{{ $consulta->molestia_consulta }}</span></div>
-    <div><span class="label">Tiempo de evolución:</span><span class="value">{{ $consulta->tiempo_consulta }}</span></div>
-    <div><span class="label">Inicio:</span><span class="value">{{ $consulta->inicio_consulta }}</span></div>
-    <div><span class="label">Curso:</span><span class="value">{{ $consulta->curso_consulta }}</span></div>
-</div>
+    <!-- ===== MOTIVO DE CONSULTA ===== -->
+    <div class="section">
+        <div class="section-title">Motivo de Consulta</div>
+        <div><span class="label">Molestia principal:</span><span
+                class="value">{{ $consulta->molestia_consulta }}</span></div>
+        <div><span class="label">Tiempo de evolución:</span><span
+                class="value">{{ $consulta->tiempo_consulta }}</span></div>
+        <div><span class="label">Inicio:</span><span class="value">{{ $consulta->inicio_consulta }}</span></div>
+        <div><span class="label">Curso:</span><span class="value">{{ $consulta->curso_consulta }}</span></div>
+    </div>
 
-<!-- ===== ENFERMEDAD ACTUAL ===== -->
-<div class="section">
-    <div class="section-title">Enfermedad Actual</div>
-    <div class="value">{{ $consulta->enfermedad_consulta }}</div>
-</div>
+    <!-- ===== ENFERMEDAD ACTUAL ===== -->
+    <div class="section">
+        <div class="section-title">Enfermedad Actual</div>
+        <div class="value">{{ $consulta->enfermedad_consulta }}</div>
+    </div>
 
-<!-- ===== ANTECEDENTES ===== -->
-<div class="section">
-    <div class="section-title">Antecedentes</div>
-    <div><span class="label">Familiares:</span><span class="value">{{ $consulta->atecedente_familiar_consulta }}</span></div>
-    <div><span class="label">Patológicos:</span><span class="value">{{ $consulta->atecedente_patologico_consulta }}</span></div>
-</div>
+    <!-- ===== ANTECEDENTES ===== -->
+    <div class="section">
+        <div class="section-title">Antecedentes</div>
+        <div><span class="label">Familiares:</span><span
+                class="value">{{ $consulta->atecedente_familiar_consulta }}</span></div>
+        <div><span class="label">Patológicos:</span><span
+                class="value">{{ $consulta->atecedente_patologico_consulta }}</span></div>
+    </div>
 
-<!-- ===== SIGNOS VITALES ===== -->
-<div class="section">
-    <div class="section-title">Signos Vitales</div>
-    <table>
-        <tr>
-            <th>Peso</th>
-            <th>Talla</th>
-            <th>IMC</th>
-            <th>Temp.</th>
-            <th>PA</th>
-            <th>FC</th>
-            <th>Sat O₂</th>
-        </tr>
-        <tr>
-            <td>{{ $consulta->peso_consulta }}</td>
-            <td>{{ $consulta->talla_consulta }}</td>
-            <td>{{ $consulta->imc_consulta }}</td>
-            <td>{{ $consulta->temperatura_consulta }}</td>
-            <td>{{ $consulta->presion_consulta }}</td>
-            <td>{{ $consulta->frecuencia_consulta }}</td>
-            <td>{{ $consulta->saturacion_consulta }}</td>
-        </tr>
-    </table>
-</div>
+    <!-- ===== SIGNOS VITALES ===== -->
+    <div class="section">
+        <div class="section-title">Signos Vitales</div>
+        <table>
+            <tr>
+                <th>Peso</th>
+                <th>Talla</th>
+                <th>IMC</th>
+                <th>Temp.</th>
+                <th>PA</th>
+                <th>FC</th>
+                <th>Sat O₂</th>
+            </tr>
+            <tr>
+                <td>{{ $consulta->peso_consulta }}</td>
+                <td>{{ $consulta->talla_consulta }}</td>
+                <td>{{ $consulta->imc_consulta }}</td>
+                <td>{{ $consulta->temperatura_consulta }}</td>
+                <td>{{ $consulta->presion_consulta }}</td>
+                <td>{{ $consulta->frecuencia_consulta }}</td>
+                <td>{{ $consulta->saturacion_consulta }}</td>
+            </tr>
+        </table>
+    </div>
 
-<!-- ===== EXAMEN FÍSICO ===== -->
-<div class="section">
-    <div class="section-title">Examen Físico</div>
-    <div class="value">{{ $consulta->examen_consulta }}</div>
-</div>
+    <!-- ===== EXAMEN FÍSICO ===== -->
+    <div class="section">
+        <div class="section-title">Examen Físico</div>
+        <div class="value">{{ $consulta->examen_consulta }}</div>
+    </div>
 
-<!-- ===== IMPRESIÓN DIAGNÓSTICA ===== -->
-<div class="section">
-    <div class="section-title">Impresión Diagnóstica</div>
-    <div class="value">{{ $consulta->impresion_consulta }}</div>
-</div>
+    <!-- ===== IMPRESIÓN DIAGNÓSTICA ===== -->
+    <div class="section">
+        <div class="section-title">Impresión Diagnóstica</div>
+        <div class="value">{{ $consulta->impresion_consulta }}</div>
+    </div>
 
-<!-- ===== EXÁMENES AUXILIARES ===== -->
-<div class="section">
-    <div class="section-title">Exámenes Auxiliares</div>
-    <div class="value">{{ $consulta->examen_auxiliar_consulta }}</div>
-</div>
+    <!-- ===== EXÁMENES AUXILIARES ===== -->
+    <div class="section">
+        <div class="section-title">Exámenes Auxiliares</div>
+        <div class="value">{{ $consulta->examen_auxiliar_consulta }}</div>
+    </div>
 
-<!-- ===== TRATAMIENTO ===== -->
-<div class="section">
-    <div class="section-title">Tratamiento</div>
-    <div class="value">{{ $consulta->tratamiento_consulta }}</div>
-</div>
+    <!-- ===== TRATAMIENTO ===== -->
+    <div class="section">
+        <div class="section-title">Tratamiento</div>
+        <div class="value">{{ $consulta->tratamiento_consulta }}</div>
+    </div>
 
-<!-- ===== FIRMA ===== -->
-<div class="firma">
-    <div class="firma-linea"></div>
-    Médico Tratante<br>
-    CMP: ___________
-</div>
+    <!-- ===== FIRMA ===== -->
+
+    <div class="firma">
+        @if ($firma_img)
+            <img src="{{ $firma_img }}" style="height:70px; width:auto; max-width:200px;">
+            <br> ___________________________<br>
+            Laboratorio Clínico <br>
+            Colegiatura: {{ $profesional->colegiatura_cargo }}
+        @endif
+    </div>
 
 </body>
+
 </html>

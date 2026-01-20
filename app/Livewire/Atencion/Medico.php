@@ -39,7 +39,7 @@ class Medico extends Component
 
     public function render()
     {
-        //doctorees 2
+        //doctor es 2
         $medicos = User::orderBy('name')->where('privilegio_cargo', 2)->get();
         return view('livewire.atencion.medico', compact('medicos'));
     }

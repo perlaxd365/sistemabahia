@@ -25,6 +25,7 @@ class Medicamentos extends Component
     public $tratamiento;
     public $nombre_paciente;
     public $dni;
+    public $privilegio;
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
@@ -40,6 +41,9 @@ class Medicamentos extends Component
         $paciente = User::find($this->atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
         $this->dni = $paciente->dni;
+
+        //privilegio
+        $this->privilegio = auth()->user()->privilegio_cargo;
     }
     public function render()
     {
@@ -121,7 +125,7 @@ class Medicamentos extends Component
             $this->dispatch('alert', [
                 'type' => 'error',
                 'title' => 'Atención finalizada',
-                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : '.$this->dni
+                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : ' . $this->dni
             ]);
             return;
         }

@@ -44,14 +44,14 @@
 
             </div>
         @endif
-<br>
+        <br>
         <div>
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🩺 Atenciones Activas</h5>
 
                     <input type="text" class="form-control w-25" placeholder="Buscar paciente..."
-                        wire:model.debounce.500ms="search">
+                        wire:model.live.500ms="search">
                 </div>
 
                 <div class="card-body p-0">
@@ -63,6 +63,7 @@
                                 <th>DNI</th>
                                 <th>Médico</th>
                                 <th>Fecha</th>
+                                <th class="text-center">Comprobante</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -75,25 +76,51 @@
                                     <td>{{ $atencion->paciente->dni ?? '-' }}</td>
                                     <td>{{ $atencion->medico->name ?? '-' }}</td>
                                     <td>{{ $atencion->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="text-center">
+                                        @switch($atencion->comprobante->estado)
+                                            @case('BORRADOR')
+                                                <span class="badge bg-warning">
+                                                    {{ $atencion->comprobante->estado }}
+                                                </span>
+                                            @break
+                                            @case('PENDIENTE')
+                                                <span class="badge bg-secondary">
+                                                    {{ $atencion->comprobante->estado }}
+                                                </span>
+                                            @break
+                                            @case('EMITIDO')
+                                                
+                                                <span class="badge bg-success">
+                                                    {{ $atencion->comprobante->estado }}
+                                                </span>
+                                            @break
 
+                                            @default
+                                        @endswitch
+
+
+                                    </td>
                                     <td class="text-center">
                                         <a href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"><u>Ir
                                                 a atención</u></a>
                                     </td>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted py-3">
-                                        No hay atenciones activas
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-3">
+                                            No hay atenciones activas
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
+            <div wire:ignore.self class="card-footer text-right">
+                {{ $atenciones->links(data: ['scrollTo' => false]) }}
+            </div>
+        </div>
     </div>
-</div>
