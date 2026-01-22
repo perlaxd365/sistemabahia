@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AtencionController;
+use App\Http\Controllers\CajaTurnoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\ImagenController;
@@ -62,4 +63,8 @@ Route::group(['middleware' => ['auth']], function () {
     
     //PERFIL
     Route::get('perfil', [PerfilController::class, 'index'])->name('perfil');
+
+    
+    //PERFIL
+    Route::get('caja', [CajaTurnoController::class, 'index'])->name('caja');
 });

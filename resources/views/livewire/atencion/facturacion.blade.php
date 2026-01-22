@@ -73,7 +73,18 @@
                                 <option value="FACTURA">🔵 Factura</option>
                             </select>
                         </div>
-
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Método de pago
+                            </label>
+                            <select class="form-control" wire:model.defer="tipo_pago">
+                                <option value="EFECTIVO">Efectivo</option>
+                                <option value="YAPE">Yape</option>
+                                <option value="PLIN">Plin</option>
+                                <option value="TARJETA">Tarjeta</option>
+                                <option value="TRANSFERENCIA">Transferencia</option>
+                            </select>
+                        </div>
                         {{-- IGV --}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Aplicar IGV</label>
@@ -222,7 +233,8 @@
                     @if ($comprobante->estado === 'BORRADOR')
                         <button wire:click="emitir" wire:loading.attr="disabled" class="btn btn-success btn-sm"
                             type="button"> <i class="fa fa-plus-circle"></i> <i wire:target="emitir"
-                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> 🚀 Emitir comprobante
+                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> 🚀 Emitir
+                            comprobante
                             Usuario</button>
                     @endif
 

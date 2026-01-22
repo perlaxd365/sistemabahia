@@ -42,7 +42,7 @@ class User extends Authenticatable
         'password',
         'estado_user',
     ];
-    
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -93,5 +93,15 @@ class User extends Authenticatable
     public function adminlte_desc()
     {
         return  auth()->user()->nombre_cargo;
+    }
+
+    public function cajaTurnos()
+    {
+        return $this->hasMany(CajaTurno::class, 'user_id');
+    }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'user_id');
     }
 }

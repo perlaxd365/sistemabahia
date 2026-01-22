@@ -54,7 +54,11 @@ return new class extends Migration
             $table->string('pdf_url')->nullable();
 
 
+            $table->unsignedBigInteger('id_caja_turno')->nullable();
 
+            $table->foreign('id_caja_turno')
+                ->references('id_caja_turno')
+                ->on('caja_turnos');
 
             $table->timestamps();
         });

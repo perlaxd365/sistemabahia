@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use App\Models\Comprobante;
 use App\Models\NubefactConfig;
+use App\Models\Pago;
 use DateUtil;
 use Exception;
 
@@ -31,6 +32,7 @@ class NubeFactService
      */
     public function emitir(Comprobante $comprobante): array
     {
+        
         if ($comprobante->estado !== 'BORRADOR') {
             throw new Exception('El comprobante no está en estado BORRADOR');
         }
@@ -50,7 +52,7 @@ class NubeFactService
      */
     protected function buildJson(Comprobante $c): array
     {
-        
+
 
         $items   = $this->buildItems($c);
         $totales = $this->calcularTotales($items);
@@ -96,6 +98,16 @@ class NubeFactService
 
             'items' => $items,
         ];
+
+        Pago::create([
+            'id_comprobante' =>  $c->id_comprobante,
+            'id_atencion'    => $this->atencion->id_atencion,
+            'id_caja_turno'  => session('id_caja_turno'), // si está abierto
+            'tipo_pago'      => $this->tipo_pago,
+            'monto'          => $this->comprobante->total,
+            'fecha_pago'     => now(),
+            'user_id'        => auth()->id(),
+        ]);
     }
 
     /**

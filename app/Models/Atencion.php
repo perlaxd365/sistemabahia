@@ -91,4 +91,9 @@ class Atencion extends Model
             ->whereIn('estado', ['EMITIDO', 'PENDIENTE'])
             ->exists();
     }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'id_atencion');
+    }
 }

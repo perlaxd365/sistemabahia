@@ -3,11 +3,15 @@
 namespace App\Livewire\Atencion;
 
 use App\Models\Atencion;
+use App\Models\CajaMovimiento;
+use App\Models\CajaTurno;
 use App\Models\Cliente;
 use App\Models\Comprobante;
 use App\Models\ComprobanteDetalle;
+use App\Models\Pago;
 use App\Services\NubeFactService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -105,6 +109,11 @@ class Facturacion extends Component
             $this->comprobante->load('detalles');
         });
     }
+
+
+    /**
+     * Calcular totoales
+     */
     protected function recalcularTotalesSunat()
     {
         $this->comprobante->subtotal = round(
@@ -124,6 +133,11 @@ class Facturacion extends Component
 
         $this->comprobante->save();
     }
+
+
+    /**
+     * Cargar items al borrador
+     */
     public function cargarItems()
     {
         // 1️⃣ Debe existir comprobante
@@ -194,6 +208,10 @@ class Facturacion extends Component
             $this->comprobante->load('detalles');
         });
     }
+
+    /**
+     * calcular totlaes
+     */
     protected function recalcularTotales()
     {
 
@@ -217,6 +235,10 @@ class Facturacion extends Component
         ]);
     }
 
+
+    /**
+     * Actualizar el tipo de compronamte
+     */
     public function actualizarTipoComprobante()
     {
         $this->numero_documento = "";
@@ -238,6 +260,10 @@ class Facturacion extends Component
             $this->recalcularTotales();
         }
     }
+
+    /***
+     * calcular igv
+     */
     public function updatedConIgv($value)
     {
         if (!$this->comprobante) return;
@@ -249,6 +275,11 @@ class Facturacion extends Component
         $this->recalcularTotales();
     }
 
+
+    /*
+    *Guardamos cliente
+     * 
+     */
     public $numero_documento;
     public $cliente_nombre;
     public $cliente_razon;
@@ -293,7 +324,9 @@ class Facturacion extends Component
         }
     }
 
-
+    /**
+     * Buscamos ruc
+     */
     public function buscarRuc()
     {
         $this->validate([
@@ -322,6 +355,9 @@ class Facturacion extends Component
         $this->cliente_direccion = $data['direccion'];
     }
 
+    /**
+     * Buscar Dni
+     */
     public function buscarDni()
     {
 
@@ -342,13 +378,44 @@ class Facturacion extends Component
     }
 
     //enviara a sunat
-
+    public $tipo_pago = 'EFECTIVO';
     public function emitir()
     {
+        //verificar turno y pago
+        $cajaTurno = CajaTurno::turnoAbierto()->first();
+
+        if (!$cajaTurno) {
+            $this->dispatch(
+                'alert',
+                ['type' => 'error', 'title' => 'No hay un turno de caja abierto', 'message' => 'Error']
+            );
+            return;
+        }
+
+        //PAGO 
         if ($this->tipo_comprobante === "TICKET") {
             # code...
-
             $this->registrarTicket();
+            // procede a guardar pago
+            $pago = Pago::create([
+                'id_comprobante' => $this->comprobante->id_comprobante,
+                'id_atencion'    => $this->comprobante->atencion->id_atencion,
+                'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
+                'tipo_pago'      => $this->tipo_pago,
+                'monto'          => $this->comprobante->total,
+                'fecha_pago'     => now(),
+                'user_id'        => Auth()->id(),
+            ]);
+
+            CajaMovimiento::create([
+                'id_caja_turno' => $cajaTurno->id_caja_turno,
+                'tipo' => 'INGRESO',
+                'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
+                'monto' => $this->comprobante->total,
+                'id_referencia' => $pago->id_pago,
+                'id_usuario' => Auth::id(),
+                'responsable' => auth()->user()->name,
+            ]);
 
             $this->dispatch(
                 'alert',
@@ -356,25 +423,27 @@ class Facturacion extends Component
             );
             return;
         }
-        if (!$this->comprobante) {
-            $this->dispatch(
-                'alert',
-                ['type' => 'error', 'title' => 'No existe comprobante', 'message' => 'Error']
-            );
-            return;
-        }
 
-        if ($this->comprobante->estado === 'EMITIDO') {
-            $this->dispatch(
-                'alert',
-                ['type' => 'error', 'title' => 'El comprobante ya fue emitido', 'message' => 'Error']
-            );
-            return;
-        }
 
         DB::beginTransaction();
-
         try {
+
+            if (!$this->comprobante) {
+                $this->dispatch(
+                    'alert',
+                    ['type' => 'error', 'title' => 'No existe comprobante', 'message' => 'Error']
+                );
+                return;
+            }
+
+            if ($this->comprobante->estado === 'EMITIDO') {
+                $this->dispatch(
+                    'alert',
+                    ['type' => 'error', 'title' => 'El comprobante ya fue emitido', 'message' => 'Error']
+                );
+                return;
+            }
+
 
             // 1️⃣ Validaciones
             $this->validarAntesDeEmitir();
@@ -388,6 +457,26 @@ class Facturacion extends Component
             // 4️⃣ Enviar a NubeFact
             $respuesta = app(NubeFactService::class)
                 ->emitir($this->comprobante);
+            // procede a guardar pago
+            $pago = Pago::create([
+                'id_comprobante' => $this->comprobante->id_comprobante,
+                'id_atencion'    => $this->comprobante->atencion->id_atencion,
+                'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
+                'tipo_pago'      => $this->tipo_pago,
+                'monto'          => $this->comprobante->total,
+                'fecha_pago'     => now(),
+                'user_id'        => Auth()->id(),
+            ]);
+
+            CajaMovimiento::create([
+                'id_caja_turno' => $cajaTurno->id_caja_turno,
+                'tipo' => 'INGRESO',
+                'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
+                'monto' => $this->comprobante->total,
+                'id_referencia' => $pago->id_pago,
+                'id_usuario' => Auth::id(),
+                'responsable' => auth()->user()->name,
+            ]);
 
             if (!$respuesta || !is_array($respuesta)) {
                 throw new \Exception('Respuesta vacía o inválida de NubeFact');
@@ -485,9 +574,11 @@ class Facturacion extends Component
         } catch (\Exception $e) {
 
             DB::rollBack();
-            $this->addError('general', $e->getMessage());
+            dd($e->getMessage());
         }
     }
+
+
 
     protected function siguienteNumeroTicket(): int
     {
@@ -528,67 +619,65 @@ class Facturacion extends Component
             return;
         }
 
-        DB::transaction(function () {
 
-            // 1️⃣ Actualizar datos base (RESPETANDO con_igv)
-            $this->comprobante->update([
-                'tipo_comprobante' => 'TICKET',
-                'serie'            => 'TCK',
-                'numero'           => $this->comprobante->numero
-                    ?? $this->siguienteNumeroTicket(),
-                'fecha_emision'    => now(),
-                'con_igv'          => (bool) $this->con_igv, // ✅ CLAVE
+        // 1️⃣ Actualizar datos base (RESPETANDO con_igv)
+        $this->comprobante->update([
+            'tipo_comprobante' => 'TICKET',
+            'serie'            => 'TCK',
+            'numero'           => $this->comprobante->numero
+                ?? $this->siguienteNumeroTicket(),
+            'fecha_emision'    => now(),
+            'con_igv'          => (bool) $this->con_igv, // ✅ CLAVE
+        ]);
+
+        // 2️⃣ Limpiar detalles
+        $this->comprobante->detalles()->delete();
+
+        // 3️⃣ Servicios
+        foreach ($this->atencion->servicios as $servicio) {
+
+            $precio   = (float) $servicio->pivot->precio_unitario;
+            $cantidad = (float) ($servicio->pivot->cantidad ?? 1);
+            $subtotal = round($precio * $cantidad, 2);
+
+            ComprobanteDetalle::create([
+                'id_comprobante'  => $this->comprobante->id_comprobante,
+                'descripcion'     => $servicio->nombre_servicio,
+                'cantidad'        => $cantidad,
+                'precio_unitario' => $precio,
+                'subtotal'        => $subtotal,
+                'igv'             => 0,
+                'unidad'          => 'NIU',
             ]);
+        }
 
-            // 2️⃣ Limpiar detalles
-            $this->comprobante->detalles()->delete();
+        // 4️⃣ Medicamentos
+        foreach ($this->atencion->medicamentos as $med) {
 
-            // 3️⃣ Servicios
-            foreach ($this->atencion->servicios as $servicio) {
+            $precio   = (float) $med->pivot->precio;
+            $cantidad = (float) ($med->pivot->cantidad ?? 1);
+            $subtotal = round($precio * $cantidad, 2);
 
-                $precio   = (float) $servicio->pivot->precio_unitario;
-                $cantidad = (float) ($servicio->pivot->cantidad ?? 1);
-                $subtotal = round($precio * $cantidad, 2);
-
-                ComprobanteDetalle::create([
-                    'id_comprobante'  => $this->comprobante->id_comprobante,
-                    'descripcion'     => $servicio->nombre_servicio,
-                    'cantidad'        => $cantidad,
-                    'precio_unitario' => $precio,
-                    'subtotal'        => $subtotal,
-                    'igv'             => 0,
-                    'unidad'          => 'NIU',
-                ]);
-            }
-
-            // 4️⃣ Medicamentos
-            foreach ($this->atencion->medicamentos as $med) {
-
-                $precio   = (float) $med->pivot->precio;
-                $cantidad = (float) ($med->pivot->cantidad ?? 1);
-                $subtotal = round($precio * $cantidad, 2);
-
-                ComprobanteDetalle::create([
-                    'id_comprobante'  => $this->comprobante->id_comprobante,
-                    'descripcion'     => $med->nombre,
-                    'cantidad'        => $cantidad,
-                    'precio_unitario' => $precio,
-                    'subtotal'        => $subtotal,
-                    'igv'             => 0,
-                    'unidad'          => 'NIU',
-                ]);
-            }
-
-            // 5️⃣ Recalcular totales (USA con_igv REAL)
-            $this->recalcularTotalesTicket();
-
-            // 6️⃣ Emitir
-            $this->comprobante->update([
-                'estado' => 'EMITIDO',
+            ComprobanteDetalle::create([
+                'id_comprobante'  => $this->comprobante->id_comprobante,
+                'descripcion'     => $med->nombre,
+                'cantidad'        => $cantidad,
+                'precio_unitario' => $precio,
+                'subtotal'        => $subtotal,
+                'igv'             => 0,
+                'unidad'          => 'NIU',
             ]);
+        }
 
-            $this->comprobante->load('detalles');
-        });
+        // 5️⃣ Recalcular totales (USA con_igv REAL)
+        $this->recalcularTotalesTicket();
+
+        // 6️⃣ Emitir
+        $this->comprobante->update([
+            'estado' => 'EMITIDO',
+        ]);
+
+        $this->comprobante->load('detalles');
     }
 
     /**

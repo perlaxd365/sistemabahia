@@ -54,4 +54,23 @@ class Comprobante extends Model
     {
         return $this->belongsTo(Atencion::class, 'id_atencion');
     }
+    //// pagos
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'id_comprobante');
+    }
+
+    // Pago total registrado
+    public function totalPagado()
+    {
+        return $this->pagos()
+            ->where('estado', 'REGISTRADO')
+            ->sum('monto');
+    }
+
+    // ¿Está pagado?
+    public function estaPagado()
+    {
+        return $this->totalPagado() >= $this->total;
+    }
 }

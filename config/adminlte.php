@@ -386,7 +386,13 @@ return [
             'can' => 'ver-imagen',
         ],
 
-        ['header' => 'account_settings'],
+        ['header' => 'CAJA'],
+        [
+            'text' => 'Turno Caja',
+            'url' => 'caja',
+            'icon' => 'fas fa-money-bill',
+        ],
+        ['header' => 'CONFIGURACIÓN DE CUENTA'],
         [
             'text' => 'Perfil',
             'url' => 'perfil',

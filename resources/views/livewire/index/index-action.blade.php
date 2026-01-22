@@ -77,26 +77,29 @@
                                     <td>{{ $atencion->medico->name ?? '-' }}</td>
                                     <td>{{ $atencion->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="text-center">
-                                        @switch($atencion->comprobante->estado)
-                                            @case('BORRADOR')
-                                                <span class="badge bg-warning">
-                                                    {{ $atencion->comprobante->estado }}
-                                                </span>
-                                            @break
-                                            @case('PENDIENTE')
-                                                <span class="badge bg-secondary">
-                                                    {{ $atencion->comprobante->estado }}
-                                                </span>
-                                            @break
-                                            @case('EMITIDO')
-                                                
-                                                <span class="badge bg-success">
-                                                    {{ $atencion->comprobante->estado }}
-                                                </span>
-                                            @break
+                                        @isset($atencion->comprobante->estado)
+                                            @switch($atencion->comprobante->estado)
+                                                @case('BORRADOR')
+                                                    <span class="badge bg-warning">
+                                                        {{ $atencion->comprobante->estado }}
+                                                    </span>
+                                                @break
 
-                                            @default
-                                        @endswitch
+                                                @case('PENDIENTE')
+                                                    <span class="badge bg-secondary">
+                                                        {{ $atencion->comprobante->estado }}
+                                                    </span>
+                                                @break
+
+                                                @case('EMITIDO')
+                                                    <span class="badge bg-success">
+                                                        {{ $atencion->comprobante->estado }}
+                                                    </span>
+                                                @break
+
+                                                @default
+                                            @endswitch
+                                        @endisset
 
 
                                     </td>

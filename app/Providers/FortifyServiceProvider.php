@@ -44,10 +44,12 @@ class FortifyServiceProvider extends ServiceProvider
 
 
             // 🚫 Usuario desactivado
-            if (! User::where('email', $request->email)->first()->estado_user) {
-                  throw ValidationValidationException::withMessages([
-            'email' => 'Este usuario está desactivado.',
-        ]);
+            $user = User::where('email', $request->email)->first();
+
+            if (! optional($user)->estado_user) {
+                throw ValidationValidationException::withMessages([
+                    'email' => 'Usuario inexistente o desactivado.',
+                ]);
             }
             return Limit::perMinute(5)->by($throttleKey);
         });
