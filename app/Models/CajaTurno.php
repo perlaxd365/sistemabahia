@@ -101,4 +101,19 @@ class CajaTurno extends Model
 
         return $this->monto_cierre - $this->totalTurno();
     }
+
+
+
+    public function movimientos()
+    {
+        return $this->hasMany(CajaMovimiento::class, 'id_caja_turno');
+    }
+
+
+    public function saldo()
+    {
+        return $this->monto_apertura
+            + $this->totalIngresos()
+            - $this->totalEgresos();
+    }
 }

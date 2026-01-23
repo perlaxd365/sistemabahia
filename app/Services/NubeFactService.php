@@ -8,6 +8,7 @@ use App\Models\NubefactConfig;
 use App\Models\Pago;
 use DateUtil;
 use Exception;
+use Illuminate\Support\Str;
 
 class NubeFactService
 {
@@ -32,7 +33,7 @@ class NubeFactService
      */
     public function emitir(Comprobante $comprobante): array
     {
-        
+
         if ($comprobante->estado !== 'BORRADOR') {
             throw new Exception('El comprobante no está en estado BORRADOR');
         }
@@ -56,6 +57,7 @@ class NubeFactService
 
         $items   = $this->buildItems($c);
         $totales = $this->calcularTotales($items);
+
         return [
             'operacion' => 'generar_comprobante',
 
@@ -67,7 +69,7 @@ class NubeFactService
                 ? 'FFF1'
                 : 'BBB1',
             'numero' => null,
-            'codigo_unico' => 'CB-' . $c->id_comprobante,
+            'codigo_unico' => 'CB-' . $c->id_comprobante . '-' . now()->timestamp,
             'sunat_transaction' => 1,
 
             // 🔴 CLIENTE CORRECTO
@@ -201,9 +203,6 @@ class NubeFactService
             'items' => $items,
         ];
     }
-
-
-
     /**
      * Procesar respuesta SUNAT
      */
@@ -300,5 +299,47 @@ class NubeFactService
         return [
             'nombres' => $persona->full_name ?? null,
         ];
+    }
+
+    /**
+     * Para ejecutar a diario
+     */
+    public function enviarResumen($boletas)
+    {
+        if ($boletas->isEmpty()) {
+            return null;
+        }
+
+        $fecha = now()->toDateString();
+
+        $payload = [
+            'operacion'            => 'generar_resumen',
+            'tipo_de_comprobante'  => 'RC',
+            'serie'                => 'RC01',
+            'fecha_de_emision'     => $fecha,
+            'fecha_de_referencia'  => $fecha,
+            'items'                => [],
+        ];
+
+        foreach ($boletas as $b) {
+            $payload['items'][] = [
+                'tipo_de_comprobante' => '03', // BOLETA
+                'serie'               => $b->serie,
+                'numero'              => $b->numero,
+                'estado'              => '1', // 1 = agregar
+                'total'               => (float) $b->total,
+            ];
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+            'Content-Type'  => 'application/json',
+        ])->post(rtrim($this->ruta, '/') . '/generar_resumen', $payload);
+
+        if (! $response->successful()) {
+            throw new \Exception('Error al enviar resumen: ' . $response->body());
+        }
+
+        return $response->json();
     }
 }

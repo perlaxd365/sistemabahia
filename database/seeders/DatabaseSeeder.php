@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ImagenAreasSeeder::class);
         $this->call(ImagenEstudiosSeeder::class);
         $this->call(NubeFactSeeder::class);
+        $this->call(SeriesSeeder::class);
     }
 }

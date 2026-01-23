@@ -13,6 +13,7 @@ class Comprobante extends Model
     protected $primaryKey = 'id_comprobante';
     protected $fillable = [
         'tipo_comprobante',
+        'resumen_diario_id',
         'serie',
         'numero',
         'id_atencion',

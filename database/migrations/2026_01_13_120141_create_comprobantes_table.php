@@ -23,6 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_atencion')->nullable();
             $table->unsignedBigInteger('id_paciente')->nullable();
             $table->unsignedBigInteger('id_cliente')->nullable(); // factura
+            $table->unsignedBigInteger('id_resumen')->nullable(); // resumen sunat
 
             // Fechas
             $table->string('fecha_emision')->nullable();
@@ -59,7 +60,11 @@ return new class extends Migration
             $table->foreign('id_caja_turno')
                 ->references('id_caja_turno')
                 ->on('caja_turnos');
-
+                
+            $table->foreign('id_resumen')
+                ->references('id_resumen')
+                ->on('resumen_diarios');
+                
             $table->timestamps();
         });
     }

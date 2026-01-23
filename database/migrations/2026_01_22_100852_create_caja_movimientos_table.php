@@ -12,20 +12,36 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('caja_movimientos', function (Blueprint $table) {
-            $table->id('id_caja_movimiento');
-            $table->unsignedBigInteger('id_referencia')->nullable();
-            $table->unsignedBigInteger('id_usuario');
+            $table->bigIncrements('id_caja_movimiento');
+
+            // Turno de caja (OBLIGATORIO)
             $table->unsignedBigInteger('id_caja_turno');
 
+            // Usuario que registra
+            $table->unsignedBigInteger('id_usuario');
+
+            // Referencia opcional (pago, caja chica, ajuste, etc.)
+            $table->unsignedBigInteger('id_referencia')->nullable();
+            $table->string('tabla_referencia')->nullable();
+            // Ej: pagos | caja_chicas | ajustes
+
+            // Tipo de movimiento
             $table->enum('tipo', ['INGRESO', 'EGRESO']);
+
             $table->string('descripcion');
             $table->decimal('monto', 10, 2);
             $table->string('responsable')->nullable();
 
             $table->timestamps();
 
-            
-            $table->foreign('id_usuario')->references('id')->on('users');
+            // Foreign keys
+            $table->foreign('id_usuario')
+                ->references('id')
+                ->on('users');
+
+            $table->foreign('id_caja_turno')
+                ->references('id_caja_turno')
+                ->on('caja_turnos');
         });
     }
 

@@ -41,10 +41,10 @@ class CajaTurno extends Component
         }
 
         // 🔒 Validar si ya existe turno abierto
-       
+
         DB::transaction(function () {
 
-            ModelsCajaTurno::create([
+            $this->cajaTurno =  ModelsCajaTurno::create([
                 'fecha_apertura'      => now(),
                 'monto_apertura'      => $this->monto_apertura,
                 'estado'              => 'ABIERTO',
@@ -53,12 +53,6 @@ class CajaTurno extends Component
         });
 
 
-        $this->cajaTurno = ModelsCajaTurno::create([
-            'fecha_apertura'       => now(),
-            'monto_apertura'       => $this->monto_apertura,
-            'estado'               => 'ABIERTO',
-            'id_usuario_apertura'  => Auth()->id(),
-        ]);
 
         session(['id_caja_turno' => $this->cajaTurno->id_caja_turno]);
         $this->dispatch(

@@ -118,12 +118,14 @@
                                             FACTURA
                                         </label>
                                         <div class="input-group">
-                                            <input type="number" class="form-control"
-                                                wire:model.defer="numero_documento"
-                                                placeholder="Ingrese RUC (11 dígitos)">
-                                            <button class="btn btn-outline-primary" type="button"
-                                                wire:click="buscarRuc"
-                                                @if (strlen($numero_documento) !== 11) disabled @endif> 🔍</button>
+                                            <input type="text" class="form-control"
+                                                wire:model.live="numero_documento"
+                                                maxlength="{{ $tipo_comprobante === 'FACTURA' ? 11 : 8 }}">
+                                            <button type="button" class="btn btn-outline-primary"
+                                                wire:click="{{ $tipo_comprobante === 'FACTURA' ? 'buscarRuc' : 'buscarDni' }}"
+                                                @disabled(!$this->puedeBuscar)>
+                                                🔍
+                                            </button>
                                             @error('numero_documento')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror

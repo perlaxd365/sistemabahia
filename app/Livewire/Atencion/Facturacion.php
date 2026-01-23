@@ -24,6 +24,8 @@ class Facturacion extends Component
     public $con_igv = true;
     public function mount($id_atencion)
     {
+        ///FACTURA
+
         $this->atencion = Atencion::with([
             'servicios',
             'medicamentos'
@@ -33,6 +35,10 @@ class Facturacion extends Component
             ->with('detalles')
             ->first();
     }
+
+    /**
+     * Se crea un borrador de comienzo 
+     */
     public function crearBorrador()
     {
         // 1️⃣ Evitar duplicar comprobante
@@ -241,10 +247,10 @@ class Facturacion extends Component
      */
     public function actualizarTipoComprobante()
     {
-        $this->numero_documento = "";
-        $this->cliente_nombre = "";
-        $this->cliente_direccion = "";
-        $this->cliente_razon = "";
+        $this->numero_documento = "20607862908";
+        $this->cliente_nombre = "CESAR";
+        $this->cliente_direccion = "direccion de prueba";
+        $this->cliente_razon = "CLIENTE S.A.C.";
         // Factura siempre con IGV
         if ($this->tipo_comprobante === 'FACTURA') {
             $this->con_igv = true;
@@ -379,6 +385,13 @@ class Facturacion extends Component
 
     //enviara a sunat
     public $tipo_pago = 'EFECTIVO';
+
+
+
+    /**
+     * EMITIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIR
+     * 
+     */
     public function emitir()
     {
         //verificar turno y pago
@@ -413,6 +426,7 @@ class Facturacion extends Component
                 'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
                 'monto' => $this->comprobante->total,
                 'id_referencia' => $pago->id_pago,
+                'tabla_referencia' => 'caja_chicas',
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
             ]);
@@ -473,6 +487,7 @@ class Facturacion extends Component
                 'tipo' => 'INGRESO',
                 'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
                 'monto' => $this->comprobante->total,
+                'tabla_referencia' => 'caja_chicas',
                 'id_referencia' => $pago->id_pago,
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
@@ -741,6 +756,18 @@ class Facturacion extends Component
         ];
     }
 
+    public function getPuedeBuscarProperty(): bool
+{
+    if ($this->tipo_comprobante === 'FACTURA') {
+        return strlen($this->numero_documento ?? '') === 11;
+    }
+
+    if ($this->tipo_comprobante === 'BOLETA') {
+        return strlen($this->numero_documento ?? '') === 8;
+    }
+
+    return false;
+}
     public function render()
     {
         return view('livewire.atencion.facturacion');

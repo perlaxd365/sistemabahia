@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AtencionController;
+use App\Http\Controllers\CajaChicaController;
+use App\Http\Controllers\CajaMovimientoController;
 use App\Http\Controllers\CajaTurnoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\FarmaciaController;
@@ -9,12 +11,14 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\LaboratorioController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\SunatController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use App\Models\CajaChica;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -65,6 +69,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('perfil', [PerfilController::class, 'index'])->name('perfil');
 
     
-    //PERFIL
+    //CAJA
     Route::get('caja', [CajaTurnoController::class, 'index'])->name('caja');
+    Route::get('cajachica', [CajaChicaController::class, 'index'])->name('cajachica');
+    Route::get('cajamovimiento', [CajaMovimientoController::class, 'index'])->name('cajamovimiento');
+
+    
+    //SUNAT
+    Route::get('consultarticket', [SunatController::class, 'consultarticket'])->name('consultarticket');
 });

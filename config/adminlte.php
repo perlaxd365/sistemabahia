@@ -390,7 +390,17 @@ return [
         [
             'text' => 'Turno Caja',
             'url' => 'caja',
+            'icon' => 'fas fa-calendar',
+        ],
+        [
+            'text' => 'Caja Chica',
+            'url' => 'cajachica',
             'icon' => 'fas fa-money-bill',
+        ],
+        [
+            'text' => 'Movimientos Caja',
+            'url' => 'cajamovimiento',
+            'icon' => 'fa fa-angle-double-right',
         ],
         ['header' => 'CONFIGURACIÓN DE CUENTA'],
         [
@@ -446,6 +456,17 @@ return [
             'text' => 'Servicios',
             'icon_color' => 'yellow',
             'url' => 'configuracion',
+        ],
+        [
+            'text' => 'Sunat',
+            'icon' => 'fas fa-archway',
+            'submenu' => [
+                [
+                    'text' => 'Consultar Ticket',
+                    'icon_color' => 'red',
+                    'url' => 'consultarticket',
+                ],
+            ],
         ],
     ],
 
