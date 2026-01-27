@@ -242,8 +242,9 @@
         @if ($firma_img)
             <img src="{{ $firma_img }}" style="height:70px; width:auto; max-width:200px;">
             <br> ___________________________<br>
-            Laboratorio Clínico <br>
-            Colegiatura: {{ $profesional->colegiatura_cargo }}
+            @if ($profesional->colegiatura_cargo)
+                Colegiatura: {{ $profesional->colegiatura_cargo }}
+            @endif
         @endif
     </div>
 

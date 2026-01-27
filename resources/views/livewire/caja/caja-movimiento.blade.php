@@ -1,33 +1,56 @@
-<div>
-   <div class="container-fluid d-flex justify-content-center">
-
+<div class="container-fluid d-flex justify-content-center">
     <div class="col-xxl-8 col-xl-9 col-lg-10">
 
-        {{-- SIN TURNO --}}
+        {{-- ALERTA TURNO --}}
         @if (!$cajaTurno)
-            <div class="alert alert-warning text-center py-4">
-                <div class="fw-semibold mb-1">Caja no disponible</div>
-                <small class="text-muted">
-                    No existe un turno de caja abierto.
-                </small>
+            <div class="alert alert-warning text-center py-3 mb-4">
+                ⚠️ No existe un turno de caja abierto.
+                <br>
+                <small>Los movimientos mostrados son solo de consulta.</small>
             </div>
-            @return
         @endif
 
-        {{-- TITULO --}}
-        <div class="mb-4 text-center">
-            <small class="text-muted">
-                Movimientos financieros del turno activo
-            </small>
+        {{-- FILTROS --}}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body row g-3 align-items-end">
+
+                <div class="col-md-4">
+                    <label class="form-label">Fecha</label>
+                    <input type="date"
+                           class="form-control"
+                           wire:model.live="fechaConsulta">
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label">Responsable</label>
+                    <select class="form-control"
+                            wire:model.live="idUsuario">
+                        <option value="">— Todos —</option>
+                        @foreach ($usuarios as $user)
+                            <option value="{{ $user->id }}">
+                                {{ $user->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-grid">
+                    <button wire:click="cargarMovimientos"
+                            class="btn btn-primary">
+                        🔍 Consultar
+                    </button>
+                </div>
+
+            </div>
         </div>
 
         {{-- RESUMEN --}}
-        <div class="row justify-content-center mb-4">
+        <div class="row mb-4">
             <div class="col-md-4">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body py-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
                         <small class="text-muted">Ingresos</small>
-                        <div class="fs-4 fw-semibold text-success mt-1">
+                        <div class="fs-4 fw-semibold text-success">
                             S/ {{ number_format($totalIngresos, 2) }}
                         </div>
                     </div>
@@ -35,10 +58,10 @@
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body py-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
                         <small class="text-muted">Egresos</small>
-                        <div class="fs-4 fw-semibold text-danger mt-1">
+                        <div class="fs-4 fw-semibold text-danger">
                             S/ {{ number_format($totalEgresos, 2) }}
                         </div>
                     </div>
@@ -46,10 +69,10 @@
             </div>
 
             <div class="col-md-4">
-                <div class="card shadow-sm border-primary text-center">
-                    <div class="card-body py-4">
-                        <small class="text-muted">Saldo en Caja</small>
-                        <div class="fs-3 fw-bold text-primary mt-1">
+                <div class="card text-center shadow-sm border-primary">
+                    <div class="card-body">
+                        <small class="text-muted">Saldo</small>
+                        <div class="fs-3 fw-bold text-primary">
                             S/ {{ number_format($saldo, 2) }}
                         </div>
                     </div>
@@ -59,18 +82,17 @@
 
         {{-- TABLA --}}
         <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom text-center">
+            <div class="card-header text-center bg-white">
                 <div class="fw-semibold">
-                    Detalle de Movimientos
+                    Movimientos de Caja
                 </div>
                 <small class="text-muted">
-                    Turno N.º {{ $cajaTurno->id_caja_turno }} ·
-                    Apertura {{ $cajaTurno->fecha_apertura->format('d/m/Y H:i') }}
+                    Fecha: {{ \Carbon\Carbon::parse($fechaConsulta)->format('d/m/Y') }}
                 </small>
             </div>
 
             <div class="card-body p-0 table-responsive">
-                <table class="table table-sm table-hover mb-0 align-middle">
+                <table class="table table-sm table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr class="text-uppercase small text-muted text-center">
                             <th>Fecha</th>
@@ -89,20 +111,18 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <span class="badge 
-                                        {{ $mov->tipo === 'INGRESO' 
-                                            ? 'bg-success-subtle text-success border' 
+                                    <span class="badge
+                                        {{ $mov->tipo === 'INGRESO'
+                                            ? 'bg-success-subtle text-success border'
                                             : 'bg-danger-subtle text-danger border' }}">
                                         {{ $mov->tipo }}
                                     </span>
                                 </td>
 
-                                <td>
-                                    {{ $mov->descripcion }}
-                                </td>
+                                <td>{{ $mov->descripcion }}</td>
 
                                 <td class="text-center">
-                                    {{ $mov->responsable ?? '—' }}
+                                    {{ $mov->usuario->name ?? $mov->responsable ?? '—' }}
                                 </td>
 
                                 <td class="text-end fw-semibold">
@@ -114,7 +134,7 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="text-center text-muted py-4">
-                                    No existen movimientos registrados.
+                                    No existen movimientos para los filtros seleccionados.
                                 </td>
                             </tr>
                         @endforelse
@@ -124,6 +144,4 @@
         </div>
 
     </div>
-</div>
-
 </div>

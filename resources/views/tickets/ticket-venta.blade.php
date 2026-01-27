@@ -44,8 +44,8 @@
 
             body {
                 width: 70mm;
-                margin-left: 7% ;
-                padding-top: 7% ;
+                margin-left: 7%;
+                padding-top: 7%;
                 font-family: Arial, sans-serif;
                 font-size: 12px;
             }
@@ -106,10 +106,20 @@
                     <td class="right">S/ {{ number_format($comprobante->igv, 2) }}</td>
                 </tr>
             @endif
+            @if ($comprobante->recargo > 0)
+                <tr>
+                    <td>Recargo tarjeta (5%):</td>
+                    <td class="right">S/ {{ number_format($comprobante->recargo, 2) }}</td>
+                </tr>
+            @endif
             <tr>
                 <td><strong>TOTAL</strong></td>
                 <td class="right">
-                    <strong>S/ {{ number_format($comprobante->total, 2) }}</strong>
+                    @if ($comprobante->total_cobrado)
+                        <strong>S/ {{ number_format($comprobante->total_cobrado, 2) }}</strong>
+                    @else
+                        <strong>S/ {{ number_format($comprobante->total, 2) }}</strong>
+                    @endif
                 </td>
             </tr>
         </table>

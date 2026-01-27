@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
+    public $tipo_pago;
+    public $recargo;
+    public $porcentaje_recargo_tarjeta;
     //
     public function imprimir(Comprobante $comprobante)
     {
         if ($comprobante->tipo_comprobante !== 'TICKET') {
             abort(404);
         }
-
         $comprobante->load(['detalles', 'paciente', 'atencion']);
         $pdf = Pdf::loadView(
 

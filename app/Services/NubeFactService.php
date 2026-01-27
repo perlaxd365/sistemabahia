@@ -106,7 +106,7 @@ class NubeFactService
             'id_atencion'    => $this->atencion->id_atencion,
             'id_caja_turno'  => session('id_caja_turno'), // si está abierto
             'tipo_pago'      => $this->tipo_pago,
-            'monto'          => $this->comprobante->total,
+            'monto'          => $this->comprobante->total_cobrado,
             'fecha_pago'     => now(),
             'user_id'        => auth()->id(),
         ]);
@@ -304,7 +304,7 @@ class NubeFactService
     /**
      * Para ejecutar a diario
      */
-    public function enviarResumen($boletas)
+    /* public function enviarResumen($boletas)
     {
         if ($boletas->isEmpty()) {
             return null;
@@ -341,5 +341,5 @@ class NubeFactService
         }
 
         return $response->json();
-    }
+    } */
 }

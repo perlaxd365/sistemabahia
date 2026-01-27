@@ -77,7 +77,7 @@
                             <label class="form-label fw-semibold">
                                 Método de pago
                             </label>
-                            <select class="form-control" wire:model.defer="tipo_pago">
+                            <select class="form-control" wire:model.live="tipo_pago">
                                 <option value="EFECTIVO">Efectivo</option>
                                 <option value="YAPE">Yape</option>
                                 <option value="PLIN">Plin</option>
@@ -220,10 +220,26 @@
                                     <span>IGV (18%)</span>
                                     <span>S/ {{ number_format($comprobante->igv, 2) }}</span>
                                 </div>
+                                @if ($comprobante->recargo > 0)
+                                    <div class="d-flex justify-content-between text-danger">
+                                        <span>Recargo tarj. ({{ $porcentaje_recargo_tarjeta }}%)</span>
+                                        <span>S/ {{ number_format($comprobante->recargo, 2) }}</span>
+                                    </div>
+                                @else
+                                    <div class="d-flex justify-content-between text-danger">
+                                        <span>Recargo tarj. ({{ $porcentaje_recargo_tarjeta }}%)</span>
+                                        <span>S/ {{ number_format($recargo, 2) }}</span>
+                                    </div>
+                                @endif
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between fs-5 fw-bold">
                                     <span>Total</span>
-                                    <span>S/ {{ number_format($comprobante->total, 2) }}</span>
+
+                                    @if ($comprobante->total_cobrado > 0)
+                                        <span>S/ {{ number_format($comprobante->total_cobrado, 2) }}</span>
+                                    @else
+                                        <span>S/ {{ number_format($comprobante->total, 2) }}</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

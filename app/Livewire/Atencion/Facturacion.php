@@ -26,6 +26,7 @@ class Facturacion extends Component
     {
         ///FACTURA
 
+        // 3️⃣.1️⃣ Aplicar recargo si corresponde
         $this->atencion = Atencion::with([
             'servicios',
             'medicamentos'
@@ -34,6 +35,7 @@ class Facturacion extends Component
         $this->comprobante = Comprobante::where('id_atencion', $id_atencion)
             ->with('detalles')
             ->first();
+        // 3️⃣.1️⃣ Aplicar recargo si corresponde
     }
 
     /**
@@ -54,6 +56,9 @@ class Facturacion extends Component
                 'id_paciente'      => $this->atencion->id_paciente,
                 'tipo_comprobante' => 'TICKET',
                 'serie'            => 'T001',
+                "metodo_pago"       => "EFECTIVO",
+                "recargo"           => 0,
+                "total_cobrado"     => 0,
                 'numero'           => null,
                 'fecha_emision'    => now(),
                 'subtotal'         => 0, // gravada
@@ -210,6 +215,9 @@ class Facturacion extends Component
             // 6️⃣ Recalcular totales
             $this->recalcularTotales();
 
+            // 3️⃣.1️⃣ Aplicar recargo si corresponde
+            $this->recalcularTotalConRecargo();
+
             // 7️⃣ Refrescar relación
             $this->comprobante->load('detalles');
         });
@@ -234,6 +242,10 @@ class Facturacion extends Component
         }
 
         $this->comprobante->update([
+
+            "metodo_pago"   => $this->tipo_pago,
+            "recargo"     => $this->recargo,
+            "total_cobrado" => $this->total_cobrado,
             'subtotal' => $subtotal,
             'igv' => $igv,
             'total' => $total,
@@ -386,6 +398,46 @@ class Facturacion extends Component
     //enviara a sunat
     public $tipo_pago = 'EFECTIVO';
 
+    /**Tipo de pago */
+    public $recargo = 0;
+    public $porcentaje_recargo_tarjeta = 5;
+    public $total_cobrado = 0;
+    protected function recalcularTotalConRecargo()
+    {
+        if (!$this->comprobante) {
+            return;
+        }
+
+        // Total base SUNAT (sin recargo)
+        $baseTotal = $this->comprobante->subtotal + $this->comprobante->igv;
+
+        if ($this->tipo_pago === 'TARJETA') {
+            $this->recargo = round(
+                $baseTotal * ($this->porcentaje_recargo_tarjeta / 100),
+                2
+            );
+        } else {
+            $this->recargo = 0;
+        }
+
+        // Total final a cobrar (NO afecta SUNAT)
+        $this->comprobante->total_cobrado = round($baseTotal + $this->recargo, 2);
+        $this->comprobante->save();
+    }
+
+    /**Tipo de pago */
+    public function updatedTipoPago($value)
+    {
+        $this->recalcularTotalConRecargo();
+    }
+
+
+
+
+
+
+
+
 
 
     /**
@@ -415,7 +467,7 @@ class Facturacion extends Component
                 'id_atencion'    => $this->comprobante->atencion->id_atencion,
                 'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
                 'tipo_pago'      => $this->tipo_pago,
-                'monto'          => $this->comprobante->total,
+                'monto'          => $this->comprobante->total_cobrado,
                 'fecha_pago'     => now(),
                 'user_id'        => Auth()->id(),
             ]);
@@ -424,7 +476,7 @@ class Facturacion extends Component
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
                 'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
-                'monto' => $this->comprobante->total,
+                'monto'         => $this->comprobante->total_cobrado, // 👈 correcto
                 'id_referencia' => $pago->id_pago,
                 'tabla_referencia' => 'caja_chicas',
                 'id_usuario' => Auth::id(),
@@ -467,6 +519,8 @@ class Facturacion extends Component
 
             // 3️⃣ Totales
             $this->recalcularTotales();
+            // 3️⃣.1️⃣ Aplicar recargo si corresponde
+            $this->recalcularTotalConRecargo();
 
             // 4️⃣ Enviar a NubeFact
             $respuesta = app(NubeFactService::class)
@@ -477,7 +531,7 @@ class Facturacion extends Component
                 'id_atencion'    => $this->comprobante->atencion->id_atencion,
                 'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
                 'tipo_pago'      => $this->tipo_pago,
-                'monto'          => $this->comprobante->total,
+                'monto'          => $this->comprobante->total_cobrado, // 👈 correcto
                 'fecha_pago'     => now(),
                 'user_id'        => Auth()->id(),
             ]);
@@ -486,7 +540,7 @@ class Facturacion extends Component
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
                 'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
-                'monto' => $this->comprobante->total,
+                'monto'         => $this->comprobante->total_cobrado, // 👈 correcto
                 'tabla_referencia' => 'caja_chicas',
                 'id_referencia' => $pago->id_pago,
                 'id_usuario' => Auth::id(),
@@ -639,6 +693,9 @@ class Facturacion extends Component
         $this->comprobante->update([
             'tipo_comprobante' => 'TICKET',
             'serie'            => 'TCK',
+            "metodo_pago"   => $this->tipo_pago,
+            "recargo"     => $this->recargo,
+            "total_cobrado" => $this->total_cobrado,
             'numero'           => $this->comprobante->numero
                 ?? $this->siguienteNumeroTicket(),
             'fecha_emision'    => now(),
@@ -686,6 +743,8 @@ class Facturacion extends Component
 
         // 5️⃣ Recalcular totales (USA con_igv REAL)
         $this->recalcularTotalesTicket();
+        // 3️⃣.1️⃣ Aplicar recargo si corresponde
+        $this->recalcularTotalConRecargo();
 
         // 6️⃣ Emitir
         $this->comprobante->update([
@@ -757,17 +816,17 @@ class Facturacion extends Component
     }
 
     public function getPuedeBuscarProperty(): bool
-{
-    if ($this->tipo_comprobante === 'FACTURA') {
-        return strlen($this->numero_documento ?? '') === 11;
-    }
+    {
+        if ($this->tipo_comprobante === 'FACTURA') {
+            return strlen($this->numero_documento ?? '') === 11;
+        }
 
-    if ($this->tipo_comprobante === 'BOLETA') {
-        return strlen($this->numero_documento ?? '') === 8;
-    }
+        if ($this->tipo_comprobante === 'BOLETA') {
+            return strlen($this->numero_documento ?? '') === 8;
+        }
 
-    return false;
-}
+        return false;
+    }
     public function render()
     {
         return view('livewire.atencion.facturacion');

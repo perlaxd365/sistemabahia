@@ -16,9 +16,9 @@
                     <div class="card border-success shadow-sm">
                         <div class="card-body d-flex align-items-center justify-content-between">
 
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-info bg-opacity-10 rounded-circle p-2">
-                                    <img class="rounded-circle" src="{{ $atencion->medico->foto_url }}" width="50px" height="50px" alt="">
+                            <div class="d-flex align-items-center gap-1">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-1">
+                                    <img class="rounded-circle" src="{{ $atencion->medico->foto_url }}" width="60px" height="60px" alt="">
                                 </div>
 
                                 <div class="pl-2">
