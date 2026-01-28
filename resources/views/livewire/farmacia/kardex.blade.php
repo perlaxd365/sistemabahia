@@ -80,7 +80,7 @@
                             <td class="small">{{ $mov->descripcion }}</td>
 
                             <td class="text-center fw-semibold">
-                                {{ $mov->cantidad }}
+                                {{ $mov->cantidad }} 
                             </td>
 
                             <td class="text-center text-muted">

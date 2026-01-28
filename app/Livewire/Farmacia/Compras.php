@@ -191,7 +191,7 @@ class Compras extends Component
                     'id_medicamento'  => $item['id_medicamento'],
                     'id_compra'       => $compra->id_compra,
                     'tipo_movimiento' => 'ENTRADA',
-                    'cantidad'        => $cantidad,
+                    'cantidad'        => $item['cantidad'],
                     'stock_anterior'  => $stockAnterior,
                     'stock_actual'    => $stockNuevo,
                     'descripcion'     => 'Ingreso por compra',
