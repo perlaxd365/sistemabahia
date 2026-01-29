@@ -11,13 +11,17 @@ class Servicio extends Model
     use HasFactory;
     protected $name = "servicios";
     protected $primaryKey = 'id_servicio';
+    public $timestamps = false;
     protected $fillable = [
         'id_servicio',
         'id_subtipo_servicio',
         'nombre_servicio',
         'precio_servicio',
+        'codigo_sunat',
+        'unidad_sunat',
         'estado_servicio'
     ];
+   
 
     public function subtipo()
     {

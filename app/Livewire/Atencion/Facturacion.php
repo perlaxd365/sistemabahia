@@ -482,7 +482,12 @@ class Facturacion extends Component
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
             ]);
+            $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
 
+            $atencion->update([
+                'estado' => 'FINALIZADO',
+                'fecha_fin_atencion' => now()
+            ]);
             $this->dispatch(
                 'alert',
                 ['type' => 'success', 'title' => 'Ticket registrado correctamente', 'message' => 'Exito']
@@ -545,6 +550,13 @@ class Facturacion extends Component
                 'id_referencia' => $pago->id_pago,
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
+            ]);
+
+            $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
+
+            $atencion->update([
+                'estado' => 'FINALIZADO',
+                'fecha_fin_atencion' => now()
             ]);
 
             if (!$respuesta || !is_array($respuesta)) {

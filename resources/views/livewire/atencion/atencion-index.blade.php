@@ -129,76 +129,96 @@
                     @endif
                     {{-- Paso 2 --}}
                     @if ($step == 2)
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-9">
-                                        <h5><b>Atenciones de <p class="text-danger">{{ $name }}</p></b> </h5>
-                                    </div>
-                                    <div class="col-3">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tipo</th>
+                                    <th>Inicio</th>
+                                    <th>Fin</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Facturación</th>
+                                    <th class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                                        <button wire:click="exportarPDF" wire:loading.attr="disabled"
-                                            class="btn btn-secondary btn-sm" type="button"> <i
-                                                class="fa fa-print"></i> <i wire:target="exportarPDF"
-                                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                                            Imprimir</button>
-                                    </div>
+                                @forelse ($atenciones as $i => $atencion)
+                                    <tr>
 
-                                    <table class="table table-responsive">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Tipo de Atención</th>
-                                                <th scope="col">Fecha Atención</th>
-                                                <th scope="col">fecha finalización</th>
-                                                <th scope="col">Ver</th>
-                                                <th scope="col">Estado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                        <td>{{ $i + 1 }}</td>
 
+                                        <td>
+                                            <span class="fw-semibold">
+                                                       {!! $atencion->tipo_atencion !!}
+                                            </span>
+                                        </td>
 
-                                            @if ($atenciones->count())
-                                                <?php $count = 1; ?>
-                                                @foreach ($atenciones as $atencion)
-                                                    <tr>
-                                                        <th scope="row">{{ $count++ }}</th>
-                                                        <td>{!! $atencion->tipo_atencion !!}</td>
-                                                        <td>{{ DateUtil::getFechaCompleta($atencion->fecha_inicio_atencion) }}
-                                                        </td>
-                                                        <td>{{ $atencion->fecha_fin_atencion ? DateUtil::getFechaCompleta($atencion->fecha_fin_atencion) : 'Atendiendose' }}
-                                                        </td>
-                                                        <td class="text-center">
+                                        <td>
+                                            {{ DateUtil::getFechaHora($atencion->fecha_inicio_atencion) }}
+                                        </td>
 
+                                        <td>
+                                            {{ $atencion->fecha_fin_atencion ? DateUtil::getFechaHora($atencion->fecha_fin_atencion) : '—' }}
+                                        </td>
 
-                                                            @if ($atencion->estado == "PROCESO")
-                                                                <span class="badge bg-success">Activa</span>
-                                                            @elseif($atencion->estado == "FINALIZADO")
-                                                                <span class="badge bg-secondary">Finalizado</span>
-                                                            @else
-                                                                <span class="badge bg-warning">ANULADO</span>
-                                                            @endif
-                                                        </td>
-                                                        
-                                                        <td><a
-                                                                href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"><u>Ir
-                                                                    a atención</u></a></td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td>
-                                                        <div class="card-body">
-                                                            <strong>No se registraron atenciones.</strong>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                        {{-- ESTADO CLÍNICO --}}
+                                        <td class="text-center">
+                                            @if ($atencion->estado == 'PROCESO')
+                                                <span class="badge bg-success-subtle text-success border">
+                                                    ● En atención
+                                                </span>
+                                            @elseif ($atencion->estado == 'FINALIZADO')
+                                                <span class="badge bg-primary-subtle text-primary border">
+                                                    ✔ Finalizado
+                                                </span>
+                                            @elseif ($atencion->estado == 'ANULADO')
+                                                <span class="badge bg-danger-subtle text-danger border">
+                                                    ✖ Anulado
+                                                </span>
                                             @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                                        </td>
+
+                                        {{-- FACTURACIÓN --}}
+                                        <td class="text-center">
+
+                                            @if ($atencion->comprobante)
+                                                <span class="badge bg-info text-dark">
+                                                    Facturado
+                                                </span>
+                                            @elseif ($atencion->pagado ?? false)
+                                                <span class="badge bg-warning text-dark">
+                                                    Cobrado
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">
+                                                    Pendiente
+                                                </span>
+                                            @endif
+
+                                        </td>
+
+                                        {{-- ACCIÓN --}}
+                                        <td class="text-center">
+                                            <a href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                Ver
+                                            </a>
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            No se registraron atenciones
+                                        </td>
+                                    </tr>
+                                @endforelse
+
+                            </tbody>
+                        </table>
+
                         <div class="flex justify-between mt-4">
                             <button class="btn btn-sm nextBtn mt-3 " wire:click="prevStep"
                                 type="button"><u>Atrás</u>
