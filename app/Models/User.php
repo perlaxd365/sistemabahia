@@ -81,7 +81,7 @@ class User extends Authenticatable
     public function adminlte_profile_url()
     {
         // Aquí coloca la ruta a tu perfil, por ejemplo:
-        return 'profile'; // o 'user/profile'
+        return 'perfil'; // o 'user/profile'
     }
 
     public function adminlte_image()

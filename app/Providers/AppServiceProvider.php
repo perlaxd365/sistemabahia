@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
         //ver
         Gate::define('ver-farmacia', function ($user) {
-            return in_array($user->privilegio_cargo, [1, 3, 5, 6]);
+            return in_array($user->privilegio_cargo, [1,6]);
         });
         //editar 
         Gate::define('editar-farmacia', function ($user) {
@@ -95,6 +95,16 @@ class AppServiceProvider extends ServiceProvider
         //editar 
         Gate::define('editar-resultados', function ($user) {
             return in_array($user->privilegio_cargo,  [1,2, 5]);
+        });
+
+         //CAJA
+        //ver
+        Gate::define('ver-caja', function ($user) {
+            return in_array($user->privilegio_cargo, [1,5]);
+        });
+        //editar 
+        Gate::define('editar-caja', function ($user) {
+            return in_array($user->privilegio_cargo,  [1]);
         });
     }
 

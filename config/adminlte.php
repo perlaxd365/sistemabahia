@@ -113,7 +113,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'vendor/adminlte/dist/img/logo_clinica.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -360,7 +360,10 @@ return [
             'can' => 'Recepcionista',
         ],
 
-        ['header' => 'INTERNO'],
+        [
+            'header' => 'INTERNO',
+            'can' => 'ver-farmacia',
+        ],
         [
             'text' => 'Farmacia',
             'url' => 'farmacia',
@@ -386,21 +389,27 @@ return [
             'can' => 'ver-imagen',
         ],
 
-        ['header' => 'CAJA'],
+        [
+            'header' => 'CAJA',
+            'can' => 'ver-caja',
+        ],
         [
             'text' => 'Turno Caja',
             'url' => 'caja',
             'icon' => 'fas fa-calendar',
+            'can' => 'ver-caja',
         ],
         [
             'text' => 'Caja Chica',
             'url' => 'cajachica',
             'icon' => 'fas fa-money-bill',
+            'can' => 'ver-caja',
         ],
         [
             'text' => 'Movimientos Caja',
             'url' => 'cajamovimiento',
             'icon' => 'fa fa-angle-double-right',
+            'can' => 'editar-caja',
         ],
         ['header' => 'CONFIGURACIÓN DE CUENTA'],
         [
@@ -446,16 +455,21 @@ return [
                 ],
             ],
         ], */
-        ['header' => 'CONFIGURACION'],
+        [
+            'header' => 'CONFIGURACION',
+            'can' => 'Administrador',
+        ],
         [
             'text' => 'Proveedor',
             'icon_color' => 'green',
             'url' => 'proveedor',
+            'can' => 'Administrador',
         ],
         [
             'text' => 'Servicios',
             'icon_color' => 'yellow',
             'url' => 'configuracion',
+            'can' => 'Administrador',
         ],
         [
             'text' => 'Sunat',
@@ -465,6 +479,7 @@ return [
                     'text' => 'Consultar Ticket',
                     'icon_color' => 'red',
                     'url' => 'consultarticket',
+                    'can' => 'Administrador',
                 ],
             ],
         ],

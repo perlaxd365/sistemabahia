@@ -85,7 +85,9 @@
                                 <th class="text-end">Monto (S/)</th>
                                 <th>Responsable</th>
                                 <th class="text-center">Estado</th>
-                                <th class="text-center pe-4">Acción</th>
+                                @can('editar-caja')
+                                    <th class="text-center pe-4">Acción</th>
+                                @endcan
                             </tr>
                         </thead>
 
@@ -121,15 +123,18 @@
                                     </td>
 
                                     <td class="text-center pe-4">
-                                        @if ($item->estado === 'REGISTRADO')
-                                            <button wire:click="anular({{ $item->id_caja_chica }})"
-                                                class="badge btn-sm btn-outline-info"
-                                                onclick="confirm('¿Confirma la anulación del egreso?') || event.stopImmediatePropagation()">
-                                                Anular
-                                            </button>
-                                        @else
-                                            —
-                                        @endif
+                                        @can('editar-caja')
+                                            @if ($item->estado === 'REGISTRADO')
+                                                <button wire:click="anular({{ $item->id_caja_chica }})"
+                                                    class="badge btn-sm btn-outline-info"
+                                                    onclick="confirm('¿Confirma la anulación del egreso?') || event.stopImmediatePropagation()">
+                                                    Anular
+                                                </button>
+                                            @else
+                                                —
+                                            @endif
+                                        @endcan
+
                                     </td>
                                 </tr>
                             @empty
