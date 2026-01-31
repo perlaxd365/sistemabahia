@@ -15,6 +15,12 @@
                 Medicamentos
             </a>
         </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link {{ $tab === 'salidainterna' ? 'active' : '' }}"
+                wire:click.prevent="setTab('salidainterna')">
+                Salida Interna
+            </a>
+        </li>
 
         @can('editar-farmacia')
             <li class="nav-item">
@@ -49,6 +55,8 @@
                 <livewire:farmacia.dashboard />
             @elseif($tab === 'medicamentos')
                 <livewire:farmacia.medicamentos />
+            @elseif($tab === 'salidainterna')
+                <livewire:farmacia.salidainterna />
             @elseif($tab === 'proveedores')
                 <livewire:farmacia.proveedores />
             @elseif($tab === 'compras')

@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
         //ver
         Gate::define('ver-farmacia', function ($user) {
-            return in_array($user->privilegio_cargo, [1,6]);
+            return in_array($user->privilegio_cargo, [1,3,6]);
         });
         //editar 
         Gate::define('editar-farmacia', function ($user) {

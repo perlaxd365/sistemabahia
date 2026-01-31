@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class KardexMedicamento extends Model
 {
-      //  
+    //  
     use HasFactory;
     protected $name = "kardex_medicamentos";
     protected $primaryKey = 'id_kardex';
@@ -27,5 +27,11 @@ class KardexMedicamento extends Model
     public function medicamento()
     {
         return $this->belongsTo(Medicamento::class, 'id_medicamento');
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
