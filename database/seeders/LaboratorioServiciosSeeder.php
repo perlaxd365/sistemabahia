@@ -7,6 +7,7 @@ use App\Models\SubTipoServicio;
 use App\Models\TipoServicio;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class LaboratorioServiciosSeeder extends Seeder
 {
@@ -161,6 +162,51 @@ class LaboratorioServiciosSeeder extends Seeder
                     'precio_servicio' => $item[1],
                     'estado_servicio' => true,
                     'codigo_sunat' => null,
+                    'unidad_sunat' => 'NIU'
+                ]
+            );
+        }
+
+        $tipo = TipoServicio::firstOrCreate(
+            ['nombre_tipo_servicio' => 'LABORATORIO'],
+            ['estado_tipo_servicio' => true]
+        );
+
+        // ============================
+        // SUBTIPOS POR ÁREA
+        // ============================
+
+        $areas = DB::table('laboratorio_areas')->get();
+
+        $subtipos = [];
+
+        foreach ($areas as $area) {
+            $subtipos[$area->id_area] = SubTipoServicio::firstOrCreate(
+                [
+                    'nombre_subtipo_servicio' => strtoupper($area->nombre),
+                    'id_tipo_servicio' => $tipo->id_tipo_servicio
+                ],
+                ['estado_subtipo_servicio' => true]
+            );
+        }
+
+        // ============================
+        // SERVICIOS POR EXAMEN
+        // ============================
+
+        $examenes = DB::table('laboratorio_examens')->get();
+
+        foreach ($examenes as $examen) {
+
+            Servicio::firstOrCreate(
+                [
+                    'nombre_servicio' => strtoupper($examen->nombre),
+                    'id_subtipo_servicio' => $subtipos[$examen->id_area]->id_subtipo_servicio
+                ],
+                [
+                    // 👇 luego puedes actualizar precios desde el sistema
+                    'precio_servicio' => 0,
+                    'estado_servicio' => true,
                     'unidad_sunat' => 'NIU'
                 ]
             );

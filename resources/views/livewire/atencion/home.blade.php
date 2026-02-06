@@ -43,7 +43,7 @@
                             @endif
 
                             {{-- CONSULTA --}}
-                            @if ($this->puedeVer([1,2, 5]))
+                            @if ($this->puedeVer([1,2, 3, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'consulta' ? 'active' : '' }}"
                                         wire:click="cambiarTab('consulta')">Consulta</a>

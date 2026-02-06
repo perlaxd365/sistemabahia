@@ -409,7 +409,7 @@ return [
             'text' => 'Movimientos Caja',
             'url' => 'cajamovimiento',
             'icon' => 'fa fa-angle-double-right',
-            'can' => 'editar-caja',
+            'can' => 'ver-caja',
         ],
         ['header' => 'CONFIGURACIÓN DE CUENTA'],
         [
@@ -472,13 +472,13 @@ return [
             'can' => 'Administrador',
         ],
         [
-            'text' => 'Sunat',
-            'icon' => 'fas fa-archway',
+            'text' => 'Reportes',
+            'icon' => 'fas fa-file',
             'submenu' => [
                 [
-                    'text' => 'Consultar Ticket',
+                    'text' => 'Ingresos',
                     'icon_color' => 'red',
-                    'url' => 'consultarticket',
+                    'url' => 'ingreso',
                     'can' => 'Administrador',
                 ],
             ],

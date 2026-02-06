@@ -188,51 +188,50 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ANTROPOMETRÍA -->
-            <div class="hc-card">
-                <div class="hc-header">Somatometría</div>
-                <div class="hc-body row g-2">
-                    <div class="col-md-2">
-                        <label>Peso</label>
-                        <input type="number" class="form-control vital" wire:model.live="peso_consulta">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Talla</label>
-                        <input type="number" class="form-control vital" wire:model.live="talla_consulta">
-                    </div>
-                    <div class="col-md-2">
-                        <label>IMC</label>
-                        <input type="text" class="form-control vital" wire:model="imc_consulta">
-                    </div>
+        @endif
+        <!-- ANTROPOMETRÍA -->
+        <div class="hc-card">
+            <div class="hc-header">Somatometría</div>
+            <div class="hc-body row g-2">
+                <div class="col-md-2">
+                    <label>Peso</label>
+                    <input type="number" class="form-control vital" wire:model.live="peso_consulta">
+                </div>
+                <div class="col-md-2">
+                    <label>Talla</label>
+                    <input type="number" class="form-control vital" wire:model.live="talla_consulta">
+                </div>
+                <div class="col-md-2">
+                    <label>IMC</label>
+                    <input type="text" class="form-control vital" wire:model="imc_consulta">
                 </div>
             </div>
+        </div>
 
-            <!-- SIGNOS VITALES -->
-            <div class="hc-card">
-                <div class="hc-header">Funciones Vitales</div>
-                <div class="hc-body row g-2">
-                    <div class="col-md-2">
-                        <label>Temp °C</label>
-                        <input type="number" step="0.1" class="form-control vital"
-                            wire:model="temperatura_consulta">
-                    </div>
-                    <div class="col-md-3">
-                        <label>PA</label>
-                        <input type="text" class="form-control vital" wire:model="presion_consulta"
-                            placeholder="120/80">
-                    </div>
-                    <div class="col-md-2">
-                        <label>FC</label>
-                        <input type="number" class="form-control vital" wire:model="frecuencia_consulta">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Sat O₂ %</label>
-                        <input type="number" class="form-control vital" wire:model="saturacion_consulta">
-                    </div>
+        <!-- SIGNOS VITALES -->
+        <div class="hc-card">
+            <div class="hc-header">Funciones Vitales</div>
+            <div class="hc-body row g-2">
+                <div class="col-md-2">
+                    <label>Temp °C</label>
+                    <input type="number" step="0.1" class="form-control vital" wire:model="temperatura_consulta">
+                </div>
+                <div class="col-md-3">
+                    <label>PA</label>
+                    <input type="text" class="form-control vital" wire:model="presion_consulta" placeholder="120/80">
+                </div>
+                <div class="col-md-2">
+                    <label>FC</label>
+                    <input type="number" class="form-control vital" wire:model="frecuencia_consulta">
+                </div>
+                <div class="col-md-2">
+                    <label>Sat O₂ %</label>
+                    <input type="number" class="form-control vital" wire:model="saturacion_consulta">
                 </div>
             </div>
+        </div>
 
+        @if ($medico_responsable)
             <!-- EXAMEN -->
             <div class="hc-card">
                 <div class="hc-header">Examen Físico</div>
@@ -261,7 +260,7 @@
                     </div>
                     <br>
                     <div class="container">
-<br>
+                        <br>
                         <div class="col-md-12">
                             <div class="alert alert-primary border-0 shadow-sm" style="background-color:#f1f7ff;">
                                 <div class="d-flex align-items-start">
@@ -293,15 +292,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- BOTÓN -->
+        @endif
+        <!-- BOTÓN -->
+        @can('editar-signos')
             <div class="text-end mt-3">
                 <button type="button" wire:click="agregarConsulta" class="btn btn-clinico">
                     Guardar Consulta
                 </button>
             </div>
-        @endif
-
+        @endcan
         <!-- BOTÓN -->
         <div class="text-end mt-2">
             <button type="button" wire:click="printConsulta" class="btn btn-imprimir">

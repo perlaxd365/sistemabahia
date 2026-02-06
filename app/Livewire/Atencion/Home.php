@@ -26,16 +26,16 @@ class Home extends Component
 
         $permisosPorTab = [
             'info'         => [1, 2, 3, 4, 5, 6],
-            'medico'       => [1,5],
-            'servicios'    => [1,5],
-            'signos'       => [1,2,3,5],
-            'consulta'     => [1,2, 5],
+            'medico'       => [1, 5],
+            'servicios'    => [1, 5],
+            'signos'       => [1, 2, 3, 5],
+            'consulta'     => [1, 2, 3, 5],
             'medicamentos' => [1, 5, 6],
-            'laboratorio'  => [1,2, 5],
-            'imagen'       => [1,2, 5],
-            'insumos'      => [1,2],
-            'resultados'   => [1,2, 5],
-            'facturacion'  => [1,5],
+            'laboratorio'  => [1, 2, 5],
+            'imagen'       => [1, 2, 5],
+            'insumos'      => [1, 2],
+            'resultados'   => [1, 2, 5],
+            'facturacion'  => [1, 5],
         ];
 
         if (

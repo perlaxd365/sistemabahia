@@ -21,12 +21,13 @@
         </div>
 
         <!-- TABLA -->
-        <div class="card-body p-0">
+        <div class="card-body p-0 table-responsive">
 
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 table-sm">
                 <thead class="table-light text-uppercase small">
                     <tr>
                         <th>Solicitante</th>
+                        <th>Paciente</th>
                         <th>Historia</th>
                         <th>Fecha</th>
                         <th>Exámenes</th>
@@ -48,6 +49,13 @@
                                 <div class="small text-muted">
                                     Cargo: {{ UserUtil::getUserByID($orden->solicitante)->nombre_cargo }}
                                 </div>
+                            </td>
+
+                            <!-- HISTORIA -->
+                            <td>
+                                <small>{{ $orden->atencion->paciente->name }} </small>
+                                <br> 
+                                 <b>{{ $orden->atencion->paciente->dni }}</b>
                             </td>
 
                             <!-- HISTORIA -->

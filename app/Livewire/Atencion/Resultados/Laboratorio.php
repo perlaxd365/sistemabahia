@@ -59,7 +59,7 @@ class Laboratorio extends Component
         $pdf = Pdf::loadView(
             'reportes.resultados-laboratorio',
             compact('orden', 'base64', 'paciente', 'base64', 'firma_img','profesional')
-        )->setPaper('A4'/* , 'landscape' */);
+        )->setPaper('A4', 'landscape' );
 
         return response()->streamDownload(
             fn() => print($pdf->output()),

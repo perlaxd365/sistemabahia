@@ -175,12 +175,29 @@
         <div class="section-title">Resultados</div>
         <div class="info">
             <div class="orden">
+                @php
+                    $agrupados = [];
+                @endphp
+
                 @foreach ($orden->detalles as $det)
-                    <div> {{ $det->examenes->areas->nombre ?? 'Manual' }} -
-                        {{ $det->examenes->nombre ?? $det->examen_manual }}</div>
-                    <br>
-                    <div class="resultado-ckeditor"> {!! $det->resultados->resultado ?? '' !!}</div>
-                    <br><br>
+                    @php
+                        $resultado = trim(strip_tags($det->resultados->resultado ?? ''));
+                        $area = $det->examenes->areas->nombre ?? null;
+                    @endphp
+
+                    @if ($resultado !== '' && $area)
+                        @php
+                            $agrupados[$area][] = $det->resultados->resultado;
+                        @endphp
+                    @endif
+                @endforeach
+                @foreach ($agrupados as $area => $resultados)
+                    <div style="margin-bottom: 10px;">
+                        <strong>{{ $area }}</strong><br>
+                        <span class="resultado-ckeditor">
+                            {!! implode('- - - - - - - - - - - - - - - - - - - - - - - - - - - ', $resultados) !!}
+                        </span>
+                    </div>
                 @endforeach
             </div>
         </div>

@@ -57,7 +57,7 @@
                         wire:model.live.500ms="search">
                 </div>
 
-                <div class="card-body p-0">
+                <div class="card-body p-0 table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr class="text-uppercase small text-muted">
