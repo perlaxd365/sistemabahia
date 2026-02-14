@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 class Usuario extends Component
 {
     public $id_usuario, $name, $dni, $fecha_nacimiento, $genero, $direccion, $telefono, $email, $password, $nombre_cargo, $especialidad_cargo, $colegiatura_cargo, $foto_url, $foto_url_update;
+    public $nombres, $apellido_paterno, $apellido_materno, $tipo_documento;
     public $showDetail = false;
     public $privilegio_actual;
     ////// image
@@ -32,6 +33,7 @@ class Usuario extends Component
     {
         $this->privilegio_actual = auth()->user()->privilegio_cargo;
         $this->show = 8;
+        $this->tipo_documento = 1;
         $this->table = true;
     }
     public function render()
@@ -46,7 +48,8 @@ class Usuario extends Component
                         ->orwhere('name', 'LIKE', '%' . $this->search . '%')
                         ->orwhere('dni', 'LIKE', '%' . $this->search . '%')
                         ->orwhere('email', 'LIKE', '%' . $this->search . '%');
-                })->paginate($this->show);
+                })
+                ->orderby('created_at', 'desc')->paginate($this->show);
         } else {
             $lista_usuarios = User::select('*')
                 ->where(function ($query) {
@@ -76,7 +79,7 @@ class Usuario extends Component
     public function agregar()
     {
         $messages = [
-            'name.required' => 'Por favor ingresar el nombre del usuario',
+            'tipo_documento' => 'Por favor selecciona el tipo de doc',
             'genero.required' => 'Por favor ingresar el genero del usuario',
             'dni.required' => 'Por favor ingresar el dni del usuario',
             'fecha_nacimiento.required' => 'Por favor seleccionar fecha de nacimiento del usuario',
@@ -86,7 +89,7 @@ class Usuario extends Component
         ];
 
         $rules = [
-            'name' => 'required',
+            'tipo_documento' => 'required|in:1,2,3',
             'dni' => 'required|unique:users,dni',
             'fecha_nacimiento' => 'required',
             'genero' => 'required',
@@ -151,14 +154,22 @@ class Usuario extends Component
             $this->password = $this->dni;
         }
 
-
+        $this->name = trim(
+            $this->nombres . ' ' .
+                $this->apellido_paterno . ' ' .
+                $this->apellido_materno
+        );
 
         User::create([
             'name' => $this->name,
+            'nombres' => $this->nombres,
+            'apellido_paterno' => $this->apellido_paterno,
+            'apellido_materno' => $this->apellido_materno,
             'email' => $this->email,
             'password' => bcrypt($this->password),
             'genero' => $this->genero,
             'fecha_nacimiento' => $this->fecha_nacimiento,
+            'tipo_documento' => $this->tipo_documento,
             'dni' => $this->dni,
             'telefono' => $this->telefono,
             'direccion' => $this->direccion,
@@ -184,6 +195,10 @@ class Usuario extends Component
     public function default()
     {
         $this->name = '';
+        $this->nombres = '';
+        $this->apellido_paterno = '';
+        $this->apellido_materno = '';
+        $this->tipo_documento = '';
         $this->email = '';
         $this->password = '';
         $this->genero = '';
@@ -216,6 +231,9 @@ class Usuario extends Component
         $this->view = "edit";
         $user = User::find($id_usuario);
         $this->name = $user->name;
+        $this->nombres = $user->nombres;
+        $this->apellido_materno = $user->apellido_materno;
+        $this->apellido_paterno = $user->apellido_paterno;
         $this->email = $user->email;
         $this->telefono = $user->telefono;
         $this->genero = $user->genero;
@@ -239,7 +257,6 @@ class Usuario extends Component
     public function update()
     {
         $messages = [
-            'name.required' => 'Por favor ingresar el nombre del usuario',
             'dni.required' => 'Por favor ingresar el dni del usuario',
             'genero.required' => 'Por favor ingresar el genero usuario',
             'fecha_nacimiento.required' => 'Por favor ingresar fecha de nacimiento del usuario',
@@ -248,7 +265,6 @@ class Usuario extends Component
         ];
 
         $rules = [
-            'name' => 'required',
             'dni' => 'required',
             'genero' => 'required',
             'fecha_nacimiento' => 'required',
@@ -290,8 +306,20 @@ class Usuario extends Component
 
 
         $user = User::find($this->id_usuario);
+
+
+        $this->name = trim(
+            $this->nombres . ' ' .
+                $this->apellido_paterno . ' ' .
+                $this->apellido_materno
+        );
+
         $user->update([
             'name' => $this->name,
+            'nombres' => $this->nombres,
+            'apellido_paterno' => $this->apellido_paterno,
+            'apellido_materno' => $this->apellido_materno,
+            'tipo_documento' => $this->tipo_documento,
             'dni' => $this->dni,
             'genero' => $this->genero,
             'fecha_nacimiento' => $this->fecha_nacimiento,

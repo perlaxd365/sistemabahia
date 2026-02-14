@@ -18,6 +18,7 @@ class Atencion extends Model
         'id_historia',
         'id_responsable',
         'tipo_atencion',
+        'relato_consulta',
         'fecha_inicio_atencion',
         'fecha_fin_atencion',
         'estado'
@@ -47,7 +48,16 @@ class Atencion extends Model
             'id_historia'
         );
     }
-
+    public function getTipoAtencionTextoAttribute()
+    {
+        return match ($this->tipo_atencion) {
+            '01' => 'Consulta Externa',
+            '02' => 'Emergencia',
+            '03' => 'Hospitalización',
+            '05' => 'Procedimiento Ambulatorio',
+            default => 'No definido',
+        };
+    }
     // Servicios médicos
     public function servicios()
     {

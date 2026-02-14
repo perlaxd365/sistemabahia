@@ -27,6 +27,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'apellido_paterno',
+        'apellido_materno',
+        'nombres',
         'email',
         'genero',
         'dni',
@@ -42,6 +45,15 @@ class User extends Authenticatable
         'password',
         'estado_user',
     ];
+
+    public function getNombreCompletoAttribute()
+    {
+        if ($this->nombres || $this->apellido_paterno) {
+            return trim("{$this->nombres} {$this->apellido_paterno} {$this->apellido_materno}");
+        }
+
+        return $this->name;
+    }
 
 
     /**

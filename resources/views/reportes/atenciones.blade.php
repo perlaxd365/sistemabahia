@@ -17,7 +17,7 @@
               @foreach ($atenciones as $atencion)
                   <tr>
                       <th scope="row">{{ $count++ }}</th>
-                      <td>{!! $atencion->tipo_atencion !!}</td>
+                      <td>{!! $atencion->relato_atencion !!}</td>
                       <td>{{ DateUtil::getFechaCompleta($atencion->fecha_inicio_atencion) }}
                       </td>
                       <td>{{ $atencion->fecha_fin_atencion ? DateUtil::getFechaCompleta($atencion->fecha_fin_atencion) : '' }}

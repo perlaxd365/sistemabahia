@@ -147,8 +147,7 @@
                                             <small class="text-muted d-block">Subtotal</small>
                                             <input
                                                 class="form-control-sm w-100 form-control-sm  text-success fs-6 border-0 bg-light text-end fw-semibold"
-                                                readonly disabled
-                                                value=" S/ {{ number_format($item['subtotal'], 2) }}">
+                                                readonly disabled value=" S/ {{ number_format($item['subtotal'], 2) }}">
                                         </div>
                                     </td>
 
@@ -181,92 +180,105 @@
                 </div>
 
             </div>
-        @endif
-
-    </div>
-
-
-    <div class="card border-0 shadow-sm mt-3">
-
-        <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
-
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-clinico mr-2">
-                    <i class="fa fa-pills"></i>
-                </div>
-
-                <div>
-                    <div class="fw-semibold text-clinico">
-                        Medicamentos Dispensados
-                    </div>
-                    <div class="small text-muted">
-                        Registro histórico de medicamentos entregados en esta atención
-                    </div>
-                </div>
-            </div>
-
-            <button type="button" class="btn btn-sm btn-toggle-clinico" wire:click="toggleDispensados">
-                <i class="fa {{ $mostrarDispensados ? 'fa-chevron-up' : 'fa-chevron-down' }}"></i>
-                {{ $mostrarDispensados ? 'Ocultar detalle' : 'Ver detalle' }}
-            </button>
+            @endif
 
         </div>
 
 
-        <!-- CONTENIDO DESPLEGABLE -->
-        @if ($mostrarDispensados)
-            <div class="card-body p-0">
+        <div class="card border-0 shadow-sm mt-3">
 
-                @if ($medicamentosDispensados->count())
-                    <ul class="list-group list-group-flush">
+            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
 
-                        @foreach ($medicamentosDispensados as $item)
-                            <li class="list-group-item">
-
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <strong class="text-clinico">
-                                            {{ $item->medicamentos->nombre }}
-                                        </strong>
-
-                                        <div class="small text-muted">
-                                            {{ $item->medicamentos->concentracion }}
-                                            · {{ $item->medicamentos->presentacion }}
-                                            · {{ $item->medicamentos->marca }}
-                                        </div>
-
-                                        <div class="small mt-1">
-                                            Cantidad: <b>{{ $item->cantidad }}</b>
-                                            | Precio: <b>S/ {{ number_format($item->precio, 2) }}</b>
-                                        </div>
-                                    </div>
-
-                                    <div class="text-end">
-                                        <span class="badge bg-light text-dark">
-                                            {{ $item->created_at->format('d/m/Y H:i') }}
-                                        </span>
-
-                                        <div class="fw-semibold text-primary mt-1">
-                                            S/ {{ number_format($item->subtotal, 2) }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </li>
-                        @endforeach
-
-                    </ul>
-                @else
-                    <div class="p-3 text-center text-muted small">
-                        No se han dispensado medicamentos aún
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-clinico mr-2">
+                        <i class="fa fa-pills"></i>
                     </div>
-                @endif
+
+                    <div>
+                        <div class="fw-semibold text-clinico">
+                            Medicamentos Dispensados
+                        </div>
+                        <div class="small text-muted">
+                            Registro histórico de medicamentos entregados en esta atención
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-toggle-clinico" wire:click="toggleDispensados">
+                    <i class="fa {{ $mostrarDispensados ? 'fa-chevron-up' : 'fa-chevron-down' }}"></i>
+                    {{ $mostrarDispensados ? 'Ocultar detalle' : 'Ver detalle' }}
+                </button>
 
             </div>
-        @endif
+
+
+            <!-- CONTENIDO DESPLEGABLE -->
+            @if ($mostrarDispensados)
+                <div class="card-body p-0">
+
+                    @if ($medicamentosDispensados->count())
+                        <ul class="list-group list-group-flush">
+
+                            @foreach ($medicamentosDispensados as $item)
+                                <li class="list-group-item py-3">
+
+                                    <div class="row align-items-center">
+
+                                        {{-- INFO MEDICAMENTO --}}
+                                        <div class="col-md-6">
+                                            <strong class="text-clinico fs-6">
+                                                {{ $item->medicamentos->nombre }}
+                                            </strong>
+
+                                            <div class="small text-muted">
+                                                {{ $item->medicamentos->concentracion }}
+                                                · {{ $item->medicamentos->presentacion }}
+                                                · {{ $item->medicamentos->marca }}
+                                            </div>
+
+                                            <div class="small mt-1">
+                                                Cantidad: <b>{{ $item->cantidad }}</b>
+                                                | Precio: <b>S/ {{ number_format($item->precio, 2) }}</b>
+                                            </div>
+                                        </div>
+
+                                        {{-- FECHA Y SUBTOTAL --}}
+                                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                                            <span class="badge bg-light text-dark">
+                                                {{ $item->created_at->format('d/m/Y H:i') }}
+                                            </span>
+
+                                            <div class="fw-semibold text-primary fs-6 mt-2">
+                                                S/ {{ number_format($item->subtotal, 2) }}
+                                            </div>
+                                        </div>
+
+                                        {{-- BOTÓN --}}
+                                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                                            <small style="cursor: pointer" wire:click="eliminarMedicamento({{ $item->id_atencion_medicamento }})"
+                                                class="badge badge-warning">
+                                                <i class="fa fa-clock"></i>
+                                                Retornar a Farmacia
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                </li>
+                            @endforeach
+
+                        </ul>
+                    @else
+                        <div class="p-3 text-center text-muted small">
+                            No se han dispensado medicamentos aún
+                        </div>
+                    @endif
+
+                </div>
+            @endif
+
+        </div>
+
+
 
     </div>
-
-
-
-</div>

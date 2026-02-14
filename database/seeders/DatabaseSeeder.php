@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PartosServiciosSeeder::class);
         $this->call(CirugiasServiciosSeeder::class);
         $this->call(AlquilerSalaCirugiaServiciosSeeder::class);
+        $this->call(ServiciosSeeder::class);
 
         // =========================
         // FACTURACIÓN
@@ -40,5 +41,7 @@ class DatabaseSeeder extends Seeder
         $this->call(NubeFactSeeder::class);
         $this->call(SeriesSeeder::class);
         $this->call(EspecialidadesServiciosSeeder::class);
+
+        
     }
 }

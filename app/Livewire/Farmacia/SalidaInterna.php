@@ -39,14 +39,15 @@ class SalidaInterna extends Component
     }
     public function medicamentoVencido()
     {
-        if (!$this->medicamentoSeleccionado?->fecha_vencimiento) {
+        $fecha = $this->medicamentoSeleccionado?->fecha_vencimiento;
+
+        if (empty($fecha)) {
             return false;
         }
 
-        [$mes, $anio] = explode('/', $this->medicamentoSeleccionado->fecha_vencimiento);
-
-        return now()->year > $anio ||
-            (now()->year == $anio && now()->month > $mes);
+        return \Carbon\Carbon::createFromFormat('m/Y', $fecha)
+            ->endOfMonth()
+            ->lt(now());
     }
     public function guardar()
     {

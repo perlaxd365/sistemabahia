@@ -132,6 +132,19 @@ class EcografiasServiciosSeeder extends Seeder
             ['ECOGRAFIA ANTEBRAZO EPICONDILITIS', 120],
             ['ECOGRAFIA PARTES BLANDAS CABEZA Y CUELLO', 140],
             ['ECOGRAFIA DOPPLER CAROTIDAS', 200],
+            // ============================
+            // NUEVAS ECOGRAFIAS AGREGADAS
+            // ============================
+
+            ['ECODOPPLER ARTERIAL MMII', 250],
+            ['ECODOPPLER ARTERIAL MMII BILATERAL', 300],
+            ['ECODOPPLER VENOSO MMII', 250],
+            ['ECODOPPLER VENOSO MMII BILATERAL', 300],
+            ['ECODOPPLER ARTERIAL Y VENOSO MMII BILATERAL', 400],
+            ['ECO RENAL', 120],
+            ['ECO RENOVESICAL', 140],
+            ['ECO RENOVESICOPROSTATICO', 160],
+            ['ECO PARTES BLANDAS', 120],
 
         ];
 

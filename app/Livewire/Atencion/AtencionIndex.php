@@ -18,6 +18,7 @@ class AtencionIndex extends Component
     public $show;
     public $dni, $name, $fecha_nacimiento, $telefono;
     public $tipo_atencion;
+    public $relato_consulta;
     public function mount(Request $request)
     {
         if ($request->dni) {
@@ -62,6 +63,7 @@ class AtencionIndex extends Component
         $this->telefono = "";
         $this->fecha_nacimiento = "";
         $this->tipo_atencion = "";
+        $this->relato_consulta = "";
     }
 
     public function nextStep()
@@ -94,7 +96,7 @@ class AtencionIndex extends Component
             $this->dispatch('get-ckeditor');
 
             $this->validate([
-                'tipo_atencion' => 'required',
+                'relato_consulta' => 'required',
             ]);
             $this->guardar();
         }
@@ -129,6 +131,7 @@ class AtencionIndex extends Component
         $this->validate([
             'id_paciente' => 'required',
             'tipo_atencion' => 'required',
+            'relato_consulta' => 'required',
         ]);
 
         $id_historia = PacienteUtil::addHistoria($this->id_paciente);
@@ -137,6 +140,7 @@ class AtencionIndex extends Component
             'id_responsable' => auth()->user()->id,
             'id_historia' => $id_historia,
             'tipo_atencion' => $this->tipo_atencion,
+            'relato_consulta' => $this->relato_consulta,
             'fecha_inicio_atencion' => now(),
             'estado' => "PROCESO",
         ]);
@@ -159,7 +163,7 @@ class AtencionIndex extends Component
     #[On('editorUpdated')]
     public function updateEditorValue($value)
     {
-        $this->tipo_atencion = $value;
+        $this->relato_consulta = $value;
     }
 
     public function exportarPDF()

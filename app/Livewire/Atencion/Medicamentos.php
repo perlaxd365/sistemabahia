@@ -9,6 +9,7 @@ use App\Models\KardexMedicamento;
 use App\Models\Medicamento;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Medicamentos extends Component
@@ -159,7 +160,7 @@ class Medicamentos extends Component
             // Actualizar stock
             Medicamento::where('id_medicamento', $item['id_medicamento'])
                 ->decrement('stock', $item['cantidad']);
-
+            $atencion = Atencion::find($this->id_atencion);
             // Registrar kardex
             KardexMedicamento::create([
                 'id_medicamento'  => $item['id_medicamento'],
@@ -168,7 +169,7 @@ class Medicamentos extends Component
                 'cantidad'        => $item['cantidad'],
                 'stock_anterior'  => $stockAnterior,
                 'stock_actual'     => $stockNuevo,
-                'descripcion'     => 'Dispensación en atención médica',
+                'descripcion'     => 'Dispensación en atención médica #' . $this->id_atencion . '  para ' . $atencion->paciente->name,
                 'user_id'         => auth()->user()->id,
             ]);
         }
@@ -199,5 +200,50 @@ class Medicamentos extends Component
             ->where('id_atencion', $this->id_atencion)
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public function eliminarMedicamento($id)
+    {
+        DB::transaction(function () use ($id) {
+
+            $item = AtencionMedicamento::findOrFail($id);
+
+            // 🔒 Validar que la atención no esté facturada
+            $atencion = Atencion::find($item->id_atencion);
+
+            if ($atencion->estado === 'FINALIZADO') {
+                throw new \Exception("No se puede eliminar. La atención está finalizada.");
+            }
+
+
+            $medicamento = Medicamento::find($item->id_medicamento);
+
+            $stockAnterior = $medicamento->stock;
+
+            // 🔄 Regresar stock
+            $medicamento->stock += $item->cantidad;
+            $medicamento->save();
+
+            // 📝 Registrar en kardex
+            KardexMedicamento::create([
+                'id_medicamento' => $item->id_medicamento,
+                'id_atencion' => $item->id_atencion,
+                'tipo_movimiento' => 'ENTRADA',
+                'cantidad' => $item->cantidad,
+                'stock_anterior' => $stockAnterior,
+                'stock_actual' => $medicamento->stock,
+                'descripcion' => 'ANULACIÓN DE DISPENSACIÓN',
+                'user_id' => auth()->id()
+            ]);
+
+            // 🗑 Eliminar el medicamento de la atención
+            $item->delete();
+        });
+
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'title' => 'Medicamento cancelado',
+            'message' => 'Medicamento eliminado y stock restaurado.'
+        ]);
     }
 }

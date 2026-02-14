@@ -109,8 +109,14 @@
                                                 <div class="d-flex align-items-center gap-1">
                                                     <div class="bg-info bg-opacity-10 rounded-circle p-1">
                                                         <img class="rounded-circle"
-                                                            src="{{ $atencion->medico->foto_url }}" width="30px"
-                                                            height="30px" alt="">
+                                                            src="<?php 
+                                                            if($atencion->medico->foto_url){
+                                                                echo $atencion->medico->foto_url;
+                                                            }else{
+                                                                echo 'https://media.istockphoto.com/id/1065743020/es/vector/icono-de-estetoscopio.jpg?s=612x612&w=0&k=20&c=rY5Ee82y4ocdymBfngbV7_Oxv9JnTJDTtsnukMMqdRk=' ;
+                                                            }
+                                                            ?>"
+                                                            width="30px" height="30px" alt="">
                                                     </div>
 
                                                     <div class="pl-2">
@@ -176,10 +182,17 @@
 
                                     {{-- ACCIONES --}}
                                     <td class="text-center">
-                                        <a href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"
-                                            class="btn btn-sm btn-outline-primary rounded-pill px-1">
-                                            Abrir atención
-                                        </a>
+
+                                        <a href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}">
+                                            <small class="badge badge-success">Abrir atención</small></a>
+
+                                        @can('ver-caja')
+                                            <a href="javascript:void(0)"
+                                                wire:click='anular({{ $atencion->id_atencion }})'><small
+                                                    class="badge badge-warning mt-2"
+                                                    onclick=" return confirm('¿Seguro que deseas anular esta atención?') || event.stopImmediatePropagation()">Anular
+                                                    Atencion</small></a>
+                                        @endcan
                                     </td>
                                 </tr>
 

@@ -150,7 +150,7 @@
 
                                         <td>
                                             <span class="fw-semibold">
-                                                       {!! $atencion->tipo_atencion !!}
+                                                {!! $atencion->relato_atencion !!}
                                             </span>
                                         </td>
 
@@ -242,9 +242,20 @@
                                                             </p></b>
                                                     </h5>
                                                 </div>
-                                                <textarea id="editor" name="tipo_atencion" class="form-control" rows="10">{{ $tipo_atencion }}</textarea>
-
+                                                <select wire:model="tipo_atencion" class="form-control" required>
+                                                    <option value="">Seleccionar</option>
+                                                    <option value="01">Consulta Externa</option>
+                                                    <option value="02">Emergencia</option>
+                                                    <option value="03">Hospitalización</option>
+                                                    <option value="05">Procedimiento Ambulatorio</option>
+                                                </select>
                                                 @error('tipo_atencion')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                                <br>
+                                                <textarea id="editor" name="relato_consulta" class="form-control" rows="10">{{ $relato_consulta }}</textarea>
+
+                                                @error('relato_consulta')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
 
@@ -253,7 +264,6 @@
                                     </div>
 
                                 </div>
-
                                 <button type="button" onclick="printEditor()" class="btn btn-sm btn-danger">Imprimir
                                     <i class="fa fa-print"></i></button>
                                 <div class="flex justify-between mt-4">

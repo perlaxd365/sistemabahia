@@ -23,11 +23,11 @@ class AtencionMedicamento extends Model
 
 
     public function medicamentos()
-{
-    return $this->belongsTo(
-        Medicamento::class,
-        'id_medicamento',
-        'id_medicamento'
-    );
-}
+    {
+        return $this->belongsTo(
+            Medicamento::class,
+            'id_medicamento',
+            'id_medicamento'
+        );
+    }
 }
