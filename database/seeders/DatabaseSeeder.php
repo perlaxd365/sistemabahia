@@ -41,7 +41,6 @@ class DatabaseSeeder extends Seeder
         $this->call(NubeFactSeeder::class);
         $this->call(SeriesSeeder::class);
         $this->call(EspecialidadesServiciosSeeder::class);
-
-        
+        $this->call(Cie10Seeder::class);
     }
 }

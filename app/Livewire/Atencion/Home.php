@@ -27,6 +27,7 @@ class Home extends Component
         $permisosPorTab = [
             'info'         => [1, 2, 3, 4, 5, 6],
             'medico'       => [1, 5],
+            'diagnostico'  => [1, 5],
             'servicios'    => [1, 5],
             'signos'       => [1, 2, 3, 5],
             'consulta'     => [1, 2, 3, 5],
@@ -50,6 +51,7 @@ class Home extends Component
         $map = [
             'info'          => 'atencion.info-paciente',
             'medico'        => 'atencion.medico',
+            'diagnostico'   => 'atencion.diagnostico',
             'servicios'     => 'atencion.servicios',
             'signos'        => 'atencion.signos-vitales',
             'consulta'      => 'atencion.consulta',

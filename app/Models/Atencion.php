@@ -102,8 +102,17 @@ class Atencion extends Model
             ->exists();
     }
 
+    public function estaFinalizada(): bool
+    {
+        return $this->whereIn('estado', ['FINALIZADO'])
+            ->exists();
+    }
     public function pagos()
     {
         return $this->hasMany(Pago::class, 'id_atencion');
+    }
+    public function diagnosticos()
+    {
+        return $this->hasMany(AtencionDiagnostico::class, 'id_atencion', 'id_atencion');
     }
 }

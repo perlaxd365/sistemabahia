@@ -142,6 +142,8 @@ class AtencionIndex extends Component
             'tipo_atencion' => $this->tipo_atencion,
             'relato_consulta' => $this->relato_consulta,
             'fecha_inicio_atencion' => now(),
+            'fecha_atencion' => now()->toDateString(),
+            'hora_atencion' => now()->format('H:i:s'),
             'estado' => "PROCESO",
         ]);
 

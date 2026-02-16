@@ -26,6 +26,14 @@
                                 </li>
                             @endif
 
+                            {{-- DIAGNOSTICO --}}
+                            @if ($this->puedeVer([1,5]))
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $tab == 'diagnostico' ? 'active' : '' }}"
+                                        wire:click="cambiarTab('diagnostico')">Diagnóstico</a>
+                                </li>
+                            @endif
+
                             {{-- SERVICIOS --}}
                             @if ($this->puedeVer([1,5]))
                                 <li class="nav-item">
