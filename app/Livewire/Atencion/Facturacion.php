@@ -48,6 +48,20 @@ class Facturacion extends Component
             return;
         }
 
+        $totalItems = 0;
+
+        $totalItems += $this->atencion->servicios()->count();
+        $totalItems += $this->atencion->medicamentos()->count();
+
+        if ($totalItems <= 0) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Atención sin cargos',
+                'message' => 'Debe agregar al menos un servicio o medicamento antes de emitir comprobante.'
+            ]);
+            return;
+        }
+
         DB::transaction(function () {
 
             // 2️⃣ Crear comprobante BORRADOR
@@ -64,6 +78,7 @@ class Facturacion extends Component
                 'subtotal'         => 0, // gravada
                 'igv'              => 0,
                 'total'            => 0,
+                'id_caja_turno'    => session('id_caja_turno'),
                 'estado'           => 'BORRADOR',
             ]);
 
@@ -161,6 +176,13 @@ class Facturacion extends Component
             return;
         }
 
+
+        if (!session('id_caja_turno')) {
+            $this->dispatch(
+                'alert',
+                ['type' => 'error', 'title' => 'POR FAVOR ABRIR TURNO DE CAJA', 'message' => 'Error de caja']
+            );
+        }
         DB::transaction(function () {
 
             // 3️⃣ Eliminar detalles anteriores
@@ -259,10 +281,10 @@ class Facturacion extends Component
      */
     public function actualizarTipoComprobante()
     {
-        $this->numero_documento = "20607862908";
-        $this->cliente_nombre = "CESAR";
-        $this->cliente_direccion = "direccion de prueba";
-        $this->cliente_razon = "CLIENTE S.A.C.";
+        $this->numero_documento = "";
+        $this->cliente_nombre = "";
+        $this->cliente_direccion = "";
+        $this->cliente_razon = "";
         // Factura siempre con IGV
         if ($this->tipo_comprobante === 'FACTURA') {
             $this->con_igv = true;
@@ -484,10 +506,6 @@ class Facturacion extends Component
             ]);
             $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
 
-            $atencion->update([
-                'estado' => 'FINALIZADO',
-                'fecha_fin_atencion' => now()
-            ]);
             $this->dispatch(
                 'alert',
                 ['type' => 'success', 'title' => 'Ticket registrado correctamente', 'message' => 'Exito']
@@ -554,10 +572,6 @@ class Facturacion extends Component
 
             $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
 
-            $atencion->update([
-                'estado' => 'FINALIZADO',
-                'fecha_fin_atencion' => now()
-            ]);
 
             if (!$respuesta || !is_array($respuesta)) {
                 throw new \Exception('Respuesta vacía o inválida de NubeFact');
@@ -839,6 +853,137 @@ class Facturacion extends Component
 
         return false;
     }
+
+
+    public function anularComprobanteInterno()
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $comprobante = Comprobante::findOrFail($this->comprobante->id_comprobante);
+
+            // 1️⃣ Validar que sea TICKET
+            if ($comprobante->tipo_comprobante !== 'TICKET') {
+
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'title' => 'Operación no permitida',
+                    'message' => 'Solo se pueden anular TICKETS internos.'
+                ]);
+
+                return;
+            }
+
+            // 2️⃣ Validar estado
+            if ($comprobante->estado === 'ANULADO') {
+
+                $this->dispatch('alert', [
+                    'type' => 'warning',
+                    'title' => 'Comprobante ya anulado',
+                    'message' => 'Este comprobante ya se encuentra en estado ANULADO.'
+                ]);
+
+                return;
+            }
+
+            // 3️⃣ Validar turno de caja
+
+
+            // 4️⃣ Validar que el turno esté abierto (recomendado)
+            $turno = $comprobante->cajaTurno;
+
+            if ($turno && $turno->estado === 'CERRADO') {
+
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'title' => 'Turno cerrado',
+                    'message' => 'No se puede anular porque el turno de caja está cerrado.'
+                ]);
+
+                return;
+            }
+
+            // 5️⃣ Cambiar estado
+            $comprobante->estado = 'ANULADO';
+            $comprobante->save();
+
+            // 6️⃣ Crear movimiento inverso en caja
+            CajaMovimiento::create([
+                'id_usuario'      => auth()->id(),
+                'id_referencia'   => $comprobante->id_comprobante,
+                'tabla_referencia' => 'comprobantes',
+                'tipo'            => 'EGRESO',
+                'descripcion'     => 'ANULACIÓN TICKET ' . $comprobante->serie . '-' . $comprobante->numero,
+                'monto'           => $comprobante->total,
+                'responsable'     => auth()->user()->name,
+            ]);
+
+            DB::commit();
+
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'title' => 'Ticket anulado',
+                'message' => 'El ticket fue anulado y la caja fue revertida correctamente.'
+            ]);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Error del sistema',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function eliminarComprobante()
+    {
+        if (!$this->comprobante) {
+            return;
+        }
+
+        if ($this->comprobante->estado !== 'BORRADOR') {
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Acción no permitida',
+                'message' => 'Solo se pueden eliminar comprobantes en estado BORRADOR'
+            ]);
+
+            return;
+        }
+
+        if ($this->comprobante->total_cobrado > 0) {
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Acción bloqueada',
+                'message' => 'No se puede eliminar un comprobante que ya tiene pagos registrados'
+            ]);
+
+            return;
+        }
+
+        DB::transaction(function () {
+
+            // Eliminar detalles primero
+            $this->comprobante->detalles()->delete();
+
+            // Eliminar comprobante
+            $this->comprobante->delete();
+        });
+
+        $this->comprobante = null;
+
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'title' => 'Comprobante eliminado',
+            'message' => 'El borrador fue eliminado correctamente'
+        ]);
+    }
+
     public function render()
     {
         return view('livewire.atencion.facturacion');

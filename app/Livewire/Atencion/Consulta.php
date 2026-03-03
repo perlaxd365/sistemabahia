@@ -92,7 +92,7 @@ class Consulta extends Component
 
     public function agregarConsulta()
     {
-        if ($this->atencion->estaBloqueada()) {
+        if ($this->atencion->estaFinalizada()) {
 
             $this->dispatch('alert', [
                 'type' => 'error',
@@ -243,5 +243,59 @@ class Consulta extends Component
                 ['type' => 'info', 'title' => 'No se resgitró historia.', 'message' => 'Sin registro']
             );
         }
+    }
+
+    public function printReceta()
+    {
+        if (!$this->id_consulta) {
+            $this->dispatch('alert', [
+                'type' => 'info',
+                'title' => 'No existe consulta registrada.',
+                'message' => 'Guarde primero la consulta.'
+            ]);
+            return;
+        }
+
+
+        $consulta = ModelsConsulta::find($this->id_consulta);
+        $paciente = User::find($this->id_paciente);
+        $atencion = Atencion::find($this->id_atencion);
+
+        // LOGO
+        $path = public_path('images/logo-clinica.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        // DOCTOR
+        $profesional = UserUtil::getUserByID($atencion->id_medico);
+
+        $firma_img = null;
+
+        if ($profesional && $profesional->firma_url) {
+            try {
+                $url = $profesional->firma_url;
+                $data_firma = file_get_contents($url);
+                $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+                $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+            } catch (\Exception $e) {
+                $firma_img = null;
+            }
+        }
+
+        $pdf = Pdf::loadView('reportes.print-receta', compact(
+            'consulta',
+            'paciente',
+            'base64',
+            'firma_img',
+            'profesional'
+        ))->setPaper([0, 0, 226.77, 600], 'portrait'); // tamaño ticket 80mm
+
+        $pdf->getDomPDF()->set_option("defaultFont", "DejaVu Sans");
+
+        return response()->streamDownload(
+            fn() => print($pdf->output()),
+            'receta_' . $paciente->name . '.pdf'
+        );
     }
 }

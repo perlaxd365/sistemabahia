@@ -7,7 +7,11 @@ use App\Models\LaboratorioResultado;
 use App\Models\OrdenLaboratorio;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Termwind\Components\Dd;
 use UserUtil;
 
 class Resultados extends Component
@@ -18,6 +22,9 @@ class Resultados extends Component
     public $paciente;
     public $atencion;
     public $historia;
+    use WithFileUploads;
+
+    public $pdfResultado;
     //paciente
     public function mount($id_orden)
     {
@@ -32,96 +39,91 @@ class Resultados extends Component
         $this->paciente = $this->atencion->paciente;
         $this->historia = $this->atencion->historia;
 
-
+        
 
         foreach ($this->orden->detalles as $det) {
             $this->resultados[$det->id_detalle_laboratorio] =
                 $det->resultados->resultado ?? '';
         }
     }
-    public function guardar()
-    {
-        foreach ($this->resultados as $id_detalle => $data) {
 
-            LaboratorioResultado::updateOrCreate(
-                ['id_detalle_laboratorio' => $id_detalle],
-                [
-                    'resultado'       => $data,
-                    'observacion'     => null,
-                    'fecha_resultado' => Carbon::now(),
-                ]
-            );
+
+    public function subirResultado()
+    {
+        if ($this->orden->estado === 'ANULADO') {
+            return;
         }
 
-        $this->orden->update(['estado' => 'PROCESO']);
+        $this->validate([
+            'pdfResultado' => 'required|mimes:pdf|max:5120'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $path = Storage::disk('cloudinary')->putFileAs(
+                'informes_pdf',
+                $this->pdfResultado,
+                'orden_' . $this->orden->id_orden . '_' . time() . '.pdf',
+                [
+                    'resource_type' => 'raw'
+                ]
+            );
+
+            $this->orden->update([
+                'ruta_pdf_resultado' => $path,
+                'fecha_subida_pdf' => now(),
+                'id_usuario_subida_pdf' => auth()->id(),
+                'estado' => 'PROCESO' // 🔥 YA NO FINALIZA
+            ]);
+
+            DB::commit();
+
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'title' => 'Documento actualizado correctamente',
+                'message' => 'Puede seguir modificándolo'
+            ]);
+
+            $this->orden->refresh();
+            $this->reset('pdfResultado');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Error al subir documento',
+                'message' => 'Comunicar a sistemas'
+            ]);
+        }
+    }
+    public function finalizarInforme()
+    {
+        if (!$this->orden->ruta_pdf_resultado) {
+
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'title' => 'Debe subir un informe primero',
+                'message' => 'No puede finalizar vacío'
+            ]);
+
+            return;
+        }
+
+        $this->orden->update([
+            'estado' => 'FINALIZADO'
+        ]);
+
+        $this->orden->refresh();
 
         $this->dispatch('alert', [
             'type' => 'success',
-            'title' => 'Resultados actualizados correctamente',
-            'message' => 'Resultados agregados'
+            'title' => 'Informe finalizado correctamente',
+            'message' => 'El documento queda bloqueado'
         ]);
     }
-
-    public function finalizar()
-    {
-        foreach ($this->resultados as $id_detalle => $data) {
-
-            LaboratorioResultado::updateOrCreate(
-                ['id_detalle_laboratorio' => $id_detalle],
-                [
-                    'resultado'       => $data,
-                    'observacion'     => null,
-                    'fecha_resultado' => Carbon::now(),
-                ]
-            );
-        }
-        $this->orden->update(['profesional' => auth()->user()->id]);
-        $this->orden->update(['estado' => 'FINALIZADO']);
-        // ✅ Redireccionar al listado de órdenes
-        return redirect()->route('laboratorio.ordenes');
-    }
-
-    public function vista_previa()
-    {
-
-        $orden = OrdenLaboratorio::find($this->id_orden);
-        $paciente = $this->atencion->paciente;
-        //imagen
-        $path = public_path('images/logo-clinica.png');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-
-
-        //firma de laboratorista
-        $profesional = UserUtil::getUserByID($orden->profesional);
-        $firma_img = null;
-
-        if ($profesional && $profesional->firma_url) {
-
-            try {
-                $url = $profesional->firma_url;
-
-                $data_firma = file_get_contents($url);
-
-                $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-
-                $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
-            } catch (\Exception $e) {
-                $firma_img = null;
-            }
-        }
-        $pdf = Pdf::loadView(
-            'reportes.resultados-laboratorio',
-            compact('orden', 'base64', 'paciente', 'base64', 'firma_img', 'profesional')
-        )->setPaper('A4', 'landscape');
-
-        return response()->streamDownload(
-            fn() => print($pdf->output()),
-            'resultados_laboratorio_atencion_' . $this->atencion->id_atencion . '.pdf'
-        );
-    }
-
 
     public function render()
     {

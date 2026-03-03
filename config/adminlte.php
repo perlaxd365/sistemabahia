@@ -472,6 +472,12 @@ return [
             'can' => 'Administrador',
         ],
         [
+            'text' => 'Tramas',
+            'icon_color' => 'orange',
+            'url' => 'trama',
+            'can' => 'Administrador',
+        ],
+        [
             'text' => 'Reportes',
             'icon' => 'fas fa-file',
             'submenu' => [

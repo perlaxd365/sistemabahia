@@ -21,6 +21,7 @@ class Atencion extends Model
         'relato_consulta',
         'fecha_inicio_atencion',
         'fecha_fin_atencion',
+        'enviado_susalud',
         'estado'
     ];
 
@@ -104,8 +105,11 @@ class Atencion extends Model
 
     public function estaFinalizada(): bool
     {
-        return $this->whereIn('estado', ['FINALIZADO'])
-            ->exists();
+        if ($this->estado == "PROCESO") {
+            return false;
+        } else {
+            return true;
+        }
     }
     public function pagos()
     {
@@ -114,5 +118,46 @@ class Atencion extends Model
     public function diagnosticos()
     {
         return $this->hasMany(AtencionDiagnostico::class, 'id_atencion', 'id_atencion');
+    }
+
+    public function puedeFinalizar()
+    {
+        $errores = [];
+
+        // Validar médico
+        if (!$this->id_medico) {
+            $errores[] = "No tiene médico asignado.";
+        }
+
+        if ($this->medico && empty($this->medico->colegiatura_cargo)) {
+            $errores[] = "El médico no tiene CMP registrado.";
+        }
+
+        // Validar diagnósticos
+        if (!$this->diagnosticos()->exists()) {
+            $errores[] = "No tiene diagnósticos registrados.";
+        }
+
+        if ($this->diagnosticos()->where('tipo', 'PRINCIPAL')->count() !== 1) {
+            $errores[] = "Debe tener exactamente 1 diagnóstico PRINCIPAL.";
+        }
+
+        // Validar paciente
+        if (!$this->paciente || empty($this->paciente->dni)) {
+            $errores[] = "Paciente sin DNI válido.";
+        }
+
+
+        // Validar comprobante
+        if (!$this->comprobante) {
+            $errores[] = "No se ha generado comprobante de pago.";
+        }
+        if ($this->comprobante && $this->comprobante->estado !== 'EMITIDO') {
+            $errores[] = "El comprobante no está emitido.";
+        }
+        if ($this->comprobante && $this->comprobante->estado === 'ANULADO') {
+            $errores[] = "El comprobante está anulado.";
+        }
+        return $errores;
     }
 }

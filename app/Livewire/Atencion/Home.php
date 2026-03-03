@@ -37,6 +37,7 @@ class Home extends Component
             'insumos'      => [1, 2],
             'resultados'   => [1, 2, 5],
             'facturacion'  => [1, 5],
+            'finalizar'  => [1, 5],
         ];
 
         if (
@@ -61,6 +62,7 @@ class Home extends Component
             'resultados'    => 'atencion.resultados',
             'insumos'       => 'atencion.insumos',
             'facturacion'   => 'atencion.facturacion',
+            'finalizar'   => 'atencion.finalizar',
         ];
 
         $this->componente = $map[$tab];

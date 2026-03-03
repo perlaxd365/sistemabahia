@@ -5,6 +5,7 @@ namespace App\Livewire\Atencion;
 use App\Models\Atencion;
 use App\Models\AtencionDiagnostico;
 use App\Models\Cie10;
+use App\Models\User;
 use Livewire\Component;
 
 class Diagnostico extends Component
@@ -14,12 +15,17 @@ class Diagnostico extends Component
     public $buscar = '';
     public $resultados = [];
     public $tipo = 'SECUNDARIO';
+    public $nombre_paciente, $fecha_nacimiento;
 
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
         $this->atencion = Atencion::find($id_atencion);
+        $paciente = User::find($this->atencion->id_paciente);
+        $this->nombre_paciente = $paciente->name;
+        $this->fecha_nacimiento = $paciente->fecha_nacimiento;
     }
+
 
     protected $listeners = ['refreshDiagnosticos' => '$refresh'];
 
@@ -69,7 +75,6 @@ class Diagnostico extends Component
     public function eliminar($id)
     {
         AtencionDiagnostico::find($id)?->delete();
-      
     }
     public function render()
     {

@@ -153,7 +153,7 @@
                                         </label>
                                         <div class="input-group">
                                             <input type="number" class="form-control"
-                                                wire:model.live="numero_documento" value="73888312"
+                                                wire:model.live="numero_documento" value=""
                                                 placeholder="Ingrese DNI (8 dígitos)">
                                             <button class="btn btn-outline-primary" type="button"
                                                 wire:click="buscarDni"
@@ -165,7 +165,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label>Nombres</label>
-                                        <input type="text" class="form-control" value="Cesar Raul Baca"
+                                        <input type="text" class="form-control" value=""
                                             wire:model="cliente_nombre">
                                         @error('cliente_nombre')
                                             <span class="text-danger">{{ $message }}</span>
@@ -254,6 +254,15 @@
                                 wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> 🚀 Emitir
                             comprobante
                             Usuario</button>
+
+                        {{-- NUEVO BOTÓN ELIMINAR --}}
+                        <button wire:click="eliminarComprobante" wire:loading.attr="disabled"
+                            onclick="confirm('¿Seguro que deseas eliminar este comprobante? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                            class="btn btn-danger btn-sm" type="button">
+                            <i class="fa fa-trash"></i>
+                            <i wire:target="eliminarComprobante" wire:loading.class="fa fa-spinner fa-spin"></i>
+                            🗑 Eliminar
+                        </button>
                     @endif
 
                     @if (
@@ -265,10 +274,18 @@
                     @endif
 
                     @if ($comprobante && $comprobante->tipo_comprobante === 'TICKET' && $comprobante->estado === 'EMITIDO')
+
+                        @if ($comprobante->tipo_comprobante === 'TICKET')
+                            <button wire:click="anularComprobanteInterno" wire:loading.attr="disabled"
+                                class="btn btn-danger btn-sm" type="button"> <i class="fa fa-trash"></i> <i
+                                    wire:target="anularComprobanteInterno" wire:loading.class="fa fa-spinner fa-spin"
+                                    aria-hidden="true"></i> Anular comprobante</button>
+                        @endif
                         <a href="{{ route('tickets.imprimir', $comprobante) }}" target="_blank"
                             class="btn btn-secondary">
                             🧾 Imprimir Ticket
                         </a>
+
                     @endif
                 </div>
             @endif

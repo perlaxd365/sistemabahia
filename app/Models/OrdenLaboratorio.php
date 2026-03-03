@@ -15,6 +15,10 @@ class OrdenLaboratorio extends Model
         'diagnostico',
         'solicitante',
         'profesional',
+
+        'ruta_pdf_resultado',
+        'fecha_subida_pdf',
+        'id_usuario_subida_pdf',
         'estado'
     ];
 
@@ -26,7 +30,7 @@ class OrdenLaboratorio extends Model
         );
     }
 
-    
+
     public function detalles()
     {
         return $this->hasMany(
@@ -34,5 +38,10 @@ class OrdenLaboratorio extends Model
             'id_orden'
         );
     }
-}
 
+    // ✅ Helper producción
+    public function puedeActualizarPdf()
+    {
+        return $this->estado !== 'FINALIZADO';
+    }
+}

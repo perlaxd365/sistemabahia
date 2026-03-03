@@ -30,6 +30,8 @@ class Servicios extends Component
         $paciente = User::find($this->atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
         $this->dni = $paciente->dni;
+        $this->cantidad = 1;
+        $this->id_profesional = 0;
         $this->getTotalServiciosProperty();
     }
 

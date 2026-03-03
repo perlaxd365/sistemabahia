@@ -96,6 +96,13 @@
                                         wire:click="cambiarTab('facturacion')">Facturación</a>
                                 </li>
                             @endif
+                            {{-- FACTURACIÓN --}}
+                            @if ($this->puedeVer([1,5]))
+                                <li class="nav-item">
+                                    <a class="nav-link {{ $tab == 'finalizar' ? 'active' : '' }}"
+                                        wire:click="cambiarTab('finalizar')">Finalizar</a>
+                                </li>
+                            @endif
 
                         </ul>
 

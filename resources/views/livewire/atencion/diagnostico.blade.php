@@ -4,6 +4,30 @@
         <div class="card-header bg-primary text-white">
             <strong>Diagnósticos (CIE10)</strong>
         </div>
+        <div class="card border-0 shadow-sm mt-3">
+
+            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-clinico mr-2">
+                        <i class="fa fa-check fa-lg"></i>
+                    </div>
+
+                    <div>
+                        <div class="fw-semibold text-clinico">
+                            Diagnóstico de la Atención de <b>{{ $nombre_paciente }}</b>
+                        </div>
+                        <div class="small text-muted">
+                            Resultados de diagnóstico CIE010
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <br>
+
+
 
         <div class="card-body">
 
@@ -78,8 +102,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button class="btn"
-                                        wire:click="eliminar({{ $diag->id }})">
+                                    <button class="btn" wire:click="eliminar({{ $diag->id }})">
                                         ✕
                                     </button>
                                 </td>

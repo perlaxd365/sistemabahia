@@ -14,6 +14,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\SunatController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TramaController;
 use App\Http\Controllers\UsuarioController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -78,4 +79,8 @@ Route::group(['middleware' => ['auth']], function () {
     
     //REPORTES
     Route::get('ingreso', [ReporteController::class, 'ingreso'])->name('ingreso');
+
+    
+    //REPORTES
+    Route::get('trama', [TramaController::class, 'index'])->name('trama');
 });

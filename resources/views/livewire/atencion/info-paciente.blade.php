@@ -40,6 +40,12 @@
                     <p class="dato-label">Fecha de Nacimiento</p>
                     <p class="dato-valor">{{ DateUtil::getFechaSimple($paciente->fecha_nacimiento) }}</p>
                 </div>
+                <div>
+                    <p class="dato-label">Edad</p>
+                    <p class="dato-valor">
+                        {{ $edad ? $edad . ' años' : '—' }}
+                    </p>
+                </div>
 
                 <div>
                     <p class="dato-label">Género</p>
