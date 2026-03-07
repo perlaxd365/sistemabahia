@@ -91,10 +91,19 @@
                                     {{-- HISTORIA CLÍNICA --}}
                                     <td>
                                         <span class="badge bg-light text-dark border px-3 py-2">
-                                            {{ $atencion->historia->nro_historia ?? '-' }}
-                                        </span>
-                                    </td>
+                                            {{ $atencion->historia->nro_historia ?? '-' }} <br>
 
+                                        </span>
+                                        @if ($atencion->consulta)
+                                            <span class="badge bg-success-subtle text-success border px-3 py-2">
+                                                🟢 Abierta
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger border px-3 py-2">
+                                                🔴 No iniciada
+                                            </span>
+                                        @endif
+                                    </td>
                                     {{-- MÉDICO --}}
                                     <td>
                                         <span class="text-dark fw-medium">
@@ -108,14 +117,13 @@
                                             @if (isset($atencion->medico->name))
                                                 <div class="d-flex align-items-center gap-1">
                                                     <div class="bg-info bg-opacity-10 rounded-circle p-1">
-                                                        <img class="rounded-circle"
-                                                            src="<?php 
-                                                            if($atencion->medico->foto_url){
-                                                                echo $atencion->medico->foto_url;
-                                                            }else{
-                                                                echo 'https://media.istockphoto.com/id/1065743020/es/vector/icono-de-estetoscopio.jpg?s=612x612&w=0&k=20&c=rY5Ee82y4ocdymBfngbV7_Oxv9JnTJDTtsnukMMqdRk=' ;
-                                                            }
-                                                            ?>"
+                                                        <img class="rounded-circle" src="<?php
+                                                        if ($atencion->medico->foto_url) {
+                                                            echo $atencion->medico->foto_url;
+                                                        } else {
+                                                            echo 'https://media.istockphoto.com/id/1065743020/es/vector/icono-de-estetoscopio.jpg?s=612x612&w=0&k=20&c=rY5Ee82y4ocdymBfngbV7_Oxv9JnTJDTtsnukMMqdRk=';
+                                                        }
+                                                        ?>"
                                                             width="30px" height="30px" alt="">
                                                     </div>
 
@@ -151,35 +159,43 @@
                                         </small>
                                     </td>
 
-                                    {{-- COMPROBANTE --}}
                                     <td class="text-center">
-                                        @isset($atencion->comprobante->estado)
-                                            @switch($atencion->comprobante->estado)
-                                                @case('BORRADOR')
-                                                    <span class="badge bg-warning-subtle text-warning border px-3 py-2">
-                                                        Borrador
-                                                    </span>
-                                                @break
 
-                                                @case('PENDIENTE')
-                                                    <span class="badge bg-secondary-subtle text-secondary border px-3 py-2">
-                                                        Emitido
-                                                    </span>
-                                                @break
+                                        @php
+                                            $estado = null;
 
-                                                @case('EMITIDO')
-                                                    <span class="badge bg-success-subtle text-success border px-3 py-2">
-                                                        Emitido
-                                                    </span>
-                                                @break
-                                            @endswitch
+                                            if ($atencion->comprobantes->where('estado', 'EMITIDO')->count() > 0) {
+                                                $estado = 'EMITIDO';
+                                            } elseif (
+                                                $atencion->comprobantes->where('estado', 'PENDIENTE')->count() > 0
+                                            ) {
+                                                $estado = 'PENDIENTE';
+                                            } elseif (
+                                                $atencion->comprobantes->where('estado', 'BORRADOR')->count() > 0
+                                            ) {
+                                                $estado = 'BORRADOR';
+                                            }
+                                        @endphp
+
+                                        @if ($estado === 'BORRADOR')
+                                            <span class="badge bg-warning-subtle text-warning border px-3 py-2">
+                                                Borrador
+                                            </span>
+                                        @elseif ($estado === 'PENDIENTE')
+                                            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2">
+                                                Pendiente
+                                            </span>
+                                        @elseif ($estado === 'EMITIDO')
+                                            <span class="badge bg-success-subtle text-success border px-3 py-2">
+                                                Emitido
+                                            </span>
                                         @else
                                             <span class="badge bg-light text-muted border">
                                                 Aún no genera comprobante
                                             </span>
-                                        @endisset
-                                    </td>
+                                        @endif
 
+                                    </td>
                                     {{-- ACCIONES --}}
                                     <td class="text-center">
 
@@ -196,20 +212,20 @@
                                     </td>
                                 </tr>
 
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
-                                            No hay atenciones activas
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div wire:ignore.self class="card-footer text-right">
-                    {{ $atenciones->links(data: ['scrollTo' => false]) }}
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        No hay atenciones activas
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+            <div wire:ignore.self class="card-footer text-right">
+                {{ $atenciones->links(data: ['scrollTo' => false]) }}
+            </div>
         </div>
+    </div>

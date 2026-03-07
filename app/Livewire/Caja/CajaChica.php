@@ -16,71 +16,77 @@ class CajaChica extends Component
     public $monto;
     public $responsable;
     public $cajaTurno;
-
+    public $tipo = 'EGRESO';
     protected $rules = [
+        'tipo'        => 'required|in:INGRESO,EGRESO',
         'descripcion' => 'required|string|min:5',
         'monto'       => 'required|numeric|min:0.01',
         'responsable' => 'nullable|string|max:100',
     ];
-
     public function guardar()
     {
-        $this->validate(); //verificar turno y pago
+        $this->validate();
+
         $this->cajaTurno = CajaTurno::turnoAbierto()->first();
 
         if (!$this->cajaTurno) {
-            $this->dispatch(
-                'alert',
-                ['type' => 'error', 'title' => 'Ya existe caja abierta', 'message' => 'Caja']
-            );
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Caja cerrada',
+                'message' => 'No existe un turno de caja abierto.'
+            ]);
             return;
         }
-        try {
-            DB::transaction(function () {
 
-                // 🔐 Turno abierto obligatorio
+        DB::transaction(function () {
 
-                // 1️⃣ Caja chica
+            // 🔻 EGRESO (Caja chica)
+            if ($this->tipo === 'EGRESO') {
+
                 $cajaChica = ModelsCajaChica::create([
-                    'id_caja_turno'     => $this->cajaTurno->id_caja_turno,
-                    'descripcion'       => $this->descripcion,
-                    'monto'             => $this->monto,
-                    'responsable'       => $this->responsable,
-                    'fecha_movimiento'  => now(),
-                    'user_id'           => auth()->id(),
+                    'id_caja_turno'    => $this->cajaTurno->id_caja_turno,
+                    'descripcion'      => $this->descripcion,
+                    'monto'            => $this->monto,
+                    'responsable'      => $this->responsable,
+                    'fecha_movimiento' => now(),
+                    'user_id'          => auth()->id(),
                 ]);
 
-                // 2️⃣ Movimiento automático (EGRESO)
                 CajaMovimiento::create([
                     'id_caja_turno'    => $this->cajaTurno->id_caja_turno,
                     'id_usuario'       => auth()->id(),
                     'id_referencia'    => $cajaChica->id_caja_chica,
                     'tabla_referencia' => 'caja_chicas',
                     'tipo'             => 'EGRESO',
-                    'descripcion'      => $cajaChica->descripcion,
-                    'monto'            => $cajaChica->monto,
-                    'responsable'      => $cajaChica->responsable,
+                    'descripcion'      => $this->descripcion,
+                    'monto'            => $this->monto,
+                    'responsable'      => $this->responsable,
                 ]);
-            });
+            }
 
-            // Limpiar formulario
-            $this->reset(['descripcion', 'monto', 'responsable']);
+            // 🔺 INGRESO manual
+            if ($this->tipo === 'INGRESO') {
 
-            $this->dispatch(
-                'alert',
-                [
-                    'type' => 'success',
-                    'title' => 'Caja chica registrada',
-                    'message' => 'El egreso fue registrado correctamente.'
-                ]
-            );
-        } catch (\Throwable $th) {
-            dd($th);
-        }
+                CajaMovimiento::create([
+                    'id_caja_turno'    => $this->cajaTurno->id_caja_turno,
+                    'id_usuario'       => auth()->id(),
+                    'id_referencia'    => null,
+                    'tabla_referencia' => null,
+                    'tipo'             => 'INGRESO',
+                    'descripcion'      => $this->descripcion,
+                    'monto'            => $this->monto,
+                    'responsable'      => $this->responsable,
+                ]);
+            }
+        });
 
+        $this->reset(['descripcion', 'monto', 'responsable']);
 
-        // Para refrescar listados
-        //$this->dispatch('cajaChicaActualizada');
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'title' => 'Movimiento registrado',
+            'message' => 'El movimiento fue registrado correctamente.'
+        ]);
     }
 
     protected $listeners = ['cajaChicaActualizada' => '$refresh'];
@@ -129,7 +135,7 @@ class CajaChica extends Component
 
         $this->dispatch('cajaChicaActualizada');
     }
-    
+
     public function getTotalCajaChicaProperty()
     {
         $cajaTurno = CajaTurno::turnoAbierto()->first();
@@ -145,8 +151,9 @@ class CajaChica extends Component
     public function render()
     {
         $cajaTurno = CajaTurno::turnoAbierto()->first();
+
         $registros = $cajaTurno
-            ? ModelsCajaChica::where('id_caja_turno', $cajaTurno->id_caja_turno)
+            ? CajaMovimiento::where('id_caja_turno', $cajaTurno->id_caja_turno)->with('cajaChica')
             ->latest()
             ->get()
             : collect();

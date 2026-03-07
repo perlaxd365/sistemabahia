@@ -112,6 +112,41 @@
         .btn-clinico i {
             margin-left: 6px;
         }
+
+        /* ================= AUTOSAVE FLOTANTE ================= */
+        /* ================= AUTOSAVE GRANDE PREMIUM ================= */
+
+        .autosave-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .autosave-content {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+            min-width: 280px;
+        }
+
+        .autosave-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 
     <div class="card border-0 shadow-sm mt-3">
@@ -142,15 +177,15 @@
                 <div class="hc-body row g-2">
                     <div class="col-md-5">
                         <label>Molestia principal</label>
-                        <input type="text" class="form-control" wire:model="molestia_consulta">
+                        <input type="text" class="form-control" wire:model.live.debounce.800ms="molestia_consulta">
                     </div>
                     <div class="col-md-2">
                         <label>Tiempo</label>
-                        <input type="text" class="form-control" wire:model="tiempo_consulta">
+                        <input type="text" class="form-control" wire:model.live.debounce.800ms="tiempo_consulta">
                     </div>
                     <div class="col-md-2">
                         <label>Inicio</label>
-                        <select class="form-control" wire:model="inicio_consulta">
+                        <select class="form-control" wire:model.live.debounce.800ms="inicio_consulta">
                             <option>Brusco</option>
                             <option>Progresivo</option>
                             <option>Insidioso</option>
@@ -158,7 +193,7 @@
                     </div>
                     <div class="col-md-3">
                         <label>Curso</label>
-                        <select class="form-control" wire:model="curso_consulta">
+                        <select class="form-control" wire:model.live.debounce.800ms="curso_consulta">
                             <option>Estacionario</option>
                             <option>Progresivo</option>
                             <option>Intermitente</option>
@@ -167,7 +202,7 @@
                     </div>
                     <div class="col-md-12">
                         <label>Enfermedad Actual</label>
-                        <textarea class="form-control" rows="2" wire:model="enfermedad_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="enfermedad_consulta"></textarea>
 
                     </div>
                 </div>
@@ -180,11 +215,11 @@
                 <div class="hc-body row g-2">
                     <div class="col-md-6">
                         <label>Familiares</label>
-                        <textarea class="form-control" rows="2" wire:model="atecedente_familiar_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="atecedente_familiar_consulta"></textarea>
                     </div>
                     <div class="col-md-6">
                         <label>Patológicos</label>
-                        <textarea class="form-control" rows="2" wire:model="atecedente_patologico_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="atecedente_patologico_consulta"></textarea>
                     </div>
                 </div>
             </div>
@@ -196,15 +231,16 @@
                 <div class="hc-body row g-2">
                     <div class="col-md-2">
                         <label>Peso</label>
-                        <input type="number" class="form-control vital" wire:model.live="peso_consulta">
+                        <input type="number" class="form-control vital" wire:model.live.debounce.800ms="peso_consulta">
                     </div>
                     <div class="col-md-2">
                         <label>Talla</label>
-                        <input type="number" class="form-control vital" wire:model.live="talla_consulta">
+                        <input type="number" class="form-control vital"
+                            wire:model.live.debounce.800ms="talla_consulta">
                     </div>
                     <div class="col-md-2">
                         <label>IMC</label>
-                        <input type="text" class="form-control vital" wire:model="imc_consulta">
+                        <input type="text" class="form-control vital" wire:model.live.debounce.800ms="imc_consulta">
                     </div>
                 </div>
             </div>
@@ -216,20 +252,22 @@
                     <div class="col-md-2">
                         <label>Temp °C</label>
                         <input type="number" step="0.1" class="form-control vital"
-                            wire:model="temperatura_consulta">
+                            wire:model.live.debounce.800ms="temperatura_consulta">
                     </div>
                     <div class="col-md-3">
                         <label>PA</label>
-                        <input type="text" class="form-control vital" wire:model="presion_consulta"
-                            placeholder="120/80">
+                        <input type="text" class="form-control vital"
+                            wire:model.live.debounce.800ms="presion_consulta" placeholder="120/80">
                     </div>
                     <div class="col-md-2">
                         <label>FC</label>
-                        <input type="number" class="form-control vital" wire:model="frecuencia_consulta">
+                        <input type="number" class="form-control vital"
+                            wire:model.live.debounce.800ms="frecuencia_consulta">
                     </div>
                     <div class="col-md-2">
                         <label>Sat O₂ %</label>
-                        <input type="number" class="form-control vital" wire:model="saturacion_consulta">
+                        <input type="number" class="form-control vital"
+                            wire:model.live.debounce.800ms="saturacion_consulta">
                     </div>
                 </div>
             </div>
@@ -239,7 +277,7 @@
             <div class="hc-card">
                 <div class="hc-header">Examen Físico</div>
                 <div class="hc-body">
-                    <textarea class="form-control" rows="2" wire:model="examen_consulta"></textarea>
+                    <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="examen_consulta"></textarea>
                 </div>
             </div>
 
@@ -249,7 +287,7 @@
                 <div class="hc-body row g-2">
                     <div class="col-md-12">
                         <label>Impresión diagnóstica</label>
-                        <textarea class="form-control" rows="2" wire:model="impresion_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="impresion_consulta"></textarea>
                     </div>
                 </div>
             </div>
@@ -259,7 +297,7 @@
                 <div class="hc-body row g-2">
                     <div class="col-md-12">
                         <label>Exámenes auxiliares</label>
-                        <textarea class="form-control" rows="2" wire:model="examen_auxiliar_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="examen_auxiliar_consulta"></textarea>
                     </div>
                     <br>
                     <div class="container">
@@ -291,20 +329,13 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea class="form-control" rows="2" wire:model="tratamiento_consulta"></textarea>
+                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="tratamiento_consulta"></textarea>
                     </div>
                 </div>
             </div>
         @endif
         <!-- BOTÓN -->
         <div class="container row">
-            @can('editar-signos')
-                <div class="text-end mt-2 pr-2">
-                    <button type="button" wire:click="agregarConsulta" class="btn btn-imprimir">
-                        Guardar Consulta
-                    </button>
-                </div>
-            @endcan
             <!-- BOTÓN -->
             <div class="text-end mt-2 pr-2">
                 <button type="button" wire:click="printConsulta" class="btn btn-imprimir">
@@ -317,6 +348,25 @@
                 <button type="button" wire:click="printReceta" class="btn btn-imprimir">
                     🖨 Imprimir Receta
                 </button>
+            </div>
+        </div>
+    </div>
+    <div x-data="{ show: @entangle('guardadoAutomatico') }" x-show="show" x-init="$watch('show', value => {
+        if (value) {
+            setTimeout(() => show = false, 1500)
+        }
+    })"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4"
+        x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-4"
+        class="autosave-toast" style="display: none;">
+        <div class="autosave-content">
+            <div class="autosave-icon">
+                ✓
+            </div>
+            <div>
+                <div class="fw-bold">Guardado</div>
+                <div style="font-size:13px;">Cambios guardados automáticamente</div>
             </div>
         </div>
     </div>

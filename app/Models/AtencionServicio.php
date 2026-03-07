@@ -20,6 +20,16 @@ class AtencionServicio extends Model
         'cantidad',
         'precio_unitario',
         'subtotal',
+        'facturado',
         'estado'
     ];
+
+    public function servicio()
+    {
+        return $this->belongsTo(
+            Servicio::class,
+            'id_servicio',
+            'id_servicio'
+        );
+    }
 }

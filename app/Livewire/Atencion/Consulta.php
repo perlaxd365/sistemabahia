@@ -17,6 +17,7 @@ class Consulta extends Component
         $id_atencion,
         $id_paciente,
         $atencion,
+
         $molestia_consulta,
         $tiempo_consulta,
         $inicio_consulta,
@@ -39,145 +40,96 @@ class Consulta extends Component
         $examen_auxiliar_consulta,
         $tratamiento_consulta;
 
-    //medico responsable de la consulta
-
     public $medico_responsable = false;
     public $nombre_paciente;
     public $dni;
 
+    public $guardadoAutomatico = false;
+
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
-        $atencion = Atencion::find($id_atencion);
-        $this->atencion = $atencion;
-        $paciente = User::find($atencion->id_paciente);
+        $this->atencion = Atencion::find($id_atencion);
+
+        $paciente = User::find($this->atencion->id_paciente);
         $this->nombre_paciente = $paciente->name;
         $this->dni = $paciente->dni;
-        $this->id_paciente = $atencion->id_paciente;
-        $consulta = ModelsConsulta::where("id_atencion", $atencion->id_atencion)->first();
+        $this->id_paciente = $this->atencion->id_paciente;
+
+        $consulta = ModelsConsulta::where("id_atencion", $id_atencion)->first();
+
         if ($consulta) {
             $this->id_consulta = $consulta->id_consulta;
-            $this->molestia_consulta = $consulta->molestia_consulta;
-            $this->tiempo_consulta = $consulta->tiempo_consulta;
-            $this->inicio_consulta = $consulta->inicio_consulta;
-            $this->curso_consulta = $consulta->curso_consulta;
-            $this->enfermedad_consulta = $consulta->enfermedad_consulta;
-            $this->atecedente_familiar_consulta = $consulta->atecedente_familiar_consulta;
-            $this->atecedente_patologico_consulta = $consulta->atecedente_patologico_consulta;
 
-            $this->peso_consulta = $consulta->peso_consulta;
-            $this->talla_consulta = $consulta->talla_consulta;
-            $this->imc_consulta = $consulta->imc_consulta;
-
-            $this->temperatura_consulta = $consulta->temperatura_consulta;
-            $this->presion_consulta = $consulta->presion_consulta;
-            $this->frecuencia_consulta = $consulta->frecuencia_consulta;
-            $this->saturacion_consulta = $consulta->saturacion_consulta;
-            $this->examen_consulta = $consulta->examen_consulta;
-
-            $this->impresion_consulta = $consulta->impresion_consulta;
-            $this->examen_auxiliar_consulta = $consulta->examen_auxiliar_consulta;
-            $this->tratamiento_consulta = $consulta->tratamiento_consulta;
+            foreach ($consulta->getAttributes() as $campo => $valor) {
+                if (property_exists($this, $campo)) {
+                    $this->$campo = $valor;
+                }
+            }
         }
 
-        if ($atencion->id_medico && $atencion->id_medico == auth()->user()->id) {
+        if ($this->atencion->id_medico == auth()->id()) {
             $this->medico_responsable = true;
         }
     }
+
     public function render()
     {
-
         return view('livewire.atencion.consulta');
     }
 
-    public function agregarConsulta()
-    {
-        if ($this->atencion->estaFinalizada()) {
+    /*
+    |--------------------------------------------------------------------------
+    | AUTOSAVE POR CAMPO
+    |--------------------------------------------------------------------------
+    */
 
-            $this->dispatch('alert', [
-                'type' => 'error',
-                'title' => 'Atención finalizada',
-                'message' => 'Esta atención ya emitió comprobante, por favor apertura una nueva atención, el DNI ES : ' . $this->dni
-            ]);
+    public function updated($property)
+    {
+        // Solo campos de consulta
+        if (!str_ends_with($property, '_consulta')) {
             return;
         }
-        if ($this->id_consulta) {
-            $consulta = ModelsConsulta::find($this->id_consulta);
-            $consulta->update([
-                'id_atencion' => $this->id_atencion,
-                'id_paciente' => $this->id_paciente,
-                'id_responsable' => auth()->user()->id,
 
-                'molestia_consulta' => $this->molestia_consulta,
-                'tiempo_consulta' => $this->tiempo_consulta,
-                'inicio_consulta' => $this->inicio_consulta,
-                'curso_consulta' => $this->curso_consulta,
-                'enfermedad_consulta' => $this->enfermedad_consulta,
-                'atecedente_familiar_consulta' => $this->atecedente_familiar_consulta,
-                'atecedente_patologico_consulta' => $this->atecedente_patologico_consulta,
-
-                'peso_consulta' => $this->peso_consulta,
-                'talla_consulta' => $this->talla_consulta,
-                'imc_consulta' => $this->imc_consulta,
-
-                'temperatura_consulta' => $this->temperatura_consulta,
-                'presion_consulta' => $this->presion_consulta,
-                'frecuencia_consulta' => $this->frecuencia_consulta,
-                'saturacion_consulta' => $this->saturacion_consulta,
-                'examen_consulta' => $this->examen_consulta,
-
-                'impresion_consulta' => $this->impresion_consulta,
-                'examen_auxiliar_consulta' => $this->examen_auxiliar_consulta,
-                'tratamiento_consulta' => $this->tratamiento_consulta,
-                'fecha_consulta' => now(),
-                'estado_consulta' => true,
-            ]);
-        } else {
-            ModelsConsulta::create([
-                'id_atencion' => $this->id_atencion,
-                'id_paciente' => $this->id_paciente,
-                'id_responsable' => auth()->user()->id,
-
-                'molestia_consulta' => $this->molestia_consulta,
-                'tiempo_consulta' => $this->tiempo_consulta,
-                'inicio_consulta' => $this->inicio_consulta,
-                'curso_consulta' => $this->curso_consulta,
-                'enfermedad_consulta' => $this->enfermedad_consulta,
-                'atecedente_familiar_consulta' => $this->atecedente_familiar_consulta,
-                'atecedente_patologico_consulta' => $this->atecedente_patologico_consulta,
-
-                'peso_consulta' => $this->peso_consulta,
-                'talla_consulta' => $this->talla_consulta,
-                'imc_consulta' => $this->imc_consulta,
-
-                'temperatura_consulta' => $this->temperatura_consulta,
-                'presion_consulta' => $this->presion_consulta,
-                'frecuencia_consulta' => $this->frecuencia_consulta,
-                'saturacion_consulta' => $this->saturacion_consulta,
-                'examen_consulta' => $this->examen_consulta,
-
-                'impresion_consulta' => $this->impresion_consulta,
-                'examen_auxiliar_consulta' => $this->examen_auxiliar_consulta,
-                'tratamiento_consulta' => $this->tratamiento_consulta,
-                'fecha_consulta' => now(),
-                'estado_consulta' => true,
-            ]);
+        if ($this->atencion->estaFinalizada()) {
+            return;
         }
 
-        // show alert
-        $this->dispatch(
-            'alert',
-            ['type' => 'success', 'title' => 'Se registró la consulta de ' . $this->nombre_paciente . ' con éxito.', 'message' => 'Exito']
-        );
+        // Crear consulta si no existe
+        if (!$this->id_consulta) {
+            $consulta = ModelsConsulta::create([
+                'id_atencion' => $this->id_atencion,
+                'id_paciente' => $this->id_paciente,
+                'id_responsable' => auth()->id(),
+                'fecha_consulta' => now(),
+                'estado_consulta' => true,
+            ]);
+
+            $this->id_consulta = $consulta->id_consulta;
+        }
+
+        // Actualizar solo el campo modificado
+        $consulta = ModelsConsulta::find($this->id_consulta);
+
+        $consulta->$property = $this->$property;
+
+
+        $consulta->save();
+
+        $this->guardadoAutomatico = true;
     }
 
-    // Se ejecuta SOLO cuando cambia el peso
+    /*
+    |--------------------------------------------------------------------------
+    | CALCULAR IMC AUTOMÁTICO
+    |--------------------------------------------------------------------------
+    */
+
     public function updatedPesoConsulta()
     {
         $this->calcularImc();
     }
 
-    // Se ejecuta SOLO cuando cambia la talla
     public function updatedTallaConsulta()
     {
         $this->calcularImc();
@@ -186,14 +138,38 @@ class Consulta extends Component
     public function calcularImc()
     {
         if ($this->peso_consulta > 0 && $this->talla_consulta > 0) {
+
+            $talla_m = $this->talla_consulta / 100;
+
             $this->imc_consulta = round(
-                $this->peso_consulta / ($this->talla_consulta * $this->talla_consulta),
+                $this->peso_consulta / ($talla_m * $talla_m),
                 2
             );
+            $this->updated('imc_consulta');
         } else {
             $this->imc_consulta = null;
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GUARDADO MANUAL (RESPALDO)
+    |--------------------------------------------------------------------------
+    */
+
+    public function agregarConsulta()
+    {
+        if (!$this->id_consulta) {
+            $this->updated('molestia_consulta');
+        }
+
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'title' => 'Consulta guardada',
+            'message' => 'Datos guardados correctamente.'
+        ]);
+    }
+
     public function printConsulta()
     {
 
@@ -244,6 +220,7 @@ class Consulta extends Component
             );
         }
     }
+
 
     public function printReceta()
     {

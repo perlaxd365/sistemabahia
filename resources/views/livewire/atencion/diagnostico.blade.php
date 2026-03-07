@@ -43,16 +43,31 @@
                             style="z-index:1000; max-height:250px; overflow-y:auto;">
 
                             @foreach ($resultados as $item)
-                                <button type="button" class="list-group-item list-group-item-action text-start"
-                                    wire:click="seleccionar({{ $item->id }})">
+                                @php
+                                    $longitud = strlen(str_replace('.', '', $item->codigo));
+                                    $esTitulo = $longitud < 4;
+                                @endphp
 
-                                    <strong class="text-primary">
+                                <button type="button"
+                                    class="list-group-item list-group-item-action text-start
+        {{ $esTitulo ? 'disabled bg-light text-muted' : '' }}"
+                                    @if (!$esTitulo) wire:click="seleccionar({{ $item->id }})" @endif>
+
+                                    <strong class="{{ $esTitulo ? 'text-dark' : 'text-primary' }}">
                                         {{ $item->codigo }}
                                     </strong>
                                     <br>
-                                    <small class="text-muted">
+
+                                    <small class="{{ $esTitulo ? 'fw-bold' : 'text-muted' }}">
                                         {{ $item->descripcion }}
                                     </small>
+
+                                    @if ($esTitulo)
+                                        <span class="badge bg-secondary ms-2">
+                                            Categoría
+                                        </span>
+                                    @endif
+
                                 </button>
                             @endforeach
 

@@ -7,22 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class AtencionMedicamento extends Model
 {
-    // //
     use HasFactory;
-    protected $name = "atencion_medicamentos";
+
+    protected $table = "atencion_medicamentos"; // ✅ corregido
     protected $primaryKey = 'id_atencion_medicamento';
+
     protected $fillable = [
-        'id_atencion_medicamento',
         'id_atencion',
         'id_medicamento',
         'cantidad',
         'precio',
         'subtotal',
+        'facturado',
         'tipo'
     ];
 
-
-    public function medicamentos()
+    public function medicamento() // ✅ singular
     {
         return $this->belongsTo(
             Medicamento::class,

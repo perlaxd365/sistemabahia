@@ -34,7 +34,7 @@ class IndexAction extends Component
     {
 
 
-        $atenciones = Atencion::with(['paciente', 'medico', 'comprobante'])
+        $atenciones = Atencion::with(['paciente', 'medico', 'comprobantes','consulta'])
             ->where('estado', 'PROCESO')
             ->when(Auth::user()->nombre_cargo === 'Doctor', function ($query) {
                 $query->where('id_medico', Auth::id());
@@ -67,75 +67,78 @@ class IndexAction extends Component
         DB::transaction(function () use ($id) {
 
             $atencion = Atencion::with([
-                'pagos',
-                'comprobante',
-                'servicios',
+                'pagos.cajaTurno',
+                'comprobantes',
                 'medicamentos'
             ])->findOrFail($id);
 
-            // 1️⃣ Cambiar estado atención
-            $atencion->estado = 'ANULADO';
-            $atencion->save();
+            // 1️⃣ VALIDAR COMPROBANTES EMITIDOS
+            if ($atencion->comprobantes()->where('estado', 'EMITIDO')->exists()) {
+                throw new \Exception(
+                    'La atención tiene comprobantes EMITIDOS. Debe generar Nota de Crédito antes de anular.'
+                );
+            }
 
-            // 2️⃣ Anular pagos
+            // 2️⃣ VALIDAR CAJA CERRADA
             foreach ($atencion->pagos as $pago) {
                 if ($pago->cajaTurno->estado === 'CERRADO') {
                     throw new \Exception('No se puede anular. Turno de caja cerrado.');
                 }
+            }
+
+            // 3️⃣ CAMBIAR ESTADO ATENCIÓN
+            $atencion->estado = 'ANULADO';
+            $atencion->save();
+
+            // 4️⃣ ANULAR PAGOS + REVERSA EN CAJA
+            foreach ($atencion->pagos as $pago) {
+
                 $pago->estado = 'ANULADO';
                 $pago->save();
 
-                // 3️⃣ Movimiento reversa en caja
                 CajaMovimiento::create([
                     'id_caja_turno' => $pago->id_caja_turno,
-                    'id_usuario' => auth()->id(),
-                    'tipo' => 'EGRESO',
-                    'descripcion' => 'ANULACIÓN ATENCIÓN #' . $atencion->id_atencion,
-                    'monto' => $pago->monto,
+                    'id_usuario'    => auth()->id(),
+                    'tipo'          => 'EGRESO',
+                    'descripcion'   => 'ANULACIÓN ATENCIÓN #' . $atencion->id_atencion,
+                    'monto'         => $pago->monto,
                 ]);
             }
 
-            // 5️⃣ DEVOLVER MEDICAMENTOS VENDIDOS
+            // 5️⃣ DEVOLVER MEDICAMENTOS
             foreach ($atencion->medicamentos as $item) {
-
 
                 $medicamento = Medicamento::find($item->id_medicamento);
 
                 $stockAnterior = $medicamento->stock;
-                $stockNuevo = $stockAnterior + $item->pivot->cantidad;
+                $stockNuevo    = $stockAnterior + $item->pivot->cantidad;
 
-                // Actualizar stock
-                $medicamento->stock = $stockNuevo;
-                $medicamento->save();
+                $medicamento->update([
+                    'stock' => $stockNuevo
+                ]);
 
-                // Registrar ENTRADA en Kardex
                 KardexMedicamento::create([
                     'id_medicamento' => $medicamento->id_medicamento,
-                    'id_atencion' => $atencion->id_atencion,
+                    'id_atencion'    => $atencion->id_atencion,
                     'tipo_movimiento' => 'ENTRADA',
                     'stock_anterior' => $stockAnterior,
-                    'cantidad' => $item->pivot->cantidad,
-                    'stock_actual' => $stockNuevo,
-                    'descripcion' => 'DEVOLUCIÓN POR ANULACIÓN ATENCIÓN #' . $atencion->id_atencion,
-                    'user_id' => auth()->id(),
+                    'cantidad'       => $item->pivot->cantidad,
+                    'stock_actual'   => $stockNuevo,
+                    'descripcion'    => 'DEVOLUCIÓN POR ANULACIÓN ATENCIÓN #' . $atencion->id_atencion,
+                    'user_id'        => auth()->id(),
                 ]);
             }
-            // 4️⃣ Anular comprobante si existe
-            if ($atencion->comprobante) {
 
-                // Si está emitido en SUNAT → aquí deberías generar Nota de Crédito
-                if ($atencion->comprobante->estado == 'EMITIDO') {
-                    throw new \Exception('No se puede anular una atención con comprobante emitido. Generar Nota de Crédito.');
-                }
-
-                $atencion->comprobante->estado = 'ANULADO';
-                $atencion->comprobante->save();
-            }
+            // 6️⃣ ANULAR COMPROBANTES NO EMITIDOS
+            $atencion->comprobantes()
+                ->whereNotIn('estado', ['EMITIDO'])
+                ->update(['estado' => 'ANULADO']);
         });
+
         $this->dispatch('alert', [
-            'type' => 'success',
-            'title' => 'Atención anulada correctamente',
-            'message' => 'El stock fue actualizado correctamente'
+            'type'    => 'success',
+            'title'   => 'Atención anulada correctamente',
+            'message' => 'Stock, caja y pagos fueron revertidos correctamente'
         ]);
     }
 

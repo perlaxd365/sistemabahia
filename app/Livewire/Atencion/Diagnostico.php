@@ -14,7 +14,7 @@ class Diagnostico extends Component
     public $atencion, $id_atencion;
     public $buscar = '';
     public $resultados = [];
-    public $tipo = 'SECUNDARIO';
+    public $tipo = 'PRINCIPAL';
     public $nombre_paciente, $fecha_nacimiento;
 
     public function mount($id_atencion)

@@ -1,187 +1,205 @@
 <div>
     @php
-        $bloqueado = $comprobante && $comprobante->estado === 'EMITIDO';
+        $bloqueado = $comprobanteActivo && $comprobanteActivo->estado === 'EMITIDO';
     @endphp
-    <div class="card shadow-sm border-0 mt-4">
+
+    <div class="card shadow-sm border-0 mt-4 rounded-4">
+
         {{-- HEADER --}}
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="mb-0">
-                    🧾 Facturación de la Atención
-                </h5>
-                <small class="text-muted">
-                    Atención #{{ $atencion->id_atencion }}
-                </small>
+        <div class="card-header bg-white border-0 py-3 px-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark">
+                        🧾 Facturación de la Atención
+                    </h5>
+                    <small class="text-muted">
+                        Atención #{{ $atencion->id_atencion }}
+                    </small>
+                </div>
+
+                @if ($comprobanteActivo)
+                    @php
+                        $color = match ($comprobanteActivo->estado) {
+                            'BORRADOR' => 'warning',
+                            'EMITIDO' => 'success',
+                            'RECHAZADO' => 'danger',
+                            default => 'secondary',
+                        };
+                    @endphp
+
+                    <span class="badge bg-{{ $color }} px-3 py-2 rounded-pill">
+                        {{ $comprobanteActivo->estado }}
+                    </span>
+                @endif
             </div>
-
-            @if ($comprobante)
-                @php
-                    $color = match ($comprobante->estado) {
-                        'BORRADOR' => 'warning',
-                        'EMITIDO' => 'success',
-                        'RECHAZADO' => 'danger',
-                        default => 'secondary',
-                    };
-                @endphp
-
-                <span class="badge bg-{{ $color }} fs-6">
-                    {{ $comprobante->estado }}
-                </span>
-            @endif
         </div>
 
-        {{-- BODY --}}
-        <div class="card-body">
-            {{-- SIN COMPROBANTE --}}
-            @if (!$comprobante)
-                <div class="text-center py-4">
+        {{-- SELECTOR COMPROBANTES --}}
+        <div class="px-4 pb-3 border-bottom">
+            @forelse ($comprobantes as $c)
+                <button type="button" wire:click="seleccionarComprobante({{ $c->id_comprobante }})"
+                    class="btn btn-sm me-2 mb-2 rounded-pill
+                        {{ $comprobanteActivo && $comprobanteActivo->id_comprobante == $c->id_comprobante
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary' }}">
+                    {{ $c->serie }}-{{ $c->numero ?? 'BORRADOR' }}
+                </button>
+            @empty
+                <small class="text-muted">No existen comprobantes.</small>
+            @endforelse
+        </div>
+
+        <div class="card-body px-4">
+
+            {{-- SIN COMPROBANTES --}}
+            @if ($comprobantes->isEmpty())
+                <div class="text-center py-5">
                     <p class="text-muted mb-3">
-                        Esta atención aún no tiene comprobante generado.
+                        Esta atención aún no tiene comprobantes generados.
                     </p>
 
-                    <button wire:click="crearBorrador" type="button" class="btn btn-primary px-4">
+                    <button wire:click="crearBorrador" type="button" class="btn btn-primary px-4 rounded-pill">
                         ➕ Crear comprobante
                     </button>
                 </div>
-            @else
+            @endif
+
+            @if ($comprobanteActivo)
+
                 {{-- DATOS GENERALES --}}
-                <div class="row mb-3">
+                <div class="row mb-4">
                     <div class="col-md-4">
-                        <strong>Paciente:</strong><br>
-                        {{ $atencion->paciente->name }}
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Documento:</strong><br>
-                        {{ $comprobante->tipo_comprobante }} {{ $comprobante->serie }}-{{ $comprobante->numero ?? '—' }}
-                    </div>
-                    <div class="col-md-4">
-                        <strong>Fecha:</strong><br>
-                        {{ DateUtil::getFechaSimple($comprobante->fecha_emision) }}
+                        <small class="text-muted">Paciente</small>
+                        <div class="fw-semibold">
+                            {{ $atencion->paciente->name }} | {{ $atencion->paciente->dni}}
+                        </div>
                     </div>
 
+                    <div class="col-md-4">
+                        <small class="text-muted">Documento</small>
+                        <div class="fw-semibold">
+                            {{ $comprobanteActivo->tipo_comprobante }}
+                            {{ $comprobanteActivo->serie }}-{{ $comprobanteActivo->numero ?? '—' }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <small class="text-muted">Fecha</small>
+                        <div class="fw-semibold">
+                            {{ DateUtil::getFechaSimple($comprobanteActivo->fecha_emision) }}
+                        </div>
+                    </div>
                 </div>
-                <div class="row g-3">
-                    @if ($comprobante->estado === 'BORRADOR')
-                        {{-- Tipo de comprobante --}}
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Tipo de comprobante</label>
-                            <select class="form-control" wire:model.live="tipo_comprobante"
-                                @if ($bloqueado) disabled @endif
-                                wire:change="actualizarTipoComprobante">
-                                <option value="TICKET">🟡 Ticket de venta</option>
-                                <option value="BOLETA">🟢 Boleta</option>
-                                <option value="FACTURA">🔵 Factura</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">
-                                Método de pago
-                            </label>
-                            <select class="form-control" wire:model.live="tipo_pago">
-                                <option value="EFECTIVO">Efectivo</option>
-                                <option value="YAPE">Yape</option>
-                                <option value="PLIN">Plin</option>
-                                <option value="TARJETA">Tarjeta</option>
-                                <option value="TRANSFERENCIA">Transferencia</option>
-                            </select>
-                        </div>
-                        {{-- IGV --}}
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Aplicar IGV</label>
-                            <select class="form-control" wire:model.live="con_igv"
-                                @if ($bloqueado) disabled @endif
-                                @if ($tipo_comprobante === 'FACTURA') disabled @endif>
-                                <option value="1">Con IGV (18%)</option>
-                                <option value="0">Sin IGV</option>
-                            </select>
 
-                            @if ($tipo_comprobante === 'FACTURA')
-                                <small class="text-muted">
-                                    La factura siempre incluye IGV
-                                </small>
-                            @endif
-                        </div>
-                    @endif
-                </div>
-                @if ($tipo_comprobante === 'FACTURA' || $tipo_comprobante === 'BOLETA')
-                    <div class="card mt-3 border-primary">
-                        <div class="card-header fw-semibold text-primary">
-                            🏢 Datos del cliente
-                            {{ $tipo_comprobante === 'FACTURA' ? '(Factura)' : '(Boleta)' }}
-                        </div>
-                        <div class="card-body row g-2">
-                            <div class="row g-2">
+                {{-- CONFIGURACIÓN BORRADOR --}}
+                @if ($comprobanteActivo->estado === 'BORRADOR')
 
-                                @if ($tipo_comprobante === 'FACTURA')
-                                    <div class="col-md-4">
-                                        <label>
-                                            FACTURA
-                                        </label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control"
-                                                wire:model.live="numero_documento"
-                                                maxlength="{{ $tipo_comprobante === 'FACTURA' ? 11 : 8 }}">
-                                            <button type="button" class="btn btn-outline-primary"
-                                                wire:click="{{ $tipo_comprobante === 'FACTURA' ? 'buscarRuc' : 'buscarDni' }}"
-                                                @disabled(!$this->puedeBuscar)>
-                                                🔍
-                                            </button>
-                                            @error('numero_documento')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <label>Razón Social</label>
-                                        <input type="text" disabled class="form-control" wire:model="cliente_razon">
-                                        @error('cliente_razon')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label>Dirección</label>
-                                        <input type="text" disabled class="form-control"
-                                            wire:model="cliente_direccion">
-                                        @error('cliente_direccion')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                @elseif($tipo_comprobante === 'BOLETA')
-                                    <div class="col-md-6">
-                                        <label>
-                                            DNI
-                                        </label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control"
-                                                wire:model.live="numero_documento" value=""
-                                                placeholder="Ingrese DNI (8 dígitos)">
-                                            <button class="btn btn-outline-primary" type="button"
-                                                wire:click="buscarDni"
-                                                @if (strlen($numero_documento) !== 8) disabled @endif> 🔍</button>
-                                            @error('numero_documento')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label>Nombres</label>
-                                        <input type="text" class="form-control" value=""
-                                            wire:model="cliente_nombre">
-                                        @error('cliente_nombre')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                @endif
+                    <div class="card border-0 bg-light p-3 rounded-4 mb-4">
+                        <div class="row g-3">
 
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Tipo</label>
+                                <select class="form-control rounded-3" wire:model.live="tipo_comprobante"
+                                    wire:change="actualizarTipoComprobante">
+                                    <option value="TICKET">🟡 Ticket</option>
+                                    <option value="BOLETA">🟢 Boleta</option>
+                                    <option value="FACTURA">🔵 Factura</option>
+                                </select>
+                            </div>
 
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Método de pago</label>
+                                <select class="form-control rounded-3" wire:model.live="tipo_pago">
+                                    <option value="">Elegir medio de pago</option>
+                                    <option value="EFECTIVO">Efectivo</option>
+                                    <option value="YAPE">Yape</option>
+                                    <option value="PLIN">Plin</option>
+                                    <option value="TARJETA">Tarjeta</option>
+                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">IGV</label>
+                                <select class="form-control rounded-3" wire:model.live="con_igv"
+                                    @if ($tipo_comprobante === 'FACTURA') disabled @endif>
+                                    <option value="1">Con IGV (18%)</option>
+                                    <option value="0">Sin IGV</option>
+                                </select>
                             </div>
 
                         </div>
+
+                        {{-- DATOS CLIENTE --}}
+                        @if ($tipo_comprobante === 'BOLETA')
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">DNI</label>
+
+                                    <div class="input-group">
+                                        <input type="text" class="form-control rounded-start-3"
+                                            wire:model.live="numero_documento" maxlength="8" placeholder="Ingrese DNI">
+
+                                        <button type="button" wire:click="buscarDni"
+                                            class="btn btn-outline-primary rounded-end-3" @disabled(!$this->puedeBuscar)>
+                                            🔎
+                                        </button>
+                                    </div>
+
+                                    @error('numero_documento')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-8">
+                                    <label class="form-label">Nombre del cliente</label>
+                                    <input type="text" class="form-control rounded-3"
+                                        wire:model.defer="cliente_nombre">
+                                </div>
+                            </div>
+                        @endif
+
+                        @if ($tipo_comprobante === 'FACTURA')
+                            <div class="row g-3 mt-3">
+
+                                <div class="col-md-4">
+                                    <label class="form-label">RUC</label>
+
+                                    <div class="input-group">
+                                        <input type="text" class="form-control rounded-start-3"
+                                            wire:model.live="numero_documento" maxlength="11" placeholder="Ingrese RUC">
+
+                                        <button type="button" wire:click="buscarRuc"
+                                            class="btn btn-outline-primary rounded-end-3" @disabled(!$this->puedeBuscar)>
+                                            🔎
+                                        </button>
+                                    </div>
+
+                                    @error('numero_documento')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Razón Social</label>
+                                    <input type="text" class="form-control rounded-3"
+                                        wire:model.defer="cliente_razon">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Dirección</label>
+                                    <input type="text" class="form-control rounded-3"
+                                        wire:model.defer="cliente_direccion">
+                                </div>
+
+                            </div>
+                        @endif
                     </div>
                 @endif
+
                 {{-- TABLA ITEMS --}}
                 <div class="table-responsive">
-                    <table class="table table-sm align-middle">
+                    <table class="table align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>Descripción</th>
@@ -192,12 +210,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($comprobante->detalles as $d)
+                            @foreach ($comprobanteActivo->detalles as $d)
                                 <tr>
                                     <td>{{ $d->descripcion }}</td>
                                     <td class="text-center">{{ $d->cantidad }}</td>
-                                    <td class="text-end">S/ {{ number_format($d->precio_unitario, 2) }}</td>
-                                    <td class="text-end">S/ {{ number_format($d->igv, 2) }}</td>
+                                    <td class="text-end">
+                                        S/ {{ number_format($d->precio_unitario, 2) }}
+                                    </td>
+                                    <td class="text-end">
+                                        S/ {{ number_format($d->igv, 2) }}
+                                    </td>
                                     <td class="text-end fw-semibold">
                                         S/ {{ number_format($d->subtotal + $d->igv, 2) }}
                                     </td>
@@ -207,40 +229,40 @@
                     </table>
                 </div>
 
-                {{-- RESUMEN --}}
-                <div class="row justify-content-end mt-3">
+                {{-- RESUMEN FINANCIERO --}}
+                <div class="row justify-content-end mt-4">
                     <div class="col-md-4">
-                        <div class="card bg-light border-0">
+                        <div class="card border-0 shadow-sm rounded-4">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <span>Subtotal</span>
-                                    <span>S/ {{ number_format($comprobante->subtotal, 2) }}</span>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Subtotal</span>
+                                    <span>S/ {{ number_format($comprobanteActivo->subtotal, 2) }}</span>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>IGV (18%)</span>
-                                    <span>S/ {{ number_format($comprobante->igv, 2) }}</span>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">IGV</span>
+                                    <span>S/ {{ number_format($comprobanteActivo->igv, 2) }}</span>
                                 </div>
-                                @if ($comprobante->recargo > 0)
-                                    <div class="d-flex justify-content-between text-danger">
-                                        <span>Recargo tarj. ({{ $porcentaje_recargo_tarjeta }}%)</span>
-                                        <span>S/ {{ number_format($comprobante->recargo, 2) }}</span>
-                                    </div>
-                                @else
-                                    <div class="d-flex justify-content-between text-danger">
-                                        <span>Recargo tarj. ({{ $porcentaje_recargo_tarjeta }}%)</span>
-                                        <span>S/ {{ number_format($recargo, 2) }}</span>
-                                    </div>
-                                @endif
-                                <hr class="my-2">
+
+                                <div class="d-flex justify-content-between text-danger mb-2">
+                                    <span>Recargo tarjeta</span>
+                                    <span>S/ {{ number_format($comprobanteActivo->recargo ?? 0, 2) }}</span>
+                                </div>
+
+                                <hr>
+
                                 <div class="d-flex justify-content-between fs-5 fw-bold">
                                     <span>Total</span>
-
-                                    @if ($comprobante->total_cobrado > 0)
-                                        <span>S/ {{ number_format($comprobante->total_cobrado, 2) }}</span>
-                                    @else
-                                        <span>S/ {{ number_format($comprobante->total, 2) }}</span>
-                                    @endif
+                                    <span>
+                                        S/
+                                        {{ number_format(
+                                            $comprobanteActivo->total_cobrado > 0 ? $comprobanteActivo->total_cobrado : $comprobanteActivo->total,
+                                            2,
+                                        ) }}
+                                    </span>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -248,48 +270,54 @@
 
                 {{-- ACCIONES --}}
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    @if ($comprobante->estado === 'BORRADOR')
-                        <button wire:click="emitir" wire:loading.attr="disabled" class="btn btn-success btn-sm"
-                            type="button"> <i class="fa fa-plus-circle"></i> <i wire:target="emitir"
-                                wire:loading.class="fa fa-spinner fa-spin" aria-hidden="true"></i> 🚀 Emitir
-                            comprobante
-                            Usuario</button>
 
-                        {{-- NUEVO BOTÓN ELIMINAR --}}
-                        <button wire:click="eliminarComprobante" wire:loading.attr="disabled"
-                            onclick="confirm('¿Seguro que deseas eliminar este comprobante? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
-                            class="btn btn-danger btn-sm" type="button">
-                            <i class="fa fa-trash"></i>
-                            <i wire:target="eliminarComprobante" wire:loading.class="fa fa-spinner fa-spin"></i>
+                    @if ($comprobanteActivo->estado === 'BORRADOR')
+                        <button wire:click="emitir" type="button" class="btn btn-success rounded-pill px-4">
+                            🚀 Emitir
+                        </button>
+
+                        <button wire:click="eliminarComprobante" type="button"
+                            onclick="confirm('¿Eliminar este comprobante?') || event.stopImmediatePropagation()"
+                            class="btn btn-outline-danger rounded-pill px-4">
                             🗑 Eliminar
                         </button>
                     @endif
 
-                    @if (
-                        ($comprobante->estado === 'EMITIDO' || $comprobante->estado === 'PENDIENTE') &&
-                            ($comprobante->tipo_comprobante === 'BOLETA' || $comprobante->tipo_comprobante === 'FACTURA'))
-                        <a href="{{ $comprobante->pdf_url }}" target="_blank" class="btn btn-outline-primary">
-                            📄 Ver PDF
-                        </a>
-                    @endif
+                </div>
 
-                    @if ($comprobante && $comprobante->tipo_comprobante === 'TICKET' && $comprobante->estado === 'EMITIDO')
+            @endif
+            @if (
+                $comprobanteActivo &&
+                    in_array($comprobanteActivo->estado, ['EMITIDO', 'PENDIENTE']) &&
+                    in_array($comprobanteActivo->tipo_comprobante, ['BOLETA', 'FACTURA']))
+                <a href="{{ $comprobanteActivo->pdf_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    📄 Ver PDF
+                </a>
+            @endif
 
-                        @if ($comprobante->tipo_comprobante === 'TICKET')
-                            <button wire:click="anularComprobanteInterno" wire:loading.attr="disabled"
-                                class="btn btn-danger btn-sm" type="button"> <i class="fa fa-trash"></i> <i
-                                    wire:target="anularComprobanteInterno" wire:loading.class="fa fa-spinner fa-spin"
-                                    aria-hidden="true"></i> Anular comprobante</button>
-                        @endif
-                        <a href="{{ route('tickets.imprimir', $comprobante) }}" target="_blank"
-                            class="btn btn-secondary">
-                            🧾 Imprimir Ticket
-                        </a>
 
-                    @endif
+            @if ($comprobanteActivo && $comprobanteActivo->tipo_comprobante === 'TICKET' && $comprobanteActivo->estado === 'EMITIDO')
+                <button wire:click="anularComprobanteInterno" wire:loading.attr="disabled"
+                    class="btn btn-danger btn-sm" type="button">
+                    🗑 Anular comprobante
+                </button>
+
+                <a href="{{ route('tickets.imprimir', $comprobanteActivo) }}" target="_blank"
+                    class="btn btn-secondary btn-sm">
+                    🧾 Imprimir Ticket
+                </a>
+            @endif
+
+            @if ($comprobantes->isNotEmpty())
+                <div class="text-end mt-3">
+                    <button wire:click="crearComprobanteAdicional" type="button"
+                        class="btn btn-outline-primary btn-sm">
+                        ➕ Agregar Nuevo comprobante
+                    </button>
                 </div>
             @endif
         </div>
-    </div>
 
+
+    </div>
 </div>

@@ -19,7 +19,7 @@
                             @endif
 
                             {{-- MÉDICO --}}
-                            @if ($this->puedeVer([1,5]))
+                            @if ($this->puedeVer([1, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'medico' ? 'active' : '' }}"
                                         wire:click="cambiarTab('medico')">Médico</a>
@@ -27,7 +27,7 @@
                             @endif
 
                             {{-- DIAGNOSTICO --}}
-                            @if ($this->puedeVer([1,5]))
+                            @if ($this->puedeVer([1, 2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'diagnostico' ? 'active' : '' }}"
                                         wire:click="cambiarTab('diagnostico')">Diagnóstico</a>
@@ -35,7 +35,7 @@
                             @endif
 
                             {{-- SERVICIOS --}}
-                            @if ($this->puedeVer([1,5]))
+                            @if ($this->puedeVer([1, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'servicios' ? 'active' : '' }}"
                                         wire:click="cambiarTab('servicios')">Servicios</a>
@@ -43,7 +43,7 @@
                             @endif
 
                             {{-- SIGNOS VITALES --}}
-                            @if ($this->puedeVer([1,5, 3, 2]))
+                            @if ($this->puedeVer([1, 5, 3, 2]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'signos' ? 'active' : '' }}"
                                         wire:click="cambiarTab('signos')">Signos Vitales</a>
@@ -51,7 +51,7 @@
                             @endif
 
                             {{-- CONSULTA --}}
-                            @if ($this->puedeVer([1,2, 3, 5]))
+                            @if ($this->puedeVer([1, 2, 3, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'consulta' ? 'active' : '' }}"
                                         wire:click="cambiarTab('consulta')">Consulta</a>
@@ -59,7 +59,7 @@
                             @endif
 
                             {{-- MEDICAMENTOS --}}
-                            @if ($this->puedeVer([1, 5, 6]))
+                            @if ($this->puedeVer([1, 2, 5, 6]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'medicamentos' ? 'active' : '' }}"
                                         wire:click="cambiarTab('medicamentos')">Medicamentos</a>
@@ -67,7 +67,7 @@
                             @endif
 
                             {{-- LABORATORIO + IMAGEN --}}
-                            @if ($this->puedeVer([1,2, 5]))
+                            @if ($this->puedeVer([1, 2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'laboratorio' ? 'active' : '' }}"
                                         wire:click="cambiarTab('laboratorio')">Laboratorio</a>
@@ -82,7 +82,7 @@
                             {{-- INSUMOS --}}
 
                             {{-- RESULTADOS --}}
-                            @if ($this->puedeVer([1,2, 5]))
+                            @if ($this->puedeVer([1, 2, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'resultados' ? 'active' : '' }}"
                                         wire:click="cambiarTab('resultados')">Resultados</a>
@@ -90,14 +90,14 @@
                             @endif
 
                             {{-- FACTURACIÓN --}}
-                            @if ($this->puedeVer([1,5]))
+                            @if ($this->puedeVer([1, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'facturacion' ? 'active' : '' }}"
                                         wire:click="cambiarTab('facturacion')">Facturación</a>
                                 </li>
                             @endif
                             {{-- FACTURACIÓN --}}
-                            @if ($this->puedeVer([1,5]))
+                            @if ($this->puedeVer([1, 5]))
                                 <li class="nav-item">
                                     <a class="nav-link {{ $tab == 'finalizar' ? 'active' : '' }}"
                                         wire:click="cambiarTab('finalizar')">Finalizar</a>

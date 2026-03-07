@@ -340,7 +340,7 @@ return [
             'url' => 'usuario',
             'icon' => 'fas fa-fw fa-users',
             'label' => 5,
-            'label_color' => 'success',
+            'label_color' => 'danger',
             'can' => 'Administrador',
         ],
         [
@@ -371,6 +371,13 @@ return [
             'label' => 6,
             'label_color' => 'success',
             'can' => 'ver-farmacia',
+        ],
+        [
+            'text' => 'Citas',
+            'url' => 'cita',
+            'icon' => 'fas fa-edit',
+            'label' => 5,
+            'label_color' => 'secondary',
         ],
         [
             'text' => 'Laboratorio',
@@ -485,6 +492,12 @@ return [
                     'text' => 'Ingresos',
                     'icon_color' => 'red',
                     'url' => 'ingreso',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Ventas',
+                    'icon_color' => 'dark',
+                    'url' => 'venta',
                     'can' => 'Administrador',
                 ],
             ],

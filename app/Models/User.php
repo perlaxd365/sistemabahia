@@ -116,4 +116,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pago::class, 'user_id');
     }
+    public function getEdadAttribute()
+    {
+        return $this->fecha_nacimiento
+            ? \Carbon\Carbon::createFromFormat('d/m/Y', $this->fecha_nacimiento)->age
+            : null;
+    }
+    public function paciente()
+    {
+        return $this->belongsTo(User::class, 'id_paciente');
+    }
 }

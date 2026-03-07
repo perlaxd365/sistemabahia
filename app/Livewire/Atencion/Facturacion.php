@@ -3,6 +3,8 @@
 namespace App\Livewire\Atencion;
 
 use App\Models\Atencion;
+use App\Models\AtencionMedicamento;
+use App\Models\AtencionServicio;
 use App\Models\CajaMovimiento;
 use App\Models\CajaTurno;
 use App\Models\Cliente;
@@ -19,23 +21,39 @@ class Facturacion extends Component
 {
 
     public Atencion $atencion;
-    public ?Comprobante $comprobante = null;
+    public $comprobantes;
+    public ?Comprobante $comprobanteActivo = null;
     public $tipo_comprobante = 'TICKET';
     public $con_igv = true;
+    public $id_atencion;
+
+    protected $listeners = ['recargarComprobante'];
+
     public function mount($id_atencion)
     {
         ///FACTURA
 
         // 3️⃣.1️⃣ Aplicar recargo si corresponde
+        $this->id_atencion = $id_atencion;
         $this->atencion = Atencion::with([
             'servicios',
             'medicamentos'
         ])->findOrFail($id_atencion);
 
-        $this->comprobante = Comprobante::where('id_atencion', $id_atencion)
+        $this->comprobantes = Comprobante::where('id_atencion', $id_atencion)
             ->with('detalles')
-            ->first();
-        // 3️⃣.1️⃣ Aplicar recargo si corresponde
+            ->get();
+
+        $this->comprobanteActivo = $this->comprobantes->firstWhere('estado', 'BORRADOR');
+        if (!$this->comprobanteActivo && $this->comprobantes->count() > 0) {
+            $this->comprobanteActivo = $this->comprobantes->last();
+        }
+
+        if ($this->comprobanteActivo) {
+            $this->tipo_comprobante = $this->comprobanteActivo->tipo_comprobante;
+            $this->con_igv = $this->comprobanteActivo->con_igv ?? true;
+            $this->tipo_pago = $this->comprobanteActivo->metodo_pago ?? 'EFECTIVO';
+        }
     }
 
     /**
@@ -43,11 +61,18 @@ class Facturacion extends Component
      */
     public function crearBorrador()
     {
-        // 1️⃣ Evitar duplicar comprobante
-        if ($this->comprobante) {
+        $existeBorrador = Comprobante::where('id_atencion', $this->atencion->id_atencion)
+            ->where('estado', 'BORRADOR')
+            ->exists();
+
+        if ($existeBorrador) {
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'title' => 'Ya existe un borrador',
+                'message' => 'Debe emitir o eliminar el borrador actual antes de crear otro.'
+            ]);
             return;
         }
-
         $totalItems = 0;
 
         $totalItems += $this->atencion->servicios()->count();
@@ -61,104 +86,45 @@ class Facturacion extends Component
             ]);
             return;
         }
+        /* if (!session('id_caja_turno')) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Abrir turno de caja',
+                'message' => 'Debe abrir turno antes de facturar.'
+            ]);
+            return;
+        } */
 
         DB::transaction(function () {
 
-            // 2️⃣ Crear comprobante BORRADOR
-            $this->comprobante = Comprobante::create([
+            $this->comprobanteActivo = Comprobante::create([
                 'id_atencion'      => $this->atencion->id_atencion,
                 'id_paciente'      => $this->atencion->id_paciente,
-                'tipo_comprobante' => 'TICKET',
+                'tipo_comprobante' => $this->tipo_comprobante,
                 'serie'            => 'T001',
-                "metodo_pago"       => "EFECTIVO",
-                "recargo"           => 0,
-                "total_cobrado"     => 0,
-                'numero'           => null,
+                'estado'           => 'BORRADOR',
                 'fecha_emision'    => now(),
-                'subtotal'         => 0, // gravada
+                'metodo_pago'      => 'EFECTIVO',
+                'recargo'          => 0,
+                'total_cobrado'    => 0,
+                'subtotal'         => 0,
                 'igv'              => 0,
                 'total'            => 0,
+                'con_igv'          => 1,
                 'id_caja_turno'    => session('id_caja_turno'),
-                'estado'           => 'BORRADOR',
             ]);
 
-            // 3️⃣ SERVICIOS
-            foreach ($this->atencion->servicios as $servicio) {
-
-                $precioConIgv = (float) $servicio->pivot->precio_unitario;
-                $cantidad     = (float) ($servicio->pivot->cantidad ?? 1);
-
-                // 🔴 CÁLCULO SUNAT
-                $valorUnitario = round($precioConIgv / 1.18, 2);
-                $subtotal      = round($valorUnitario * $cantidad, 2); // SIN IGV
-                $igv           = round($subtotal * 0.18, 2);
-
-                ComprobanteDetalle::create([
-                    'id_comprobante'  => $this->comprobante->id_comprobante,
-                    'descripcion'     => $servicio->nombre_servicio,
-                    'cantidad'        => $cantidad,
-                    'precio_unitario' => $precioConIgv, // CON IGV
-                    'subtotal'        => $subtotal,      // SIN IGV
-                    'igv'             => $igv,
-                    'unidad'          => 'NIU',
-                    'tipo_afectacion_igv' => '10', // Gravado
-                ]);
-            }
-
-            // 4️⃣ MEDICAMENTOS
-            foreach ($this->atencion->medicamentos as $medicamento) {
-
-                $precioConIgv = (float) $medicamento->pivot->precio;
-                $cantidad     = (float) ($medicamento->pivot->cantidad ?? 1);
-
-                // 🔴 CÁLCULO SUNAT
-                $valorUnitario = round($precioConIgv / 1.18, 2);
-                $subtotal      = round($valorUnitario * $cantidad, 2);
-                $igv           = round($subtotal * 0.18, 2);
-
-                ComprobanteDetalle::create([
-                    'id_comprobante'  => $this->comprobante->id_comprobante,
-                    'descripcion'     => $medicamento->nombre,
-                    'cantidad'        => $cantidad,
-                    'precio_unitario' => $precioConIgv,
-                    'subtotal'        => $subtotal,
-                    'igv'             => $igv,
-                    'unidad'          => 'NIU',
-                    'tipo_afectacion_igv' => '10',
-                ]);
-            }
-
-            // 5️⃣ Recalcular totales SUNAT
-            $this->recalcularTotalesSunat();
-
-            // 6️⃣ Refrescar relación
-            $this->comprobante->load('detalles');
+            // 🔥 CARGAR ITEMS PENDIENTES
+            $this->cargarItems();
+            $this->atencion->load(['servicios.servicio', 'medicamentos']);
         });
+        $this->comprobantes = Comprobante::where('id_atencion', $this->atencion->id_atencion)
+            ->with('detalles')
+            ->get();
+        $this->comprobanteActivo->load('detalles');
     }
 
 
-    /**
-     * Calcular totoales
-     */
-    protected function recalcularTotalesSunat()
-    {
-        $this->comprobante->subtotal = round(
-            $this->comprobante->detalles->sum('subtotal'),
-            2
-        );
-
-        $this->comprobante->igv = round(
-            $this->comprobante->detalles->sum('igv'),
-            2
-        );
-
-        $this->comprobante->total = round(
-            $this->comprobante->subtotal + $this->comprobante->igv,
-            2
-        );
-
-        $this->comprobante->save();
-    }
 
 
     /**
@@ -166,114 +132,122 @@ class Facturacion extends Component
      */
     public function cargarItems()
     {
-        // 1️⃣ Debe existir comprobante
-        if (!$this->comprobante) {
-            return;
-        }
 
-        // 2️⃣ Solo si está en BORRADOR
-        if ($this->comprobante->estado !== 'BORRADOR') {
-            return;
-        }
+        if (!$this->comprobanteActivo) return;
 
+        if ($this->comprobanteActivo->estado !== 'BORRADOR') return;
 
-        if (!session('id_caja_turno')) {
-            $this->dispatch(
-                'alert',
-                ['type' => 'error', 'title' => 'POR FAVOR ABRIR TURNO DE CAJA', 'message' => 'Error de caja']
-            );
-        }
         DB::transaction(function () {
 
-            // 3️⃣ Eliminar detalles anteriores
-            ComprobanteDetalle::where(
-                'id_comprobante',
-                $this->comprobante->id_comprobante
-            )->delete();
+            $this->comprobanteActivo->detalles()->delete();
 
-            // 4️⃣ Cargar SERVICIOS
-            foreach ($this->atencion->servicios as $servicio) {
+            // 🔹 SERVICIOS NO FACTURADOS
+            $servicios = AtencionServicio::with('servicio')
+                ->where('id_atencion', $this->atencion->id_atencion)
+                ->where(function ($q) {
+                    $q->where('facturado', false)
+                        ->orWhereNull('facturado');
+                })
+                ->get();
 
-                $precio = $servicio->pivot->precio;
-                $cantidad = $servicio->pivot->cantidad ?? 1;
+            foreach ($servicios as $servicio) {
 
-                $subtotal = $precio * $cantidad;
-                $igv = round($subtotal * 0.18, 2);
+                $precio   = (float) $servicio->precio_unitario;
+                $cantidad = (float) $servicio->cantidad;
+
+                if ($this->con_igv) {
+
+                    $valorUnitario = round($precio / 1.18, 2);
+                    $subtotal      = round($valorUnitario * $cantidad, 2);
+                    $igv           = round($subtotal * 0.18, 2);
+                } else {
+
+                    $subtotal = round($precio * $cantidad, 2);
+                    $igv = 0;
+                }
 
                 ComprobanteDetalle::create([
-                    'id_comprobante' => $this->comprobante->id_comprobante,
-                    'descripcion'    => $servicio->nombre,
-                    'cantidad'       => $cantidad,
+                    'id_comprobante'  => $this->comprobanteActivo->id_comprobante,
+                    'descripcion'     => $servicio->servicio->nombre_servicio,
+                    'cantidad'        => $cantidad,
                     'precio_unitario' => $precio,
-                    'subtotal'       => $subtotal,
-                    'igv'            => $igv,
-                    'unidad'         => 'NIU',
+                    'subtotal'        => $subtotal,
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => $this->con_igv ? '10' : '20',
                 ]);
             }
 
-            // 5️⃣ Cargar MEDICAMENTOS
-            foreach ($this->atencion->medicamentos as $medicamento) {
+            // 🔹 MEDICAMENTOS VENTA NO FACTURADOS
+            $medicamentos = AtencionMedicamento::with('medicamento')
+                ->where('id_atencion', $this->atencion->id_atencion)
+                ->whereIn('tipo', ['VENTA', 'RECETA'])
+                ->where(function ($q) {
+                    $q->where('facturado', false)
+                        ->orWhereNull('facturado');
+                })
+                ->get();
 
-                $precio     = $medicamento->pivot->precio;
-                $cantidad   = $medicamento->pivot->cantidad ?? 1;
+            foreach ($medicamentos as $med) {
 
-                $subtotal   = $precio * $cantidad;
-                $igv        = round($subtotal * 0.18, 2);
+                $precio   = (float) $med->precio;
+                $cantidad = (float) $med->cantidad;
+
+                if ($this->con_igv) {
+
+                    $valorUnitario = round($precio / 1.18, 2);
+                    $subtotal      = round($valorUnitario * $cantidad, 2);
+                    $igv           = round($subtotal * 0.18, 2);
+                } else {
+
+                    $subtotal = round($precio * $cantidad, 2);
+                    $igv = 0;
+                }
 
                 ComprobanteDetalle::create([
-                    'id_comprobante' => $this->comprobante->id_comprobante,
-                    'descripcion'    => $medicamento->nombre,
-                    'cantidad'       => $cantidad,
+                    'id_comprobante'  => $this->comprobanteActivo->id_comprobante,
+                    'descripcion'     => $med->medicamento->nombre,
+                    'cantidad'        => $cantidad,
                     'precio_unitario' => $precio,
-                    'subtotal'       => $subtotal,
-                    'igv'            => $igv,
-                    'unidad'         => 'NIU',
+                    'subtotal'        => $subtotal,
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => $this->con_igv ? '10' : '20',
                 ]);
             }
+            $this->comprobanteActivo->load('detalles');
 
-
-            // 6️⃣ cliente
-
-            // 6️⃣ Recalcular totales
             $this->recalcularTotales();
-
-            // 3️⃣.1️⃣ Aplicar recargo si corresponde
-            $this->recalcularTotalConRecargo();
-
-            // 7️⃣ Refrescar relación
-            $this->comprobante->load('detalles');
         });
     }
-
-    /**
-     * calcular totlaes
-     */
-    protected function recalcularTotales()
+    protected function recalcularTotalesGenerales()
     {
+        if (!$this->comprobanteActivo) return;
 
-        $detalles = $this->comprobante->detalles ?? collect();
+        $subtotal = round(
+            $this->comprobanteActivo->detalles()->sum('subtotal'),
+            2
+        );
 
-        if ($this->con_igv) {
-            $subtotal = $detalles->sum('subtotal');
-            $igv = round($subtotal * 0.18, 2);
-            $total = $subtotal + $igv;
-        } else {
-            $subtotal = $detalles->sum('subtotal');
-            $igv = 0;
-            $total = $subtotal;
-        }
+        $igv = round(
+            $this->comprobanteActivo->detalles()->sum('igv'),
+            2
+        );
 
-        $this->comprobante->update([
+        $total = round($subtotal + $igv, 2);
 
-            "metodo_pago"   => $this->tipo_pago,
-            "recargo"     => $this->recargo,
-            "total_cobrado" => $this->total_cobrado,
+        $this->comprobanteActivo->update([
             'subtotal' => $subtotal,
-            'igv' => $igv,
-            'total' => $total,
-            'con_igv' => $this->con_igv,
+            'igv'      => $igv,
+            'total'    => $total,
         ]);
+
+        $this->recalcularTotalConRecargo();
+
+        $this->comprobanteActivo->refresh();
     }
+
+
 
 
     /**
@@ -291,8 +265,8 @@ class Facturacion extends Component
         }
 
         // Guardar en comprobante si existe
-        if ($this->comprobante) {
-            $this->comprobante->update([
+        if ($this->comprobanteActivo) {
+            $this->comprobanteActivo->update([
                 'tipo_comprobante' => $this->tipo_comprobante,
                 'con_igv' => $this->con_igv,
             ]);
@@ -306,9 +280,9 @@ class Facturacion extends Component
      */
     public function updatedConIgv($value)
     {
-        if (!$this->comprobante) return;
+        if (!$this->comprobanteActivo) return;
 
-        $this->comprobante->update([
+        $this->comprobanteActivo->update([
             'con_igv' => (bool) $value,
         ]);
 
@@ -341,7 +315,7 @@ class Facturacion extends Component
                 ]
             );
 
-            $this->comprobante->update([
+            $this->comprobanteActivo->update([
                 'id_cliente' => $cliente->id_cliente
             ]);
         }
@@ -358,7 +332,7 @@ class Facturacion extends Component
                 ]
             );
 
-            $this->comprobante->update([
+            $this->comprobanteActivo->update([
                 'id_cliente' => $cliente->id_cliente
             ]);
         }
@@ -426,12 +400,13 @@ class Facturacion extends Component
     public $total_cobrado = 0;
     protected function recalcularTotalConRecargo()
     {
-        if (!$this->comprobante) {
+        if (!$this->comprobanteActivo) {
             return;
         }
 
-        // Total base SUNAT (sin recargo)
-        $baseTotal = $this->comprobante->subtotal + $this->comprobante->igv;
+        $this->comprobanteActivo->refresh();
+
+        $baseTotal = $this->comprobanteActivo->subtotal + $this->comprobanteActivo->igv;
 
         if ($this->tipo_pago === 'TARJETA') {
             $this->recargo = round(
@@ -442,15 +417,14 @@ class Facturacion extends Component
             $this->recargo = 0;
         }
 
-        // Total final a cobrar (NO afecta SUNAT)
-        $this->comprobante->total_cobrado = round($baseTotal + $this->recargo, 2);
-        $this->comprobante->save();
+        $this->comprobanteActivo->total_cobrado = round($baseTotal + $this->recargo, 2);
+        $this->comprobanteActivo->save();
     }
 
     /**Tipo de pago */
     public function updatedTipoPago($value)
     {
-        $this->recalcularTotalConRecargo();
+        $this->recalcularTotales();
     }
 
 
@@ -480,16 +454,16 @@ class Facturacion extends Component
         }
 
         //PAGO 
-        if ($this->tipo_comprobante === "TICKET") {
+        if ($this->comprobanteActivo->tipo_comprobante === "TICKET") {
             # code...
             $this->registrarTicket();
             // procede a guardar pago
             $pago = Pago::create([
-                'id_comprobante' => $this->comprobante->id_comprobante,
-                'id_atencion'    => $this->comprobante->atencion->id_atencion,
+                'id_comprobante' => $this->comprobanteActivo->id_comprobante,
+                'id_atencion'    => $this->comprobanteActivo->atencion->id_atencion,
                 'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
                 'tipo_pago'      => $this->tipo_pago,
-                'monto'          => $this->comprobante->total_cobrado,
+                'monto'          => $this->comprobanteActivo->total_cobrado,
                 'fecha_pago'     => now(),
                 'user_id'        => Auth()->id(),
             ]);
@@ -497,27 +471,36 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
-                'monto'         => $this->comprobante->total_cobrado, // 👈 correcto
+                'descripcion' => $this->cliente_nombre.' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
+                'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'id_referencia' => $pago->id_pago,
                 'tabla_referencia' => 'caja_chicas',
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
             ]);
-            $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
+            $atencion = Atencion::findOrFail($this->comprobanteActivo->atencion->id_atencion);
 
             $this->dispatch(
                 'alert',
                 ['type' => 'success', 'title' => 'Ticket registrado correctamente', 'message' => 'Exito']
             );
+
+            AtencionServicio::where('id_atencion', $this->atencion->id_atencion)
+                ->where('facturado', false)
+                ->update(['facturado' => true]);
+
+            AtencionMedicamento::where('id_atencion', $this->atencion->id_atencion)
+                ->where('facturado', false)
+                ->whereIn('tipo', ['VENTA', 'RECETA'])
+                ->update(['facturado' => true]);
+
             return;
         }
-
 
         DB::beginTransaction();
         try {
 
-            if (!$this->comprobante) {
+            if (!$this->comprobanteActivo) {
                 $this->dispatch(
                     'alert',
                     ['type' => 'error', 'title' => 'No existe comprobante', 'message' => 'Error']
@@ -525,7 +508,7 @@ class Facturacion extends Component
                 return;
             }
 
-            if ($this->comprobante->estado === 'EMITIDO') {
+            if ($this->comprobanteActivo->estado === 'EMITIDO') {
                 $this->dispatch(
                     'alert',
                     ['type' => 'error', 'title' => 'El comprobante ya fue emitido', 'message' => 'Error']
@@ -547,14 +530,14 @@ class Facturacion extends Component
 
             // 4️⃣ Enviar a NubeFact
             $respuesta = app(NubeFactService::class)
-                ->emitir($this->comprobante);
+                ->emitir($this->comprobanteActivo);
             // procede a guardar pago
             $pago = Pago::create([
-                'id_comprobante' => $this->comprobante->id_comprobante,
-                'id_atencion'    => $this->comprobante->atencion->id_atencion,
+                'id_comprobante' => $this->comprobanteActivo->id_comprobante,
+                'id_atencion'    => $this->comprobanteActivo->atencion->id_atencion,
                 'id_caja_turno'  => $cajaTurno->id_caja_turno, // si está abierto
                 'tipo_pago'      => $this->tipo_pago,
-                'monto'          => $this->comprobante->total_cobrado, // 👈 correcto
+                'monto'          => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'fecha_pago'     => now(),
                 'user_id'        => Auth()->id(),
             ]);
@@ -562,15 +545,23 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => 'Pago comprobante ' . $this->comprobante->id_comprobante,
-                'monto'         => $this->comprobante->total_cobrado, // 👈 correcto
+                'descripcion' => 'Pago comprobante ' . $this->comprobanteActivo->id_comprobante,
+                'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'tabla_referencia' => 'caja_chicas',
                 'id_referencia' => $pago->id_pago,
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
             ]);
 
-            $atencion = Atencion::findOrFail($this->comprobante->atencion->id_atencion);
+            AtencionServicio::where('id_atencion', $this->atencion->id_atencion)
+                ->where('facturado', false)
+                ->update(['facturado' => true]);
+
+            AtencionMedicamento::where('id_atencion', $this->atencion->id_atencion)
+                ->where('facturado', false)
+                ->whereIn('tipo', ['VENTA', 'RECETA'])
+                ->update(['facturado' => true]);
+            $atencion = Atencion::findOrFail($this->comprobanteActivo->atencion->id_atencion);
 
 
             if (!$respuesta || !is_array($respuesta)) {
@@ -604,9 +595,9 @@ class Facturacion extends Component
                 && empty($respuesta['sunat_soap_error'])
             ) {
 
-                $this->comprobante->update(
+                $this->comprobanteActivo->update(
                     array_merge($dataBase, [
-                        'estado' => 'PENDIENTE'
+                        'estado' => 'EMITIDO'
                     ])
                 );
 
@@ -630,7 +621,7 @@ class Facturacion extends Component
                 )
             ) {
 
-                $this->comprobante->update(
+                $this->comprobanteActivo->update(
                     array_merge($dataBase, [
                         'estado' => 'RECHAZADO'
                     ])
@@ -648,7 +639,7 @@ class Facturacion extends Component
             // ✅ ACEPTADO
             if ($respuesta['aceptada_por_sunat'] === true) {
 
-                $this->comprobante->update(
+                $this->comprobanteActivo->update(
                     array_merge($dataBase, [
                         'estado' => 'EMITIDO'
                     ])
@@ -680,67 +671,89 @@ class Facturacion extends Component
         return (Comprobante::where('tipo_comprobante', 'TICKET')->max('numero') ?? 0) + 1;
     }
 
-    protected function recalcularTotalesTicket()
+    protected function recalcularTotales()
     {
-        if ($this->comprobante->estado === 'EMITIDO') {
-            return;
-        }
+        if (!$this->comprobanteActivo) return;
 
-        $total = round($this->comprobante->detalles->sum('subtotal'), 2);
+        // 🔥 Siempre consulta real a BD
+        $subtotal = round(
+            $this->comprobanteActivo->detalles()->sum('subtotal'),
+            2
+        );
 
-        if ($this->comprobante->con_igv) {
+        $igv = round(
+            $this->comprobanteActivo->detalles()->sum('igv'),
+            2
+        );
 
-            $base = round($total / 1.18, 2);
-            $igv  = round($total - $base, 2);
+        $total = round($subtotal + $igv, 2);
 
-            $this->comprobante->update([
-                'subtotal' => $base,
-                'igv'      => $igv,
-                'total'    => $total,
-            ]);
+        $this->comprobanteActivo->update([
+            'subtotal' => $subtotal,
+            'igv'      => $igv,
+            'total'    => $total,
+        ]);
+
+        // 🔥 RECARGO TARJETA
+        $baseTotal = $subtotal + $igv;
+
+        if ($this->tipo_pago === 'TARJETA') {
+            $this->recargo = round(
+                $baseTotal * ($this->porcentaje_recargo_tarjeta / 100),
+                2
+            );
         } else {
-
-            $this->comprobante->update([
-                'subtotal' => $total,
-                'igv'      => 0,
-                'total'    => $total,
-            ]);
+            $this->recargo = 0;
         }
+
+        $this->comprobanteActivo->update([
+            'metodo_pago'  => $this->tipo_pago,
+            'recargo'      => $this->recargo,
+            'total_cobrado' => round($baseTotal + $this->recargo, 2),
+            'con_igv'      => $this->con_igv,
+        ]);
+
+        // 🔥 SINCRONIZA LIVEWIRE
+        $this->comprobanteActivo->refresh();
     }
 
     public function registrarTicket()
     {
-        if (!$this->comprobante) {
+        if (!$this->comprobanteActivo) {
             return;
         }
 
 
         // 1️⃣ Actualizar datos base (RESPETANDO con_igv)
-        $this->comprobante->update([
-            'tipo_comprobante' => 'TICKET',
+        $this->comprobanteActivo->update([
+            'tipo_comprobante' => $this->tipo_comprobante,
             'serie'            => 'TCK',
             "metodo_pago"   => $this->tipo_pago,
             "recargo"     => $this->recargo,
             "total_cobrado" => $this->total_cobrado,
-            'numero'           => $this->comprobante->numero
+            'numero'           => $this->comprobanteActivo->numero
                 ?? $this->siguienteNumeroTicket(),
             'fecha_emision'    => now(),
             'con_igv'          => (bool) $this->con_igv, // ✅ CLAVE
         ]);
 
         // 2️⃣ Limpiar detalles
-        $this->comprobante->detalles()->delete();
-
+        $this->comprobanteActivo->detalles()->delete();
+        $servicios = AtencionServicio::where('id_atencion', $this->id_atencion)
+            ->where('estado', 1)
+            ->where('facturado', 0)
+            ->with('servicio') // 🔥 MUY IMPORTANTE
+            ->get();
         // 3️⃣ Servicios
-        foreach ($this->atencion->servicios as $servicio) {
 
-            $precio   = (float) $servicio->pivot->precio_unitario;
-            $cantidad = (float) ($servicio->pivot->cantidad ?? 1);
+        foreach ($servicios as $servicio) {
+
+            $precio   = (float) $servicio->precio_unitario;
+            $cantidad = (float) $servicio->cantidad;
             $subtotal = round($precio * $cantidad, 2);
-
             ComprobanteDetalle::create([
-                'id_comprobante'  => $this->comprobante->id_comprobante,
-                'descripcion'     => $servicio->nombre_servicio,
+                'id_comprobante'  => $this->comprobanteActivo->id_comprobante,
+                'descripcion'     => $servicio->servicio->nombre_servicio,
                 'cantidad'        => $cantidad,
                 'precio_unitario' => $precio,
                 'subtotal'        => $subtotal,
@@ -749,16 +762,20 @@ class Facturacion extends Component
             ]);
         }
 
-        // 4️⃣ Medicamentos
-        foreach ($this->atencion->medicamentos as $med) {
+        $medicamentos = AtencionMedicamento::where('id_atencion', $this->id_atencion)
+            ->where('facturado', 0)
+            ->with('medicamento')
+            ->get();
 
-            $precio   = (float) $med->pivot->precio;
-            $cantidad = (float) ($med->pivot->cantidad ?? 1);
+        foreach ($medicamentos as $med) {
+
+            $precio   = (float) $med->precio;   // 🔥 CORREGIDO
+            $cantidad = (float) $med->cantidad;
             $subtotal = round($precio * $cantidad, 2);
 
             ComprobanteDetalle::create([
-                'id_comprobante'  => $this->comprobante->id_comprobante,
-                'descripcion'     => $med->nombre,
+                'id_comprobante'  => $this->comprobanteActivo->id_comprobante,
+                'descripcion'     => $med->medicamento->nombre,
                 'cantidad'        => $cantidad,
                 'precio_unitario' => $precio,
                 'subtotal'        => $subtotal,
@@ -766,18 +783,15 @@ class Facturacion extends Component
                 'unidad'          => 'NIU',
             ]);
         }
-
         // 5️⃣ Recalcular totales (USA con_igv REAL)
-        $this->recalcularTotalesTicket();
-        // 3️⃣.1️⃣ Aplicar recargo si corresponde
-        $this->recalcularTotalConRecargo();
+        $this->recalcularTotales();
 
         // 6️⃣ Emitir
-        $this->comprobante->update([
+        $this->comprobanteActivo->update([
             'estado' => 'EMITIDO',
         ]);
 
-        $this->comprobante->load('detalles');
+        $this->comprobanteActivo->load('detalles');
     }
 
     /**
@@ -803,11 +817,11 @@ class Facturacion extends Component
     //prepara datos para nubefact
     protected function construirJsonNubeFact(): array
     {
-        $cliente = $this->comprobante->cliente;
+        $cliente = $this->comprobanteActivo->cliente;
 
         $items = [];
 
-        foreach ($this->comprobante->detalles as $detalle) {
+        foreach ($this->comprobanteActivo->detalles as $detalle) {
             $items[] = [
                 'unidad_de_medida' => $detalle->unidad,
                 'codigo'           => '',
@@ -833,10 +847,10 @@ class Facturacion extends Component
             'cliente_denominacion'       => $cliente->razon_social ?? $cliente->nombres,
             'cliente_direccion'          => $cliente->direccion ?? '',
             'moneda'                     => '1',
-            'total_gravada'              => $this->con_igv ? $this->comprobante->subtotal : 0,
-            'total_igv'                  => $this->comprobante->igv,
-            'total'                      => $this->comprobante->total,
-            'estado'                     => $this->comprobante->estado,
+            'total_gravada'              => $this->con_igv ? $this->comprobanteActivo->subtotal : 0,
+            'total_igv'                  => $this->comprobanteActivo->igv,
+            'total'                      => $this->comprobanteActivo->total,
+            'estado'                     => $this->comprobanteActivo->estado,
             'items'                      => $items,
         ];
     }
@@ -861,7 +875,7 @@ class Facturacion extends Component
 
         try {
 
-            $comprobante = Comprobante::findOrFail($this->comprobante->id_comprobante);
+            $comprobante = $this->comprobanteActivo;
 
             // 1️⃣ Validar que sea TICKET
             if ($comprobante->tipo_comprobante !== 'TICKET') {
@@ -917,6 +931,8 @@ class Facturacion extends Component
                 'descripcion'     => 'ANULACIÓN TICKET ' . $comprobante->serie . '-' . $comprobante->numero,
                 'monto'           => $comprobante->total,
                 'responsable'     => auth()->user()->name,
+
+                'id_caja_turno'    => auth()->user()->id,
             ]);
 
             DB::commit();
@@ -940,11 +956,11 @@ class Facturacion extends Component
 
     public function eliminarComprobante()
     {
-        if (!$this->comprobante) {
+        if (!$this->comprobanteActivo) {
             return;
         }
 
-        if ($this->comprobante->estado !== 'BORRADOR') {
+        if ($this->comprobanteActivo->estado !== 'BORRADOR') {
 
             $this->dispatch('alert', [
                 'type' => 'error',
@@ -955,7 +971,7 @@ class Facturacion extends Component
             return;
         }
 
-        if ($this->comprobante->total_cobrado > 0) {
+        if ($this->comprobanteActivo->pagos()->exists()) {
 
             $this->dispatch('alert', [
                 'type' => 'error',
@@ -969,19 +985,147 @@ class Facturacion extends Component
         DB::transaction(function () {
 
             // Eliminar detalles primero
-            $this->comprobante->detalles()->delete();
+            $this->comprobanteActivo->detalles()->delete();
 
             // Eliminar comprobante
-            $this->comprobante->delete();
+            $this->comprobanteActivo->delete();
         });
 
-        $this->comprobante = null;
 
         $this->dispatch('alert', [
             'type' => 'success',
             'title' => 'Comprobante eliminado',
             'message' => 'El borrador fue eliminado correctamente'
         ]);
+
+        $this->comprobantes = Comprobante::where('id_atencion', $this->atencion->id_atencion)
+            ->with('detalles')
+            ->get();
+
+        $this->comprobanteActivo = $this->comprobantes->last();
+    }
+    public function seleccionarComprobante($id)
+    {
+        $this->comprobanteActivo = Comprobante::with('detalles')->find($id);
+    }
+
+    public function crearComprobanteAdicional()
+    { // 🔒 No permitir más de un borrador
+        if (Comprobante::where('id_atencion', $this->atencion->id_atencion)
+            ->where('estado', 'BORRADOR')
+            ->exists()
+        ) {
+
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'title' => 'Existe borrador activo',
+                'message' => 'Debe emitir o eliminar el borrador actual antes de crear otro.'
+            ]);
+
+            return;
+        }
+        if (!$this->atencion->tienePendienteFacturar()) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'title' => 'Atención sin cargos',
+                'message' => 'Debe agregar al menos un servicio o medicamento antes de emitir comprobante.'
+            ]);
+            return;
+        }
+
+        if ($this->comprobanteActivo && $this->comprobanteActivo->estado === 'BORRADOR') {
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'title' => 'Existe borrador activo',
+                'message' => 'Debe emitir o eliminar el borrador actual.'
+            ]);
+            return;
+        }
+
+        DB::transaction(function () {
+
+            $nuevo = Comprobante::create([
+                'id_atencion'      => $this->atencion->id_atencion,
+                'id_paciente'      => $this->atencion->id_paciente,
+                'tipo_comprobante' => $this->tipo_comprobante,
+                'serie'            => 'T001',
+                'estado'           => 'BORRADOR',
+                'fecha_emision'    => now(),
+                'metodo_pago'      => 'EFECTIVO',
+                'recargo'          => 0,
+                'total_cobrado'    => 0,
+                'subtotal'         => 0,
+                'igv'              => 0,
+                'total'            => 0,
+                'con_igv'          => 1,
+                'id_caja_turno'    => session('id_caja_turno'),
+            ]);
+
+            // 🔹 SERVICIOS
+            $servicios = AtencionServicio::with('servicio')
+                ->where('id_atencion', $this->atencion->id_atencion)
+                ->where('estado', true)
+                ->where('facturado', false)
+                ->get();
+
+            foreach ($servicios as $servicio) {
+
+                $precio   = (float) $servicio->precio_unitario;
+                $cantidad = (float) $servicio->cantidad;
+
+                $valorUnitario = round($precio / 1.18, 2);
+                $subtotal      = round($valorUnitario * $cantidad, 2);
+                $igv           = round($subtotal * 0.18, 2);
+
+                $nuevo->detalles()->create([
+                    'descripcion'     => $servicio->servicio->nombre_servicio,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precio,
+                    'subtotal'        => $subtotal,
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => '10',
+                ]);
+            }
+
+            // 🔹 MEDICAMENTOS
+            $medicamentos = AtencionMedicamento::with('medicamento')
+                ->where('id_atencion', $this->atencion->id_atencion)
+                ->where('facturado', false)
+                ->get();
+
+            foreach ($medicamentos as $medicamento) {
+
+                $precio   = (float) $medicamento->precio;
+                $cantidad = (float) $medicamento->cantidad;
+
+                $valorUnitario = round($precio / 1.18, 2);
+                $subtotal      = round($valorUnitario * $cantidad, 2);
+                $igv           = round($subtotal * 0.18, 2);
+
+                $nuevo->detalles()->create([
+                    'descripcion'     => $medicamento->medicamento->nombre, // 🔥 corregido
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precio,
+                    'subtotal'        => $subtotal,
+                    'igv'             => $igv,
+                    'unidad'          => 'NIU',
+                    'tipo_afectacion_igv' => '10',
+                ]);
+            }
+
+            // 🔥 AHORA SÍ CALCULA TOTALES
+            $this->comprobanteActivo = $nuevo;
+            $this->recalcularTotales();
+        });
+
+        $this->comprobantes = Comprobante::where(
+            'id_atencion',
+            $this->atencion->id_atencion
+        )
+            ->with('detalles')
+            ->orderByDesc('id_comprobante')
+            ->get();
     }
 
     public function render()

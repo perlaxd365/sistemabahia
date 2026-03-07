@@ -195,10 +195,9 @@ class Medicamentos extends Component
 
     public function historial()
     {
-        //dispensados
-        $this->medicamentosDispensados = AtencionMedicamento::with('medicamentos')
+        $this->medicamentosDispensados = AtencionMedicamento::with('medicamento')
             ->where('id_atencion', $this->id_atencion)
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('id_atencion_medicamento')
             ->get();
     }
 
@@ -245,5 +244,13 @@ class Medicamentos extends Component
             'title' => 'Medicamento cancelado',
             'message' => 'Medicamento eliminado y stock restaurado.'
         ]);
+    }
+
+    public function getTotalDispensadoProperty()
+    {
+        return collect($this->medicamentosDispensados)
+            ->sum(function ($item) {
+                return (float) $item->subtotal;
+            });
     }
 }

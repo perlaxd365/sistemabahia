@@ -1,4 +1,29 @@
 <div>
+    <style>
+        .form-clinico {
+            border-radius: 8px;
+            border: 1px solid #dbe2ea;
+            padding: 10px;
+        }
+
+        .form-clinico:focus {
+            border-color: #0b3c5d;
+            box-shadow: 0 0 0 0.15rem rgba(11, 60, 93, 0.15);
+        }
+
+        .btn-clinico {
+            background: #0b3c5d;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 7px;
+            font-weight: 500;
+        }
+
+        .btn-clinico:hover {
+            b
+        }
+    </style>
     <div class="info-clinica">
 
 
@@ -106,6 +131,61 @@
                         @endif
 
                     </p>
+                </div>
+
+            </div>
+
+        </div>
+        <div>
+
+            <div class="info-clinica">
+
+                <!-- ============================
+        EDICIÓN DE ATENCIÓN
+        ============================== -->
+
+                <div class="card p-4 mt-3">
+
+                    <div class="titulo-seccion">
+                        ✏️ Actualizar Datos de Atención
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="dato-label">Tipo de Atención</label>
+
+                            <select wire:model="tipo_atencion" class="form-control form-clinico">
+
+                                <option value="">Seleccionar...</option>
+                                <option value="01">Consulta Externa</option>
+                                <option value="02">Emergencia</option>
+                                <option value="03">Hospitalización</option>
+                                <option value="05">Procedimiento Ambulatorio</option>
+
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <label class="dato-label">Relato de Consulta</label>
+
+                            <textarea wire:model="relato_consulta" rows="4" class="form-control form-clinico"
+                                placeholder="Describir motivo o relato de consulta..."></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="text-end mt-3">
+
+                        <button wire:click="actualizarAtencion" type="button" class="btn btn-clinico">
+
+                            💾 Guardar Cambios
+
+                        </button>
+
+                    </div>
+
                 </div>
 
             </div>

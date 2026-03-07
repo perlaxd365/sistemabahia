@@ -182,11 +182,27 @@
                                         {{-- FACTURACIÓN --}}
                                         <td class="text-center">
 
-                                            @if ($atencion->comprobante)
+                                            @php
+                                                $tieneEmitidos = $atencion
+                                                    ->comprobantes()
+                                                    ->where('estado', 'EMITIDO')
+                                                    ->exists();
+
+                                                $tienePendientes = $atencion
+                                                    ->comprobantes()
+                                                    ->whereIn('estado', ['BORRADOR', 'PENDIENTE'])
+                                                    ->exists();
+                                            @endphp
+
+                                            @if ($tieneEmitidos)
                                                 <span class="badge bg-info text-dark">
                                                     Facturado
                                                 </span>
-                                            @elseif ($atencion->pagado ?? false)
+                                            @elseif ($tienePendientes)
+                                                <span class="badge bg-primary">
+                                                    En proceso
+                                                </span>
+                                            @elseif ($atencion->pagos()->exists())
                                                 <span class="badge bg-warning text-dark">
                                                     Cobrado
                                                 </span>
@@ -197,7 +213,6 @@
                                             @endif
 
                                         </td>
-
                                         {{-- ACCIÓN --}}
                                         <td class="text-center">
                                             <a href="{{ route('atencion_general', ['id' => $atencion->id_atencion]) }}"

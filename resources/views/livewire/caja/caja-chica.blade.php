@@ -3,9 +3,6 @@
 
         {{-- ENCABEZADO INSTITUCIONAL --}}
         <div class="text-center mb-4">
-            <h5 class="fw-semibold text-dark mb-1">
-                Caja chica
-            </h5>
             <div class="text-muted small">
                 Registro y control de egresos del turno activo
             </div>
@@ -17,7 +14,7 @@
 
                 <div class="mb-3">
                     <h6 class="fw-semibold text-dark mb-0">
-                        Registro de egreso
+                        Registro de movimiento de caja
                     </h6>
                     <small class="text-muted">
                         Los egresos se descuentan automáticamente del turno de caja
@@ -36,19 +33,29 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">
+                            Tipo de movimiento
+                        </label>
+
+                        <select class="form-control" wire:model="tipo">
+                            <option value="EGRESO">Egreso (Caja chica)</option>
+                            <option value="INGRESO">Ingreso manual</option>
+                        </select>
+                    </div>
 
                     <div class="col-md-4">
                         <label class="form-label text-dark fw-semibold">
                             Monto (S/)
                         </label>
-                        <input type="number" step="0.01" class="form-control @error('monto') is-invalid @enderror"
-                            wire:model.defer="monto">
+                        <input type="number" step="0.01" placeholder="0.00"
+                            class="form-control @error('monto') is-invalid @enderror" wire:model.defer="monto">
                         @error('monto')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <label class="form-label text-dark fw-semibold">
                             Responsable
                             <span class="text-muted fw-normal">(opcional)</span>
@@ -84,6 +91,7 @@
                                 <th>Concepto</th>
                                 <th class="text-end">Monto (S/)</th>
                                 <th>Responsable</th>
+                                <th class="text-center">Tipo</th>
                                 <th class="text-center">Estado</th>
                                 @can('editar-caja')
                                     <th class="text-center pe-4">Acción</th>
@@ -109,32 +117,43 @@
                                     <td>
                                         {{ $item->responsable ?? '—' }}
                                     </td>
-
                                     <td class="text-center">
-                                        @if ($item->estado === 'REGISTRADO')
-                                            <span class="badge bg-light text-dark border">
+                                        @if ($item->tipo === 'INGRESO')
+                                            <span class="badge bg-success">Ingreso</span>
+                                        @else
+                                            <span class="badge bg-danger">Egreso</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+
+                                        @if ($item->tabla_referencia === 'caja_chicas')
+                                            @if ($item->cajaChica && $item->cajaChica->estado === 'REGISTRADO')
+                                                <span class="badge bg-light text-dark border">
+                                                    Registrado
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted border">
+                                                    Anulado
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-success">
                                                 Registrado
                                             </span>
-                                        @else
-                                            <span class="badge bg-light text-muted border">
-                                                Anulado
-                                            </span>
                                         @endif
+
                                     </td>
 
                                     <td class="text-center pe-4">
                                         @can('editar-caja')
-                                            @if ($item->estado === 'REGISTRADO')
-                                                <button wire:click="anular({{ $item->id_caja_chica }})"
+                                            @if ($item->tipo === 'EGRESO' && $item->tabla_referencia === 'caja_chicas')
+                                                <button wire:click="anular({{ $item->id_referencia }})"
                                                     class="badge btn-sm btn-outline-info"
                                                     onclick="confirm('¿Confirma la anulación del egreso?') || event.stopImmediatePropagation()">
                                                     Anular
                                                 </button>
-                                            @else
-                                                —
                                             @endif
                                         @endcan
-
                                     </td>
                                 </tr>
                             @empty

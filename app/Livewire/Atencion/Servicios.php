@@ -48,10 +48,10 @@ class Servicios extends Component
         })
             ->orderBy('name')
             ->get();
-        $atencion_servicios = AtencionServicio::where('atencion_servicios.id_atencion', $this->id_atencion)
-            ->join('atencions', 'atencions.id_atencion', 'atencion_servicios.id_atencion')
+        $atencion_servicios = AtencionServicio::where('id_atencion', $this->id_atencion)
             ->join('servicios', 'servicios.id_servicio', 'atencion_servicios.id_servicio')
-            ->leftjoin('users', 'users.id', 'atencion_servicios.id_profesional')
+            ->leftJoin('users', 'users.id', 'atencion_servicios.id_profesional')
+            ->orderByDesc('atencion_servicios.id_atencion_servicio')
             ->get();
         return view('livewire.atencion.servicios', compact('servicios', 'profesionales', 'atencion_servicios'));
     }

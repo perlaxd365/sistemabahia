@@ -68,6 +68,7 @@
         /* ===== SECCIONES ===== */
         .section {
             margin-bottom: 14px;
+            page-break-inside: avoid;
         }
 
         .section-title {
@@ -99,9 +100,12 @@
 
         /* ===== FIRMA ===== */
         .firma {
-            margin-top: 40px;
+            margin-top: 15px;
             text-align: center;
             font-size: 11px;
+
+            page-break-inside: avoid;
+            page-break-before: avoid;
         }
 
         .firma-linea {
@@ -135,6 +139,15 @@
                 <span class="label">Fecha de nacimiento:</span>
                 <span class="value">{{ $paciente->fecha_nacimiento }}</span>
             </div>
+            <div>
+                <span class="label">Edad:</span>
+                <span class="value">{{ $paciente->edad }}</span>
+            </div>
+            <div>
+                <span class="label"> DNI: </span>
+                <span class="value">{{ $paciente->dni }}</span>
+            </div>
+
             <div>
                 <span class="label">Teléfono:</span>
                 <span class="value">{{ $paciente->telefono }}</span>
@@ -240,7 +253,7 @@
 
     <div class="firma">
         @if ($firma_img)
-            <img src="{{ $firma_img }}" style="height:70px; width:auto; max-width:200px;">
+            <img src="{{ $firma_img }}" style="height:300px; width:300px; max-width:550px;">
             <br> ___________________________<br>
             @if ($profesional->colegiatura_cargo)
                 Colegiatura: {{ $profesional->colegiatura_cargo }}

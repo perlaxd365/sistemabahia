@@ -1,284 +1,286 @@
-<div>
+<div class="container-fluid px-0">
+
+    {{-- ================= TRATAMIENTO ================= --}}
     <div class="card border-0 shadow-sm mt-3">
 
-        <!-- ================= CABECERA TRATAMIENTO ================= -->
-        <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-clinico mr-2">
-                    <i class="fa fa-notes-medical fa-lg"></i>
+        <div class="card-body py-3">
+
+            <div class="d-flex align-items-start gap-3">
+
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                    <i class="fa fa-notes-medical text-primary"></i>
                 </div>
 
-                <div>
-                    <div class="fw-semibold text-clinico">
-                        Tratamiento indicado por el médico para <b>{{ $nombre_paciente }} </b>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold text-dark">
+                        Tratamiento indicado para
+                        <span class="text-primary">{{ $nombre_paciente }}</span>
                     </div>
-                    <hr>
-                    <div class="small text-muted">
-                        {!! nl2br(e($tratamiento)) ? nl2br(e($tratamiento)) : '- Sin consulta -' !!}
+
+                    <div class="text-muted mt-2" style="line-height:1.5;">
+                        {!! $tratamiento ? nl2br(e($tratamiento)) : '<span class="text-muted">Sin tratamiento registrado</span>' !!}
                     </div>
                 </div>
+
             </div>
+
         </div>
+    </div>
 
 
 
-        @can('editar-farmacia')
-            <div class="card-body pt-3">
+    @can('editar-farmacia')
 
-                <!-- ================= BUSCADOR MEDICAMENTOS ================= -->
-                <div class="card border-primary-subtle mb-3">
-                    <div class="card-header bg-primary-subtle py-2">
-                        <strong class="text-primary">
-                            <i class="fa fa-pills me-1"></i>
-                            Dispensación de medicamentos
-                        </strong>
-                    </div>
+        {{-- ================= DISPENSACIÓN ================= --}}
+        <div class="card border-0 shadow-sm mt-3">
 
-                    <div class="card-body p-2">
+            <div class="card-header bg-white py-2 border-bottom">
+                <span class="fw-semibold text-primary">
+                    <i class="fa fa-pills me-1"></i>
+                    Dispensación
+                </span>
+            </div>
 
-                        <label class="small text-muted mb-1">
-                            Buscar medicamento
-                        </label>
+            <div class="card-body py-3">
 
-                        <input type="text" wire:model.live.debounce.300ms="buscarMedicamento"
-                            class="form-control form-control-sm" placeholder="Escriba el nombre del medicamento…">
-
-                        @if ($resultados)
-                            <ul class="list-group mt-2 shadow-sm">
-                                @foreach ($resultados as $med)
-                                    <li class="list-group-item list-group-item-action py-2"
-                                        wire:click="agregarMedicamento({{ $med->id_medicamento }})
-                                    "
-                                        style="cursor:pointer">
-
-                                        <div class="fw-semibold text-primary">
-                                            {{ $med->nombre }}
-                                        </div>
-
-                                        <div class="small text-muted d-flex justify-content-between">
-                                            <span>
-                                                {{ $med->concentracion }} · {{ $med->presentacion }}
-                                            </span>
-                                            <span class="fst-italic">
-                                                {{ $med->marca }}
-                                            </span>
-                                        </div>
-
-                                        <div class="small mt-1">
-                                            <span class="badge bg-{{ $med->stock > 0 ? 'success' : 'danger' }}">
-                                                Stock: {{ $med->stock }}
-                                            </span>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-
-                    </div>
+                {{-- Buscador --}}
+                <div class="mb-3">
+                    <input type="text" wire:model.live.debounce.300ms="buscarMedicamento"
+                        class="form-control form-control-sm rounded-3 shadow-none" placeholder="Buscar medicamento...">
                 </div>
 
-                <!-- ================= TABLA DISPENSACIÓN ================= -->
+                @if ($resultados)
+                    <ul class="list-group shadow-sm mb-3">
+                        @foreach ($resultados as $med)
+                            <li class="list-group-item list-group-item-action py-2 border-0"
+                                wire:click="agregarMedicamento({{ $med->id_medicamento }})" style="cursor:pointer">
+
+                                <div class="fw-semibold text-dark">
+                                    {{ $med->nombre }}
+                                </div>
+
+                                <div class="text-muted d-flex justify-content-between">
+                                    <span>
+                                        {{ $med->concentracion }} · {{ $med->presentacion }}
+                                    </span>
+                                    <span>
+                                        Stock: {{ $med->stock }}
+                                    </span>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+
+
+                {{-- Tabla --}}
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-2">
+                    <table class="table align-middle">
+
                         <thead class="table-light">
-                            <tr class="text-muted small">
+                            <tr class="text-muted">
                                 <th>Medicamento</th>
-                                <th width="20" style="width: 120px;" class="text-center">Cantidad</th>
-                                <th width="20" class="text-center">Precio</th>
+                                <th width="90" class="text-center">Cant.</th>
+                                <th width="110" class="text-end">Precio</th>
                                 <th width="110" class="text-end">Subtotal</th>
-                                <th width="40"></th>
+                                <th width="50"></th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @forelse ($detalle as $i => $item)
                                 <tr>
-                                    <td class="small">
 
-                                        <li class="list-group-item list-group-item-action py-2"style="cursor:pointer">
-
-                                            <div class="fw-semibold text-primary">
-                                                {{ $item['nombre'] }}
-                                            </div>
-
-                                            <div class="small text-muted d-flex justify-content-between">
-                                                <span>
-                                                    {{ $item['concentracion'] }} · {{ $item['presentacion'] }}
-                                                </span>
-                                                <span class="fst-italic">
-                                                    {{ $item['marca'] }}
-                                                </span>
-                                            </div>
-
-                                            <div class="small mt-1">
-                                                <span class="badge bg-{{ $item['stock'] > 0 ? 'success' : 'danger' }}">
-                                                    Stock: {{ $item['stock'] }}
-                                                </span>
-                                            </div>
-                                        </li>
-                                    </td>
-
-
-                                    <!-- CANTIDAD -->
-                                    <td style="width: 120px; min-width:120px; max-width:120px;">
-                                        <div class="border rounded px-2 py-2 bg-white">
-                                            <small class="text-muted d-block">Cantidad</small>
-
-                                            <input type="number" min="0" step="0.01"
-                                                wire:model.live="detalle.{{ $i }}.cantidad"
-                                                class="form-control-sm w-100 form-control-sm  text-secondary fs-6 border-0 bg-light text-end fw-semibold">
+                                    <td>
+                                        <div class="fw-semibold text-dark">
+                                            {{ $item['nombre'] }}
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ $item['concentracion'] }} · {{ $item['presentacion'] }}
                                         </div>
                                     </td>
 
-                                    <!-- PRECIO -->
-                                    <td style="width: 120px; min-width:120px; max-width:120px;">
-                                        <div class="border rounded px-2 py-2 bg-white">
-                                            <small class="text-muted d-block">Precio (S/)</small>
+                                    {{-- CANTIDAD --}}
+                                    <td>
+                                        <input type="number" min="1"
+                                            wire:model.lazy="detalle.{{ $i }}.cantidad"
+                                            class="form-control form-control-sm text-center rounded-3 shadow-none border-light">
+                                    </td>
 
-                                            <input type="number" min="0" step="0.01"
-                                                wire:model.live="detalle.{{ $i }}.precio"
-                                                class="form-control-sm w-100 form-control-sm  text-secondary fs-6 border-0 bg-light text-end fw-semibold">
+                                    {{-- PRECIO --}}
+                                    <td>
+                                        <input type="number" step="0.01"
+                                            wire:model.lazy="detalle.{{ $i }}.precio"
+                                            class="form-control form-control-sm text-end rounded-3 shadow-none border-light">
+                                    </td>
+
+                                    {{-- SUBTOTAL --}}
+                                    <td class="text-end fw-semibold text-success t-2">
+                                        <div class="pt-2">
+                                            S/ {{ number_format($item['subtotal'], 2) }}
                                         </div>
                                     </td>
 
-
-                                    <!-- SUBTOTAL -->
-                                    <td style="width: 120px; min-width:120px; max-width:120px; ">
-                                        <div class="border rounded px-2 py-2 bg-white text-success">
-                                            <small class="text-muted d-block">Subtotal</small>
-                                            <input
-                                                class="form-control-sm w-100 form-control-sm  text-success fs-6 border-0 bg-light text-end fw-semibold"
-                                                readonly disabled value=" S/ {{ number_format($item['subtotal'], 2) }}">
-                                        </div>
-                                    </td>
-
-                                    <!-- ACCIÓN -->
-                                    <td class="text-center pb-2">
-                                        <button class="btn btn-sm btn-outline-danger rounded-circle"
-                                            wire:click="removeItem({{ $i }})" title="Quitar medicamento"
-                                            type="button">
-                                            <i class="fa fa-trash"></i>
+                                    {{-- ELIMINAR --}}
+                                    <td class="text-center">
+                                        <button type="button" wire:click="removeItem({{ $i }})"
+                                            class="btn btn-sm btn-light border rounded-circle p-1"
+                                            style="width:28px;height:28px;">
+                                            <i class="fa fa-minus text-muted" style="font-size:11px;"></i>
                                         </button>
                                     </td>
+
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted small py-3">
+                                    <td colspan="5" class="text-center text-muted py-3">
                                         No hay medicamentos agregados
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
+
                     </table>
                 </div>
 
-                <!-- ================= ACCIÓN FINAL ================= -->
-                <div class="d-flex justify-content-end mt-3">
-                    <button class="btn btn-primary btn-sm px-4" wire:click="guardarMedicamentos" type="button">
-                        <i class="fa fa-check me-1"></i>
+
+                {{-- TOTAL --}}
+                @if (count($detalle))
+                    <div class="d-flex justify-content-end align-items-center mt-2">
+
+                        <div class="text-end">
+                            <div class="text-muted small">
+                                Total actual
+                            </div>
+                            <div class="fw-bold text-primary fs-5">
+                                S/ {{ number_format(collect($detalle)->sum('subtotal'), 2) }}
+                            </div>
+                        </div>
+
+                    </div>
+                @endif
+
+
+                {{-- BOTÓN --}}
+                <div class="text-end mt-3">
+                    <button class="btn btn-primary btn-sm px-4 rounded-3" type="button" wire:click="guardarMedicamentos">
                         Dispensar medicamentos
                     </button>
                 </div>
 
             </div>
-            @endif
+        </div>
 
+    @endcan
+
+
+
+    {{-- ================= HISTORIAL ================= --}}
+    <div class="card border-0 shadow-sm mt-4">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <div>
+                <h6 class="mb-0 fw-semibold text-dark">
+                    Medicamentos Dispensados
+                </h6>
+                <small class="text-muted">
+                    Registro histórico de la atención
+                </small>
+            </div>
+
+            <div class="t-3 mt-3 text-end">
+                <div class="text-muted">
+                    Total dispensado
+                </div>
+                <div class="fs-4 fw-bold text-success">
+                    S/ {{ number_format($this->totalDispensado, 2) }}
+                </div>
+            </div>
+            <button type="button" wire:click="toggleDispensados" class="btn btn-sm btn-light border rounded-3 px-3">
+                {{ $mostrarDispensados ? 'Ocultar' : 'Ver detalle' }}
+            </button>
         </div>
 
 
-        <div class="card border-0 shadow-sm mt-3">
+        @if ($mostrarDispensados)
+            <div class="card-body">
 
-            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+                @if ($medicamentosDispensados->count())
 
-                <div class="d-flex align-items-center gap-3">
-                    <div class="icon-clinico mr-2">
-                        <i class="fa fa-pills"></i>
-                    </div>
+                    @foreach ($medicamentosDispensados as $item)
+                        <div class="border rounded-3 p-3 mb-3 bg-white">
 
-                    <div>
-                        <div class="fw-semibold text-clinico">
-                            Medicamentos Dispensados
-                        </div>
-                        <div class="small text-muted">
-                            Registro histórico de medicamentos entregados en esta atención
-                        </div>
-                    </div>
-                </div>
+                            <div class="row align-items-center">
 
-                <button type="button" class="btn btn-sm btn-toggle-clinico" wire:click="toggleDispensados">
-                    <i class="fa {{ $mostrarDispensados ? 'fa-chevron-up' : 'fa-chevron-down' }}"></i>
-                    {{ $mostrarDispensados ? 'Ocultar detalle' : 'Ver detalle' }}
-                </button>
+                                <div class="col-md-7">
 
-            </div>
+                                    <div class="d-flex align-items-center gap-2">
 
-
-            <!-- CONTENIDO DESPLEGABLE -->
-            @if ($mostrarDispensados)
-                <div class="card-body p-0">
-
-                    @if ($medicamentosDispensados->count())
-                        <ul class="list-group list-group-flush">
-
-                            @foreach ($medicamentosDispensados as $item)
-                                <li class="list-group-item py-3">
-
-                                    <div class="row align-items-center">
-
-                                        {{-- INFO MEDICAMENTO --}}
-                                        <div class="col-md-6">
-                                            <strong class="text-clinico fs-6">
-                                                {{ $item->medicamentos->nombre }}
-                                            </strong>
-
-                                            <div class="small text-muted">
-                                                {{ $item->medicamentos->concentracion }}
-                                                · {{ $item->medicamentos->presentacion }}
-                                                · {{ $item->medicamentos->marca }}
-                                            </div>
-
-                                            <div class="small mt-1">
-                                                Cantidad: <b>{{ $item->cantidad }}</b>
-                                                | Precio: <b>S/ {{ number_format($item->precio, 2) }}</b>
-                                            </div>
+                                        <div class="fw-semibold text-dark">
+                                            {{ optional($item->medicamento)->nombre ?? 'Medicamento eliminado' }}
                                         </div>
 
-                                        {{-- FECHA Y SUBTOTAL --}}
-                                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
-                                            <span class="badge bg-light text-dark">
-                                                {{ $item->created_at->format('d/m/Y H:i') }}
+                                        @if ($item->facturado)
+                                            <span
+                                                class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
+                                                style="font-size:11px;">
+                                                Facturado
                                             </span>
-
-                                            <div class="fw-semibold text-primary fs-6 mt-2">
-                                                S/ {{ number_format($item->subtotal, 2) }}
-                                            </div>
-                                        </div>
-
-                                        {{-- BOTÓN --}}
-                                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
-                                            <small style="cursor: pointer" wire:click="eliminarMedicamento({{ $item->id_atencion_medicamento }})"
-                                                class="badge badge-warning">
-                                                <i class="fa fa-clock"></i>
-                                                Retornar a Farmacia
-                                            </small>
-                                        </div>
+                                        @else
+                                            <span
+                                                class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"
+                                                style="font-size:11px;">
+                                                Pendiente
+                                            </span>
+                                        @endif
 
                                     </div>
 
-                                </li>
-                            @endforeach
+                                    <div class="text-muted mt-1">
+                                        {{ optional($item->medicamento)->concentracion }}
+                                        · {{ optional($item->medicamento)->presentacion }}
+                                        · {{ optional($item->medicamento)->marca }}
+                                    </div>
 
-                        </ul>
-                    @else
-                        <div class="p-3 text-center text-muted small">
-                            No se han dispensado medicamentos aún
+                                    <div class="mt-2 text-muted">
+                                        Cantidad: <strong>{{ $item->cantidad }}</strong>
+                                        &nbsp; | &nbsp;
+                                        Precio: <strong>S/ {{ number_format($item->precio, 2) }}</strong>
+                                        &nbsp; | &nbsp;
+                                        {{ $item->created_at->format('d/m/Y H:i') }}
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-5 text-md-end mt-3 mt-md-0">
+
+                                    <div class="fs-5 fw-bold text-primary">
+                                        S/ {{ number_format($item->subtotal, 2) }}
+                                    </div>
+
+                                    <button type="button"
+                                        wire:click="eliminarMedicamento({{ $item->id_atencion_medicamento }})"
+                                        class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 mt-2"
+                                        style="font-size:13px;">
+                                        <i class="fa fa-undo me-1"></i>
+                                        Retornar
+                                    </button>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    @endif
+                    @endforeach
+                @else
+                    <div class="text-center py-4 text-muted">
+                        No se han dispensado medicamentos
+                    </div>
+                @endif
 
-                </div>
-            @endif
-
-        </div>
-
-
+            </div>
+        @endif
 
     </div>
+
+</div>

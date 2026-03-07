@@ -14,4 +14,11 @@ class ReporteController extends Controller
         $carbon = new Carbon();
         return view('admin.reporte.ingreso', compact('carbon'));
     }
+
+     //
+    public function venta()
+    {
+        $carbon = new Carbon();
+        return view('admin.reporte.venta', compact('carbon'));
+    }
 }

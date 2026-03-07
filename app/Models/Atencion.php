@@ -62,14 +62,14 @@ class Atencion extends Model
     // Servicios médicos
     public function servicios()
     {
-        return $this->belongsToMany(
-            Servicio::class,
-            'atencion_servicios',
+        return $this->hasMany(
+            AtencionServicio::class,
             'id_atencion',
-            'id_servicio'
-        )->withPivot(['precio_unitario', 'cantidad'])
-            ->withTimestamps();
+            'id_atencion'
+        );
     }
+
+
     // Medicamentos recetados / vendidos en atención
     public function medicamentos()
     {
@@ -87,9 +87,10 @@ class Atencion extends Model
      ===================================================== */
 
     // Un comprobante por atención
-    public function comprobante()
+
+    public function comprobantes()
     {
-        return $this->hasOne(
+        return $this->hasMany(
             Comprobante::class,
             'id_atencion',
             'id_atencion'
@@ -98,11 +99,8 @@ class Atencion extends Model
 
     public function estaBloqueada(): bool
     {
-        return $this->comprobante()
-            ->whereIn('estado', ['EMITIDO', 'PENDIENTE'])
-            ->exists();
+        return $this->estado === 'FINALIZADO';
     }
-
     public function estaFinalizada(): bool
     {
         if ($this->estado == "PROCESO") {
@@ -124,7 +122,12 @@ class Atencion extends Model
     {
         $errores = [];
 
-        // Validar médico
+        /*
+    |--------------------------------------------------------------------------
+    | 1️⃣ MÉDICO
+    |--------------------------------------------------------------------------
+    */
+
         if (!$this->id_medico) {
             $errores[] = "No tiene médico asignado.";
         }
@@ -133,7 +136,12 @@ class Atencion extends Model
             $errores[] = "El médico no tiene CMP registrado.";
         }
 
-        // Validar diagnósticos
+        /*
+    |--------------------------------------------------------------------------
+    | 2️⃣ DIAGNÓSTICOS
+    |--------------------------------------------------------------------------
+    */
+
         if (!$this->diagnosticos()->exists()) {
             $errores[] = "No tiene diagnósticos registrados.";
         }
@@ -142,22 +150,124 @@ class Atencion extends Model
             $errores[] = "Debe tener exactamente 1 diagnóstico PRINCIPAL.";
         }
 
-        // Validar paciente
+        /*
+    |--------------------------------------------------------------------------
+    | 3️⃣ PACIENTE
+    |--------------------------------------------------------------------------
+    */
+
         if (!$this->paciente || empty($this->paciente->dni)) {
             $errores[] = "Paciente sin DNI válido.";
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | 4️⃣ COMPROBANTE (ADAPTADO A MÚLTIPLES)
+    |--------------------------------------------------------------------------
+    */
 
-        // Validar comprobante
-        if (!$this->comprobante) {
+        $comprobantes = $this->comprobantes()
+            ->whereIn('tipo_comprobante', ['TICKET', 'BOLETA', 'FACTURA'])
+            ->get();
+
+        if ($comprobantes->isEmpty()) {
             $errores[] = "No se ha generado comprobante de pago.";
+        } else {
+
+            $emitido = $comprobantes
+                ->where('estado', 'EMITIDO')
+                ->first();
+
+            if (!$emitido) {
+                $errores[] = "El comprobante no está emitido.";
+            }
+
+            $anulado = $comprobantes
+                ->where('estado', 'ANULADO')
+                ->first();
+
+            if ($anulado && !$emitido) {
+                $errores[] = "El comprobante está anulado.";
+            }
         }
-        if ($this->comprobante && $this->comprobante->estado !== 'EMITIDO') {
-            $errores[] = "El comprobante no está emitido.";
-        }
-        if ($this->comprobante && $this->comprobante->estado === 'ANULADO') {
-            $errores[] = "El comprobante está anulado.";
-        }
+
         return $errores;
+    }
+    public function totalFacturado()
+    {
+        return $this->comprobantes()
+            ->where('estado', 'EMITIDO')
+            ->sum('total');
+    }
+    public function totalAtencion()
+    {
+        $servicios = $this->servicios->sum(
+            fn($s) =>
+            $s->pivot->precio_unitario * $s->pivot->cantidad
+        );
+
+        $medicamentos = $this->medicamentos->sum(
+            fn($m) =>
+            $m->pivot->precio * $m->pivot->cantidad
+        );
+
+        return $servicios + $medicamentos;
+    }
+
+    public function tieneServiciosPendientes()
+    {
+        return $this->servicios()
+            ->where('estado', true)
+            ->where(function ($q) {
+                $q->whereNull('facturado')
+                    ->orWhere('facturado', false);
+            })
+            ->exists();
+    }
+
+    public function tieneMedicamentosPendientes()
+    {
+        return $this->medicamentos()
+            ->whereIn('tipo', ['VENTA', 'RECETA'])
+            ->where(function ($q) {
+                $q->whereNull('facturado')
+                    ->orWhere('facturado', false);
+            })
+            ->exists();
+    }
+
+    public function tienePendienteFacturar()
+    {
+        return $this->servicios()
+            ->where('estado', true)
+            ->where(function ($q) {
+                $q->whereNull('facturado')
+                    ->orWhere('facturado', false);
+            })
+            ->exists()
+
+            || $this->medicamentos()
+            ->where('estado', true)
+            ->whereIn('tipo', ['VENTA', 'RECETA'])
+            ->where(function ($q) {
+                $q->whereNull('facturado')
+                    ->orWhere('facturado', false);
+            })
+            ->exists();
+    }
+    public function consulta()
+    {
+        return $this->hasOne(Consulta::class, 'id_atencion', 'id_atencion');
+    }
+    public function actualizarDatosIniciales($tipo, $relato)
+    {
+        if ($this->estaFinalizada()) {
+            throw new \Exception("La atención ya está finalizada.");
+        }
+
+        $this->update([
+            'tipo_atencion' => $tipo,
+            'relato_consulta' => $relato
+        ]);
     }
 }

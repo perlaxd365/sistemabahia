@@ -47,4 +47,9 @@ class CajaMovimiento extends Model
     {
         return $query->where('tipo', 'EGRESO');
     }
+
+    public function cajaChica()
+    {
+        return $this->belongsTo(CajaChica::class, 'id_referencia', 'id_caja_chica');
+    }
 }

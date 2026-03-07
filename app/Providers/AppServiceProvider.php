@@ -40,11 +40,11 @@ class AppServiceProvider extends ServiceProvider
 
         //ver
         Gate::define('ver-farmacia', function ($user) {
-            return in_array($user->privilegio_cargo, [1,3,6]);
+            return in_array($user->privilegio_cargo, [1, 3, 6]);
         });
         //editar 
         Gate::define('editar-farmacia', function ($user) {
-            return in_array($user->privilegio_cargo,  [1,5, 6]);
+            return in_array($user->privilegio_cargo,  [1, 2, 5, 6]);
         });
 
         //Laboratorio 
@@ -86,36 +86,36 @@ class AppServiceProvider extends ServiceProvider
             return in_array($user->privilegio_cargo,  [1, 6]);
         });
 
-        
+
         //RESULTADOS
         //ver
         Gate::define('ver-resultados', function ($user) {
-            return in_array($user->privilegio_cargo, [1,2, 5]);
+            return in_array($user->privilegio_cargo, [1, 2, 5]);
         });
         //editar 
         Gate::define('editar-resultados', function ($user) {
-            return in_array($user->privilegio_cargo,  [1,2, 5]);
+            return in_array($user->privilegio_cargo,  [1, 2, 5]);
         });
 
-         //CAJA
+        //CAJA
         //ver
         Gate::define('ver-caja', function ($user) {
-            return in_array($user->privilegio_cargo, [1,5]);
+            return in_array($user->privilegio_cargo, [1, 5]);
         });
         //editar 
         Gate::define('editar-caja', function ($user) {
             return in_array($user->privilegio_cargo,  [1]);
         });
 
-        
-         //FUNCIONES VITALES
+
+        //FUNCIONES VITALES
         //ver
         Gate::define('ver-signos', function ($user) {
-            return in_array($user->privilegio_cargo, [1,2,5,3]);
+            return in_array($user->privilegio_cargo, [1, 2, 5, 3]);
         });
         //editar 
         Gate::define('editar-signos', function ($user) {
-            return in_array($user->privilegio_cargo,  [1,2,3]);
+            return in_array($user->privilegio_cargo,  [1, 2, 3]);
         });
     }
 

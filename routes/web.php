@@ -4,6 +4,7 @@ use App\Http\Controllers\AtencionController;
 use App\Http\Controllers\CajaChicaController;
 use App\Http\Controllers\CajaMovimientoController;
 use App\Http\Controllers\CajaTurnoController;
+use App\Http\Controllers\CitaController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\FarmaciaController;
 use App\Http\Controllers\ImagenController;
@@ -23,6 +24,7 @@ use App\Livewire\Settings\TwoFactor;
 use App\Models\CajaChica;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use App\Models\Cita;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -68,7 +70,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //PERFIL
     Route::get('perfil', [PerfilController::class, 'index'])->name('perfil');
-    
+
     //CAJA
     Route::get('caja', [CajaTurnoController::class, 'index'])->name('caja');
     Route::get('cajachica', [CajaChicaController::class, 'index'])->name('cajachica');
@@ -76,11 +78,28 @@ Route::group(['middleware' => ['auth']], function () {
 
     //SUNAT
     Route::get('consultarticket', [SunatController::class, 'consultarticket'])->name('consultarticket');
-    
+
     //REPORTES
     Route::get('ingreso', [ReporteController::class, 'ingreso'])->name('ingreso');
+    Route::get('venta', [ReporteController::class, 'venta'])->name('venta');
 
-    
+
     //REPORTES
     Route::get('trama', [TramaController::class, 'index'])->name('trama');
+    //CITAS
+    Route::get('cita', [CitaController::class, 'index'])->name('cita');
+
+
+
+    Route::get('/api/citas', function () {
+
+        return Cita::with('paciente')->get()->map(function ($cita) {
+
+            return [
+                'id' => $cita->id_cita,
+                'title' => $cita->paciente->nombre_completo . ' - ' . $cita->motivo,
+                'start' => $cita->fecha_cita . 'T' . $cita->hora_cita
+            ];
+        });
+    });
 });

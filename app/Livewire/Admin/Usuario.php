@@ -136,7 +136,7 @@ class Usuario extends Component
 
             $url = Storage::disk('cloudinary')->url($path);
         } else {
-            $url = "";
+            $url = "https://fv5-5.files.fm/thumb_show.php?i=txm72ruvz2&view&v=1&PHPSESSID=934f00d6d772e3a40f244985118ee678f8a98d67";
         }
 
         if ($this->firma_url) {
