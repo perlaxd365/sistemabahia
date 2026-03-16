@@ -18,6 +18,7 @@ class Medicamento extends Model
         'concentracion',
         'marca',
         'stock',
+        'origen',
         'precio_venta',
         'fecha_vencimiento',
         'lote',

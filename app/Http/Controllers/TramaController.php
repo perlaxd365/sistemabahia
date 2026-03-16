@@ -14,4 +14,10 @@ class TramaController extends Controller
         $carbon = new Carbon();
         return view('admin.trama.index', compact('carbon'));
     }
+    //
+    public function trama_aga()
+    {
+        $carbon = new Carbon();
+        return view('admin.trama.trama_aga', compact('carbon'));
+    }
 }

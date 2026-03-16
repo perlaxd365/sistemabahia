@@ -18,7 +18,8 @@ class Medicamentos extends Component
         $stock,
         $precio_venta,
         $fecha_vencimiento,
-        $marca;
+        $marca,
+        $origen;
     public $search, $show;
     use  WithPagination, WithoutUrlPagination;
     protected $paginationTheme = "bootstrap";
@@ -66,6 +67,7 @@ class Medicamentos extends Component
             'precio_venta' =>  $this->precio_venta,
             'stock' =>  $this->stock,
             'marca' =>  $this->marca,
+            'origen' => $this->origen,
             'fecha_vencimiento' =>  $this->fecha_vencimiento,
         ]);
         // show alert
@@ -85,6 +87,7 @@ class Medicamentos extends Component
         $this->precio_venta = "";
         $this->stock = "";
         $this->marca = "";
+        $this->origen = "";
         $this->fecha_vencimiento = "";
     }
 
@@ -99,6 +102,7 @@ class Medicamentos extends Component
         $this->concentracion = $medicamento->concentracion;
         $this->precio_venta = $medicamento->precio_venta;
         $this->stock = $medicamento->stock;
+        $this->origen = $medicamento->origen;
         $this->marca = $medicamento->marca;
         $this->fecha_vencimiento = $medicamento->fecha_vencimiento;
     }
@@ -109,12 +113,14 @@ class Medicamentos extends Component
             'nombre.required' =>  "Ingresar nombre de producto",
             'precio_venta.required' =>  "Ingresar el precio de producto",
             'stock.required' =>  "Ingresar stock de producto",
+            'origen.required' =>  "Ingresar origen producto",
         ];
 
         $rules = [
             'nombre' => 'required',
             'precio_venta' => 'required',
             'stock' => 'required',
+            'origen' => 'required',
 
         ];
         $this->validate($rules, $messages);
@@ -128,6 +134,7 @@ class Medicamentos extends Component
                 'precio_venta' =>  $this->precio_venta,
                 'stock' =>  $this->stock,
                 'marca' =>  $this->marca,
+                'origen' =>  $this->origen,
                 'fecha_vencimiento' =>  $this->fecha_vencimiento,
             ]
         );

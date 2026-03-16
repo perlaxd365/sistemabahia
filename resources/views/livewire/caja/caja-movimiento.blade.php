@@ -16,15 +16,12 @@
 
                 <div class="col-md-4">
                     <label class="form-label">Fecha</label>
-                    <input type="date"
-                           class="form-control"
-                           wire:model.live="fechaConsulta">
+                    <input type="date" class="form-control" wire:model.live="fechaConsulta">
                 </div>
 
                 <div class="col-md-5">
                     <label class="form-label">Responsable</label>
-                    <select class="form-control"
-                            wire:model.live="idUsuario">
+                    <select class="form-control" wire:model.live="idUsuario">
                         <option value="">— Todos —</option>
                         @foreach ($usuarios as $user)
                             <option value="{{ $user->id }}">
@@ -35,8 +32,7 @@
                 </div>
 
                 <div class="col-md-3 d-grid">
-                    <button wire:click="cargarMovimientos"
-                            class="btn btn-primary">
+                    <button wire:click="cargarMovimientos" class="btn btn-primary">
                         🔍 Consultar
                     </button>
                 </div>
@@ -84,7 +80,13 @@
         <div class="card shadow-sm">
             <div class="card-header text-center bg-white">
                 <div class="fw-semibold">
-                    Movimientos de Caja
+                    Movimientos de Caja <h6 class="mb-0 fw-semibold text-dark">
+                        @isset($cajaTurno)
+                            Monto incial del ultimo turno nicio de turno
+                            <b>S/ {{ $cajaTurno->monto_apertura }}</b>
+                        @endisset
+
+                    </h6>
                 </div>
                 <small class="text-muted">
                     Fecha: {{ \Carbon\Carbon::parse($fechaConsulta)->format('d/m/Y') }}
@@ -111,10 +113,9 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <span class="badge
-                                        {{ $mov->tipo === 'INGRESO'
-                                            ? 'bg-success-subtle text-success border'
-                                            : 'bg-danger-subtle text-danger border' }}">
+                                    <span
+                                        class="badge
+                                        {{ $mov->tipo === 'INGRESO' ? 'bg-success-subtle text-success border' : 'bg-danger-subtle text-danger border' }}">
                                         {{ $mov->tipo }}
                                     </span>
                                 </td>
@@ -122,7 +123,7 @@
                                 <td>{{ $mov->descripcion }}</td>
 
                                 <td class="text-center">
-                                    {{ $mov->usuario->name ?? $mov->responsable ?? '—' }}
+                                    {{ $mov->usuario->name ?? ($mov->responsable ?? '—') }}
                                 </td>
 
                                 <td class="text-end fw-semibold">

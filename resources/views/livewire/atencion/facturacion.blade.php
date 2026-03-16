@@ -71,22 +71,43 @@
                     <div class="col-md-4">
                         <small class="text-muted">Paciente</small>
                         <div class="fw-semibold">
-                            {{ $atencion->paciente->name }} | {{ $atencion->paciente->dni}}
+                            {{ $atencion->paciente->name }} - <b>{{ $atencion->paciente->dni }}</b>
                         </div>
                     </div>
+                    @if ($comprobanteActivo->cliente)
+                        <div class="col-md-4">
+                            <small class="text-muted">Cliente para Comprobante</small>
+                            <div class="fw-semibold">
+
+                                <b>{{ $comprobanteActivo->cliente->numero_documento }}</b> <br>
+                                @if ($comprobanteActivo->cliente->razon_social)
+                                    {{ $comprobanteActivo->cliente->razon_social }}
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="col-md-4">
                         <small class="text-muted">Documento</small>
                         <div class="fw-semibold">
-                            {{ $comprobanteActivo->tipo_comprobante }}
-                            {{ $comprobanteActivo->serie }}-{{ $comprobanteActivo->numero ?? '—' }}
+                            <b>{{ $comprobanteActivo->tipo_comprobante }}</b>
+                            {{ $comprobanteActivo->serie }} - <b>{{ $comprobanteActivo->numero ?? '—' }}</b>
                         </div>
                     </div>
 
                     <div class="col-md-4">
+                        <hr>
                         <small class="text-muted">Fecha</small>
                         <div class="fw-semibold">
-                            {{ DateUtil::getFechaSimple($comprobanteActivo->fecha_emision) }}
+                            <b> {{ DateUtil::getFechaSimple($comprobanteActivo->fecha_emision) }} -
+                                {{ DateUtil::getHora($comprobanteActivo->fecha_emision) }}</b>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <hr>
+                        <small class="text-muted">Medio de Pago</small>
+                        <div class="fw-semibold">
+                            <b> {{ $comprobanteActivo->metodo_pago }}</b>
                         </div>
                     </div>
                 </div>
@@ -272,10 +293,18 @@
                 <div class="d-flex justify-content-end gap-2 mt-4">
 
                     @if ($comprobanteActivo->estado === 'BORRADOR')
-                        <button wire:click="emitir" type="button" class="btn btn-success rounded-pill px-4">
-                            🚀 Emitir
-                        </button>
+                        <button wire:click="emitir" wire:loading.attr="disabled" wire:target="emitir" type="button"
+                            class="btn btn-success rounded-pill px-4">
 
+                            <span wire:loading.remove wire:target="emitir">
+                                🚀 Emitir
+                            </span>
+
+                            <span wire:loading wire:target="emitir">
+                                ⏳ Emitiendo...
+                            </span>
+
+                        </button>
                         <button wire:click="eliminarComprobante" type="button"
                             onclick="confirm('¿Eliminar este comprobante?') || event.stopImmediatePropagation()"
                             class="btn btn-outline-danger rounded-pill px-4">
@@ -290,6 +319,10 @@
                 $comprobanteActivo &&
                     in_array($comprobanteActivo->estado, ['EMITIDO', 'PENDIENTE']) &&
                     in_array($comprobanteActivo->tipo_comprobante, ['BOLETA', 'FACTURA']))
+                <button wire:click="anularComprobanteInterno" wire:loading.attr="disabled"
+                    class="btn btn-danger btn-sm" type="button">
+                    🗑 Anular comprobante
+                </button>
                 <a href="{{ $comprobanteActivo->pdf_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
                     📄 Ver PDF
                 </a>

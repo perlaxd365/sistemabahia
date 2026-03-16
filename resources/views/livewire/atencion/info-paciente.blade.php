@@ -20,8 +20,21 @@
             font-weight: 500;
         }
 
-        .btn-clinico:hover {
-            b
+        .historial-row {
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .historial-row:hover {
+            background: #f6f9fc;
+        }
+
+        .historial-link {
+            opacity: 0.7;
+        }
+
+        .historial-row:hover .historial-link {
+            opacity: 1;
         }
     </style>
     <div class="info-clinica">
@@ -136,55 +149,108 @@
             </div>
 
         </div>
-        <div>
 
-            <div class="info-clinica">
 
-                <!-- ============================
+        <!-- ============================
+          SECCIÓN: DATOS DE HISTORIAS
+    ============================== -->
+
+        <div class="card p-4">
+            <div class="titulo-seccion">
+                📖 Antecedentes Historia
+            </div>
+
+            <div class="card shadow-sm border-0 mt-3">
+
+                <div class="card-header bg-white border-bottom py-2">
+                    <span class="fw-semibold text-primary">
+                        Historial de consultas
+                    </span>
+                    <span class="text-muted small ms-2">
+                        (<b>{{ $consultas->count() }}</b>)
+                    </span>
+                </div>
+
+                <div class="list-group list-group-flush">
+
+    
+
+    @if (!empty($consultas))
+
+
+                    @foreach ($consultas as $consulta)
+                        <div class="list-group-item px-3 py-2 historial-row"
+                            wire:click="printConsulta({{ $consulta->id_consulta }})">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+
+                                <span class="fw-semibold text-dark">
+                                    {{ UserUtil::getUserMedicoByAtencionID($consulta->id_atencion)?->name }}
+                                </span>
+
+                                <span class="text-muted small">
+                                    {{ DateUtil::getFechaCompleta($consulta->fecha_consulta) }}
+                                </span>
+                                <span class="text-primary small historial-link">
+                                    💾 Descargar
+                                </span>
+
+                            </div>
+
+                        </div>
+                    @endforeach
+@endif
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- ============================
         EDICIÓN DE ATENCIÓN
         ============================== -->
+    <div>
+        <div class="info-clinica">
+            <div class="card p-4 mt-3">
 
-                <div class="card p-4 mt-3">
+                <div class="titulo-seccion">
+                    ✏️ Actualizar Datos de Atención
+                </div>
 
-                    <div class="titulo-seccion">
-                        ✏️ Actualizar Datos de Atención
-                    </div>
+                <div class="row g-3">
 
-                    <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="dato-label">Tipo de Atención</label>
 
-                        <div class="col-md-4">
-                            <label class="dato-label">Tipo de Atención</label>
+                        <select wire:model="tipo_atencion" class="form-control form-clinico">
 
-                            <select wire:model="tipo_atencion" class="form-control form-clinico">
+                            <option value="">Seleccionar...</option>
+                            <option value="01">Consulta Externa</option>
+                            <option value="02">Emergencia</option>
+                            <option value="03">Hospitalización</option>
+                            <option value="05">Procedimiento Ambulatorio</option>
 
-                                <option value="">Seleccionar...</option>
-                                <option value="01">Consulta Externa</option>
-                                <option value="02">Emergencia</option>
-                                <option value="03">Hospitalización</option>
-                                <option value="05">Procedimiento Ambulatorio</option>
-
-                            </select>
-                        </div>
-
-
-                        <div class="col-md-12">
-                            <label class="dato-label">Relato de Consulta</label>
-
-                            <textarea wire:model="relato_consulta" rows="4" class="form-control form-clinico"
-                                placeholder="Describir motivo o relato de consulta..."></textarea>
-                        </div>
+                        </select>
                     </div>
 
 
-                    <div class="text-end mt-3">
+                    <div class="col-md-12">
+                        <label class="dato-label">Relato de Consulta</label>
 
-                        <button wire:click="actualizarAtencion" type="button" class="btn btn-clinico">
-
-                            💾 Guardar Cambios
-
-                        </button>
-
+                        <textarea wire:model="relato_consulta" rows="4" class="form-control form-clinico"
+                            placeholder="Describir motivo o relato de consulta..."></textarea>
                     </div>
+                </div>
+
+
+                <div class="text-end mt-3">
+
+                    <button wire:click="actualizarAtencion" type="button" class="btn btn-clinico">
+
+                        💾 Guardar Cambios
+
+                    </button>
 
                 </div>
 
@@ -193,5 +259,7 @@
         </div>
 
     </div>
+
+</div>
 
 </div>

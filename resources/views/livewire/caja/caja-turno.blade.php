@@ -16,6 +16,10 @@
                             <div class="ml-2">
                                 <h6 class="mb-0 fw-semibold text-dark">
                                     Control de turno
+                                    @isset($cajaTurno)
+                                        Monto incial <b> S/ {{ $cajaTurno->monto_apertura }}</b>
+                                    @endisset
+
                                 </h6>
                                 <small class="text-muted">
                                     Gestión de ingresos por servicios y farmacia
@@ -53,26 +57,20 @@
                                 <label class="form-label fw-semibold">
                                     Monto de apertura (S/)
                                 </label>
-                                <input type="number"
-                                       step="0.01"
-                                       class="form-control"
-                                       wire:model.defer="monto_apertura"
-                                       placeholder="0.00">
+                                <input type="number" step="0.01" class="form-control"
+                                    wire:model.defer="monto_apertura" placeholder="0.00">
                                 @error('monto_apertura')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                                <button wire:click="abrirCaja"
-                                        class="btn btn-primary px-5">
+                                <button wire:click="abrirCaja" class="btn btn-primary px-5">
                                     Abrir turno
                                 </button>
                             </div>
                         </div>
-
                     @else
-
                         {{-- DATOS DEL TURNO --}}
                         <div class="border rounded p-3 mb-4 bg-light">
                             <div class="row">
@@ -128,8 +126,7 @@
 
                         {{-- ACCIONES --}}
                         <div class="text-end">
-                            <button wire:click="cerrarCaja"
-                                    class="btn btn-outline-danger px-4">
+                            <button wire:click="cerrarCaja" class="btn btn-outline-danger px-4">
                                 Cerrar turno
                             </button>
                         </div>

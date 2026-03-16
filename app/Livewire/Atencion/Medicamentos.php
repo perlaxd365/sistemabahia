@@ -84,6 +84,7 @@ class Medicamentos extends Component
             'concentracion' => $med->concentracion,
             'presentacion' => $med->presentacion,
             'cantidad' => 1,
+            'origen' => $med->origen,
             'precio' => $med->precio_venta,
             'subtotal' => $med->precio_venta,
             'stock' => $med->stock

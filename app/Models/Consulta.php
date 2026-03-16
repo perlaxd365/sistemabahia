@@ -41,4 +41,8 @@ class Consulta extends Model
         'fecha_consulta',
         'estado_consulta',
     ];
+    public function atencion()
+    {
+        return $this->belongsTo(Atencion::class, 'id_atencion', 'id_atencion');
+    }
 }

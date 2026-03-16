@@ -271,7 +271,7 @@ class NubeFactService
     /**CONSULTA DNI */
     public function consultarDni(string $dni): ?array
     {
-        $token = 'sk_12854.9I7yGiw8UMPISAyV9OThCBRQBC8KZkqF';
+        $token = 'sk_13918.ud2fVJy0zQvhCnWqtJnpTGVEm2oXmXzz';
         // Iniciar llamada a API
         $curl = curl_init();
 

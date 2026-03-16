@@ -18,5 +18,17 @@ class UserUtil
             return $user;
         }
     }
-    
+
+    public static function getUserMedicoByAtencionID($id_atencion)
+    {
+        $atencion = Atencion::find($id_atencion);
+        if ($atencion) {
+            # code...
+            $user = User::find($atencion->id_medico);
+            if ($user) {
+                # code...
+                return $user;
+            }
+        }
+    }
 }

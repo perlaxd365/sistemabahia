@@ -129,11 +129,11 @@
                                         @if ($item->tabla_referencia === 'caja_chicas')
                                             @if ($item->cajaChica && $item->cajaChica->estado === 'REGISTRADO')
                                                 <span class="badge bg-light text-dark border">
-                                                    Registrado
+                                                    Registrado {{ $item->estado}}
                                                 </span>
                                             @else
                                                 <span class="badge bg-light text-muted border">
-                                                    Anulado
+                                                    Anulado  {{ $item->estado}}
                                                 </span>
                                             @endif
                                         @else

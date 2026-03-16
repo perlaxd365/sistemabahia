@@ -64,7 +64,7 @@
                                 <th width="50">#</th>
                                 <th>Paciente</th>
                                 <th width="140">Historia Clínica</th>
-                                <th>Médico</th>
+                                <th width="50">Médico</th>
                                 <th width="160">Fecha</th>
                                 <th width="140" class="text-center">Comprobante</th>
                                 <th width="140" class="text-center">Acciones</th>
@@ -87,68 +87,59 @@
                                             DNI: {{ $atencion->paciente->dni ?? '-' }}
                                         </small>
                                     </td>
+                                    <link rel="stylesheet"
+                                        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
                                     {{-- HISTORIA CLÍNICA --}}
-                                    <td>
-                                        <span class="badge bg-light text-dark border px-3 py-2">
-                                            {{ $atencion->historia->nro_historia ?? '-' }} <br>
+                                    <td class="text-center">
 
-                                        </span>
-                                        @if ($atencion->consulta)
-                                            <span class="badge bg-success-subtle text-success border px-3 py-2">
-                                                🟢 Abierta
-                                            </span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger border px-3 py-2">
-                                                🔴 No iniciada
-                                            </span>
-                                        @endif
+                                        {{-- Historia clínica --}}
+                                        <div class="fw-semibold text-dark">
+                                            <i class="bi bi-journal-medical text-primary me-1"></i>
+                                            {{ $atencion->historia->nro_historia ?? 'Sin historia' }}
+                                        </div>
+
+                                        {{-- Estado de consulta --}}
+                                        <div class="mt-1">
+                                            @if ($atencion->consulta)
+                                                <span
+                                                    class="badge rounded-pill bg-success-subtle text-success border px-3 py-2">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Consulta abierta
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="badge rounded-pill bg-danger-subtle text-danger border px-3 py-2">
+                                                    <i class="bi bi-x-circle me-1"></i>
+                                                    No iniciada
+                                                </span>
+                                            @endif
+                                        </div>
+
                                     </td>
                                     {{-- MÉDICO --}}
                                     <td>
-                                        <span class="text-dark fw-medium">
-
-                                        </span>
-
-
+                                        @if (isset($atencion->medico->name))
+                                            {{-- Estado --}}
+                                            <span class="badge rounded-pill px-3 py-2 bg-warning-subtle text-warning ">
 
 
-                                        <div class="pl-2">
-                                            @if (isset($atencion->medico->name))
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <div class="bg-info bg-opacity-10 rounded-circle p-1">
-                                                        <img class="rounded-circle" src="<?php
-                                                        if ($atencion->medico->foto_url) {
-                                                            echo $atencion->medico->foto_url;
-                                                        } else {
-                                                            echo 'https://media.istockphoto.com/id/1065743020/es/vector/icono-de-estetoscopio.jpg?s=612x612&w=0&k=20&c=rY5Ee82y4ocdymBfngbV7_Oxv9JnTJDTtsnukMMqdRk=';
-                                                        }
-                                                        ?>"
-                                                            width="30px" height="30px" alt="">
-                                                    </div>
-
-                                                    <div class="pl-2">
-
-                                                        <div class="fw-semibold">
-                                                            {{ $atencion->medico->name }}
-                                                        </div>
-
-                                                        <small class="text-muted">
-                                                            {{ $atencion->medico->nombre_cargo ?? 'Médico tratante' }}
-                                                            /
-                                                            {{ $atencion->medico->nombre_especialidad ?? 'Sin Especialidad' }}
-                                                        </small>
-                                                    </div>
+                                                <div class="fw-semibold">
+                                                    {{ $atencion->medico->name }}
                                                 </div>
-                                            @endif
 
-                                        </div>
+                                                <small class="text-muted">
+                                                    {{ $atencion->medico->nombre_cargo ?? 'Médico tratante' }}
 
+                                                    @if ($atencion->medico->especialidad_cargo == '')
+                                                        {{ '/ Medicina General' }}
+                                                    @else
+                                                        / {{ $atencion->medico->especialidad_cargo }}
+                                                    @endif
 
-
-
+                                                </small>
+                                        @endif
                                     </td>
-
                                     {{-- FECHA --}}
                                     <td>
                                         <div class="fw-medium">
@@ -162,38 +153,58 @@
                                     <td class="text-center">
 
                                         @php
-                                            $estado = null;
+                                            $estado = 'SIN_COMPROBANTE';
 
-                                            if ($atencion->comprobantes->where('estado', 'EMITIDO')->count() > 0) {
+                                            if ($atencion->comprobantes->where('estado', 'EMITIDO')->count()) {
                                                 $estado = 'EMITIDO';
-                                            } elseif (
-                                                $atencion->comprobantes->where('estado', 'PENDIENTE')->count() > 0
-                                            ) {
+                                            } elseif ($atencion->comprobantes->where('estado', 'PENDIENTE')->count()) {
                                                 $estado = 'PENDIENTE';
-                                            } elseif (
-                                                $atencion->comprobantes->where('estado', 'BORRADOR')->count() > 0
-                                            ) {
+                                            } elseif ($atencion->comprobantes->where('estado', 'BORRADOR')->count()) {
                                                 $estado = 'BORRADOR';
                                             }
+
+                                            $responsable = UserUtil::getUserByID($atencion->id_responsable);
                                         @endphp
 
-                                        @if ($estado === 'BORRADOR')
-                                            <span class="badge bg-warning-subtle text-warning border px-3 py-2">
-                                                Borrador
-                                            </span>
-                                        @elseif ($estado === 'PENDIENTE')
-                                            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2">
-                                                Pendiente
-                                            </span>
-                                        @elseif ($estado === 'EMITIDO')
-                                            <span class="badge bg-success-subtle text-success border px-3 py-2">
-                                                Emitido
-                                            </span>
-                                        @else
-                                            <span class="badge bg-light text-muted border">
-                                                Aún no genera comprobante
-                                            </span>
-                                        @endif
+
+                                        <div
+                                            class="d-inline-block text-start px-3 py-2 rounded-3  bg-light-subtle shadow-sm">
+
+                                            {{-- Responsable --}}
+                                            <div class="small text-muted mb-1">
+                                                <i class="bi bi-person-circle me-1"></i>
+                                                Responsable: {{ $responsable->nombres }}
+                                                {{ $responsable->apellido_paterno }}
+                                            </div>
+
+
+                                            {{-- Estado --}}
+                                            @if ($estado === 'BORRADOR')
+                                                <span
+                                                    class="badge rounded-pill px-3 py-2 bg-warning-subtle text-warning border">
+                                                    <i class="bi bi-pencil-square me-1"></i>
+                                                    Borrador
+                                                </span>
+                                            @elseif ($estado === 'PENDIENTE')
+                                                <span
+                                                    class="badge rounded-pill px-3 py-2 bg-secondary-subtle text-secondary border">
+                                                    <i class="bi bi-hourglass-split me-1"></i>
+                                                    Pendiente
+                                                </span>
+                                            @elseif ($estado === 'EMITIDO')
+                                                <span
+                                                    class="badge rounded-pill px-3 py-2 bg-success-subtle text-success border">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Emitido, pendiente finalizar
+                                                </span>
+                                            @else
+                                                <span class="badge rounded-pill px-3 py-2 bg-light text-muted border">
+                                                    <i class="bi bi-receipt me-1"></i>
+                                                    Sin comprobante
+                                                </span>
+                                            @endif
+
+                                        </div>
 
                                     </td>
                                     {{-- ACCIONES --}}

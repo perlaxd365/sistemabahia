@@ -64,6 +64,9 @@
                                         {{ $med->concentracion }} · {{ $med->presentacion }}
                                     </span>
                                     <span>
+                                        <b>{{ $med->origen }}</b>
+                                    </span>
+                                    <span>
                                         Stock: {{ $med->stock }}
                                     </span>
                                 </div>
@@ -97,6 +100,9 @@
                                         </div>
                                         <div class="text-muted small">
                                             {{ $item['concentracion'] }} · {{ $item['presentacion'] }}
+                                        </div>
+                                        <div class="text-muted small">
+                                            {{ $item['origen'] }}
                                         </div>
                                     </td>
 
@@ -240,6 +246,7 @@
                                         {{ optional($item->medicamento)->concentracion }}
                                         · {{ optional($item->medicamento)->presentacion }}
                                         · {{ optional($item->medicamento)->marca }}
+                                        · {{ optional($item->medicamento)->origen }}
                                     </div>
 
                                     <div class="mt-2 text-muted">

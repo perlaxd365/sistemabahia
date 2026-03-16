@@ -480,9 +480,21 @@ return [
         ],
         [
             'text' => 'Tramas',
-            'icon_color' => 'orange',
-            'url' => 'trama',
-            'can' => 'Administrador',
+            'icon' => 'fas fa-file',
+            'submenu' => [
+                [
+                    'text' => 'Tramas general',
+                    'icon_color' => 'red',
+                    'url' => 'trama',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama TabAgA',
+                    'icon_color' => 'dark',
+                    'url' => 'trama_aga',
+                    'can' => 'Administrador',
+                ],
+            ],
         ],
         [
             'text' => 'Reportes',

@@ -26,7 +26,7 @@ class Facturacion extends Component
     public $tipo_comprobante = 'TICKET';
     public $con_igv = true;
     public $id_atencion;
-
+    public $cliente;
     protected $listeners = ['recargarComprobante'];
 
     public function mount($id_atencion)
@@ -471,10 +471,10 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => $this->cliente_nombre.' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
+                'descripcion' => $this->cliente_nombre . ' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
                 'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'id_referencia' => $pago->id_pago,
-                'tabla_referencia' => 'caja_chicas',
+                'tabla_referencia' => 'pagos',
                 'id_usuario' => Auth::id(),
                 'responsable' => auth()->user()->name,
             ]);
@@ -545,7 +545,7 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => 'Pago comprobante ' . $this->comprobanteActivo->id_comprobante,
+                'descripcion' => $this->cliente_nombre . ' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
                 'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'tabla_referencia' => 'caja_chicas',
                 'id_referencia' => $pago->id_pago,
@@ -849,7 +849,7 @@ class Facturacion extends Component
             'moneda'                     => '1',
             'total_gravada'              => $this->con_igv ? $this->comprobanteActivo->subtotal : 0,
             'total_igv'                  => $this->comprobanteActivo->igv,
-            'total'                      => $this->comprobanteActivo->total,
+            'total'                      => $this->comprobanteActivo->total_cobrado,
             'estado'                     => $this->comprobanteActivo->estado,
             'items'                      => $items,
         ];
@@ -921,7 +921,18 @@ class Facturacion extends Component
             // 5️⃣ Cambiar estado
             $comprobante->estado = 'ANULADO';
             $comprobante->save();
+            $turno = CajaTurno::where('estado', 'abierto')->first();
+            // 2️⃣ Validar estado
+            if (!$turno) {
 
+                $this->dispatch('alert', [
+                    'type' => 'warning',
+                    'title' => 'No existe turno abierto para anular',
+                    'message' => 'Por favor iniciar turno.'
+                ]);
+
+                return;
+            }
             // 6️⃣ Crear movimiento inverso en caja
             CajaMovimiento::create([
                 'id_usuario'      => auth()->id(),
@@ -932,7 +943,7 @@ class Facturacion extends Component
                 'monto'           => $comprobante->total,
                 'responsable'     => auth()->user()->name,
 
-                'id_caja_turno'    => auth()->user()->id,
+                'id_caja_turno'    => $turno->id_caja_turno
             ]);
 
             DB::commit();

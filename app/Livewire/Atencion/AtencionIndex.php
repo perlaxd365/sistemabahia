@@ -21,15 +21,23 @@ class AtencionIndex extends Component
     public $relato_consulta;
     public function mount(Request $request)
     {
+
+
         if ($request->dni) {
-            $this->dni = $request->dni;
+            $this->dni = trim($request->dni);
             $this->step = 2;
-            $paciente = User::where('dni', $this->dni)->where('privilegio_cargo', 7)->first();
-            $this->id_paciente = $paciente->id;
-            $this->dni = $paciente->dni;
-            $this->name = $paciente->name;
-            $this->telefono = $paciente->telefono;
-            $this->fecha_nacimiento = $paciente->fecha_nacimiento;
+
+            $paciente = User::where('dni', $this->dni)
+                ->where('privilegio_cargo', 7)
+                ->first();
+
+            if ($paciente) {
+                $this->id_paciente = $paciente->id;
+                $this->dni = $paciente->dni;
+                $this->name = $paciente->name;
+                $this->telefono = $paciente->telefono;
+                $this->fecha_nacimiento = $paciente->fecha_nacimiento;
+            }
         }
         $this->show = 20;
     }

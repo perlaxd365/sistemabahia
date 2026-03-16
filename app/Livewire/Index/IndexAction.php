@@ -34,7 +34,7 @@ class IndexAction extends Component
     {
 
 
-        $atenciones = Atencion::with(['paciente', 'medico', 'comprobantes','consulta'])
+        $atenciones = Atencion::with(['paciente', 'medico', 'comprobantes', 'consulta'])
             ->where('estado', 'PROCESO')
             ->when(Auth::user()->nombre_cargo === 'Doctor', function ($query) {
                 $query->where('id_medico', Auth::id());
@@ -73,17 +73,17 @@ class IndexAction extends Component
             ])->findOrFail($id);
 
             // 1️⃣ VALIDAR COMPROBANTES EMITIDOS
-            if ($atencion->comprobantes()->where('estado', 'EMITIDO')->exists()) {
+            /* if ($atencion->comprobantes()->where('estado', 'EMITIDO')->exists()) {
                 throw new \Exception(
                     'La atención tiene comprobantes EMITIDOS. Debe generar Nota de Crédito antes de anular.'
                 );
-            }
+            } */
 
             // 2️⃣ VALIDAR CAJA CERRADA
             foreach ($atencion->pagos as $pago) {
-                if ($pago->cajaTurno->estado === 'CERRADO') {
+              /*   if ($pago->cajaTurno->estado === 'CERRADO') {
                     throw new \Exception('No se puede anular. Turno de caja cerrado.');
-                }
+                } */
             }
 
             // 3️⃣ CAMBIAR ESTADO ATENCIÓN

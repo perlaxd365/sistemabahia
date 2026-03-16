@@ -72,6 +72,20 @@
                                         wire:model.defer="fecha_vencimiento">
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-12 mb-2">
+                                    <label class="form-label">Origen</label>
+                                    <select wire:model="origen" class="form-control">
+                                        <option value="FARMACIA">Farmacia</option>
+                                        <option value="SALA">Sala</option>
+                                        <option value="EMERGENCIA">Emergencia</option>
+                                        <option value="ALMACEN">Almacén</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+
 
                             <div class="text-end mt-3">
                                 @if ($edicion)
@@ -121,6 +135,7 @@
                                         <th>Medicamento</th>
                                         <th>Presentación</th>
                                         <th>Marca/Laboratorio</th>
+                                        <th>Origen</th>
                                         <th>Stock</th>
                                         <th>Precio</th>
                                         <th>Vencimiento</th>
@@ -146,6 +161,7 @@
                                                     {{ $med->stock }}
                                                 @endif
                                             </td>
+                                            <td>{{ $med->origen }}</td>
                                             <td>S/ {{ number_format($med->precio_venta, 2) }}</td>
                                             <td>{{ $med->fecha_vencimiento }}</td>
                                             <td>

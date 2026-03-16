@@ -31,7 +31,7 @@ class CajaMovimiento extends Component
         $this->cajaTurno = CajaTurno::turnoAbierto()->first();
 
         // Usuarios para filtro
-        $this->usuarios = User::where('privilegio_cargo',5)->orderBy('name')->get();
+        $this->usuarios = User::where('privilegio_cargo', 5)->orderBy('name')->get();
 
         $this->cargarMovimientos();
     }
@@ -39,7 +39,8 @@ class CajaMovimiento extends Component
     public function cargarMovimientos()
     {
         $query = ModelsCajaMovimiento::query()
-            ->with('usuario'); // si tienes relación user
+            ->with('usuario')
+            ->orderBy('created_at', 'desc'); // si tienes relación user
 
         // 📅 Filtro por fecha
         if ($this->fechaConsulta) {

@@ -102,4 +102,7 @@ Route::group(['middleware' => ['auth']], function () {
             ];
         });
     });
+
+    //CITAS
+    Route::get('trama_aga', [TramaController::class, 'trama_aga'])->name('trama_aga');
 });

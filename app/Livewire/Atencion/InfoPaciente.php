@@ -3,10 +3,14 @@
 namespace App\Livewire\Atencion;
 
 use App\Models\Atencion;
+use App\Models\Consulta;
 use App\Models\Historia;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use DateUtil;
 use Livewire\Component;
+use UserUtil;
 
 class InfoPaciente extends Component
 {
@@ -45,6 +49,57 @@ class InfoPaciente extends Component
         ]);
     }
 
+    public function printConsulta($id_consulta)
+    {
+
+        $consulta = Consulta::find($id_consulta);
+        if ($consulta) {
+            //imagen
+            $path = public_path('images/logo-clinica.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+            //paciente
+            $paciente = User::find($consulta->id_paciente);
+            $paciente->fecha_nacimiento = DateUtil::getFechaSimple($paciente->fecha_nacimiento);
+            $atencion = Atencion::find($consulta->id_atencion);
+            $historia = Historia::find($atencion->id_historia);
+
+            //firma de doctor
+            $profesional = UserUtil::getUserByID($atencion->id_medico);
+
+            $firma_img = null;
+
+            if ($profesional && $profesional->firma_url) {
+
+                try {
+                    $url = $profesional->firma_url;
+
+                    $data_firma = file_get_contents($url);
+
+                    $type_firma = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+
+                    $firma_img = 'data:image/' . $type_firma . ';base64,' . base64_encode($data_firma);
+                } catch (\Exception $e) {
+                    $firma_img = null;
+                }
+            }
+            $pdf = Pdf::loadView('reportes.print-consulta', compact('base64', 'consulta', 'paciente', 'historia', 'firma_img', 'profesional'));
+
+            return response()->streamDownload(
+                fn() => print($pdf->output()),
+                'consulta_' . UserUtil::getUserByID($atencion->id_medico)->name . '.pdf'
+            );
+        } else {
+
+            $this->dispatch(
+                'alert',
+                ['type' => 'info', 'title' => 'No se resgitró historia.', 'message' => 'Sin registro']
+            );
+        }
+    }
+
     public function render()
     {
         $atencion = Atencion::find($this->id_atencion);
@@ -64,6 +119,10 @@ class InfoPaciente extends Component
         if ($paciente && $paciente->fecha_nacimiento) {
             $edad = Carbon::parse($paciente->fecha_nacimiento)->age;
         }
-        return view('livewire.atencion.info-paciente', compact('paciente', 'historia', 'responsable', 'atencion', 'edad'));
+$consultas=[];
+        $consultas = Consulta::where('id_paciente', $atencion->id_paciente)
+            ->orderBy('fecha_consulta', 'desc')
+            ->get();
+        return view('livewire.atencion.info-paciente', compact('paciente', 'historia', 'responsable', 'atencion', 'edad', 'consultas'));
     }
 }
