@@ -239,7 +239,7 @@ class Consulta extends Component
         $atencion = Atencion::find($this->id_atencion);
 
         // LOGO
-        $path = public_path('images/logo-clinica.png');
+        $path = public_path('images/logo-completo.png');
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -266,7 +266,7 @@ class Consulta extends Component
             'base64',
             'firma_img',
             'profesional'
-        ))->setPaper([0, 0, 226.77, 600], 'portrait'); // tamaño ticket 80mm
+        ))->setPaper('A4', 'portrait'); // tamaño ticket 80mm
 
         $pdf->getDomPDF()->set_option("defaultFont", "DejaVu Sans");
 

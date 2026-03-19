@@ -471,7 +471,7 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => $this->cliente_nombre . ' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
+                'descripcion' =>  ' Pago de :' . $this->cliente_nombre . '|  DNI :' . $this->numero_documento . ' | Atención: ' . $this->atencion->id_atencion,
                 'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'id_referencia' => $pago->id_pago,
                 'tabla_referencia' => 'pagos',
@@ -545,7 +545,7 @@ class Facturacion extends Component
             CajaMovimiento::create([
                 'id_caja_turno' => $cajaTurno->id_caja_turno,
                 'tipo' => 'INGRESO',
-                'descripcion' => $this->cliente_nombre . ' Pago de comprobante #' . $this->comprobanteActivo->id_comprobante,
+                'descripcion' =>  ' Pago de :' . $this->cliente_nombre . '|  DNI :' . $this->numero_documento . ' | Atención: ' . $this->atencion->id_atencion,
                 'monto'         => $this->comprobanteActivo->total_cobrado, // 👈 correcto
                 'tabla_referencia' => 'caja_chicas',
                 'id_referencia' => $pago->id_pago,

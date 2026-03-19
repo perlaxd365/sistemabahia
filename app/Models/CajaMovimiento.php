@@ -52,4 +52,9 @@ class CajaMovimiento extends Model
     {
         return $this->belongsTo(CajaChica::class, 'id_referencia', 'id_caja_chica');
     }
+
+    public function pago()
+    {
+        return $this->belongsTo(Pago::class, 'id_pago', 'id_pago');
+    }
 }
