@@ -33,7 +33,11 @@ class Finalizar extends Component
     }
 
     public function finalizar()
-    {
+    { 
+        // 🔥 Ajuste automático
+        if (!$this->atencion->id_medico) {
+            $this->atencion->modo_atencion = 'PARTICULAR';
+        }
         $this->validar();
 
         if (!empty($this->errores)) {

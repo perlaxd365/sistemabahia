@@ -45,7 +45,7 @@ class SalidaInterna extends Component
             return false;
         }
 
-        return \Carbon\Carbon::createFromFormat('m/Y', $fecha)
+        return \Carbon\Carbon::parse($fecha)
             ->endOfMonth()
             ->lt(now());
     }

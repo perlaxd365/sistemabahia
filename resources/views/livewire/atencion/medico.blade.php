@@ -18,7 +18,8 @@
 
                             <div class="d-flex align-items-center gap-1">
                                 <div class="bg-info bg-opacity-10 rounded-circle p-1">
-                                    <img class="rounded-circle" src="{{ $atencion->medico->foto_url }}" width="60px" height="60px" alt="">
+                                    <img class="rounded-circle" src="{{ $atencion->medico->foto_url }}" width="60px"
+                                        height="60px" alt="">
                                 </div>
 
                                 <div class="pl-2">
@@ -31,12 +32,17 @@
                                     </div>
 
                                     <small class="text-muted">
-                                        {{ $atencion->medico->nombre_cargo ?? 'Médico tratante' }} / {{ $atencion->medico->nombre_especialidad ?? 'Sin Especialidad' }}
+                                        {{ $atencion->medico->nombre_cargo ?? 'Médico tratante' }} /
+                                        {{ $atencion->medico->nombre_especialidad ?? 'Sin Especialidad' }}
+                                    </small>
+                                    <br>
+                                    <small class="text-muted">
+                                        Usuario: <b> {{ $atencion->medico->email ?? 'No tiene correo' }} </b>
                                     </small>
                                 </div>
                             </div>
 
-                           
+
 
                         </div>
                     @else

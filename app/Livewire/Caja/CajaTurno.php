@@ -96,6 +96,14 @@ class CajaTurno extends Component
                     'TRANSFERENCIA' => $this->cajaTurno->totalPorTipo('TRANSFERENCIA'),
                 ]
                 : [],
+            'egresos' => $this->cajaTurno
+                ? $this->cajaTurno->totalEgresos()
+                : 0,
+            'saldo' => $this->cajaTurno
+                ? $this->cajaTurno->monto_apertura
+                + $this->cajaTurno->totalIngresos()
+                - $this->cajaTurno->totalEgresos()
+                : 0,
         ]);
     }
 }

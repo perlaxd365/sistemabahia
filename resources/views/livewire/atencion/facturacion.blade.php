@@ -79,9 +79,13 @@
                             <small class="text-muted">Cliente para Comprobante</small>
                             <div class="fw-semibold">
 
-                                <b>{{ $comprobanteActivo->cliente->numero_documento }}</b> <br>
+
+                                @if ($comprobanteActivo->cliente->nombres)
+                                    {{ $comprobanteActivo->cliente->nombres }} -
+                                @endif <b>{{ $comprobanteActivo->cliente->numero_documento }}</b>
+                                <br>
                                 @if ($comprobanteActivo->cliente->razon_social)
-                                    {{ $comprobanteActivo->cliente->razon_social }}
+                                   - {{ $comprobanteActivo->cliente->razon_social }}
                                 @endif
                             </div>
                         </div>

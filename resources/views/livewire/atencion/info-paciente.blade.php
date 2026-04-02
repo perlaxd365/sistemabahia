@@ -99,7 +99,9 @@
 
         <div class="card p-4">
             <div class="titulo-seccion">
-                🩺 Información de la Atención
+                🩺 Información de la Atención - @if ($atencion->modo_atencion == 'PARTICULAR')
+                    <span class="badge bg-warning">ATENCIÓN PARTICULAR</span>
+                @endif
             </div>
 
             <div class="info-grid">
@@ -173,34 +175,34 @@
 
                 <div class="list-group list-group-flush">
 
-    
-
-    @if (!empty($consultas))
 
 
-                    @foreach ($consultas as $consulta)
-                        <div class="list-group-item px-3 py-2 historial-row"
-                            wire:click="printConsulta({{ $consulta->id_consulta }})">
-
-                            <div class="d-flex justify-content-between align-items-center">
+                    @if (!empty($consultas))
 
 
-                                <span class="fw-semibold text-dark">
-                                    {{ UserUtil::getUserMedicoByAtencionID($consulta->id_atencion)?->name }}
-                                </span>
+                        @foreach ($consultas as $consulta)
+                            <div class="list-group-item px-3 py-2 historial-row"
+                                wire:click="printConsulta({{ $consulta->id_consulta }})">
 
-                                <span class="text-muted small">
-                                    {{ DateUtil::getFechaCompleta($consulta->fecha_consulta) }}
-                                </span>
-                                <span class="text-primary small historial-link">
-                                    💾 Descargar
-                                </span>
+                                <div class="d-flex justify-content-between align-items-center">
+
+
+                                    <span class="fw-semibold text-dark">
+                                        {{ UserUtil::getUserMedicoByAtencionID($consulta->id_atencion)?->name }}
+                                    </span>
+
+                                    <span class="text-muted small">
+                                        {{ DateUtil::getFechaCompleta($consulta->fecha_consulta) }}
+                                    </span>
+                                    <span class="text-primary small historial-link">
+                                        💾 Descargar
+                                    </span>
+
+                                </div>
 
                             </div>
-
-                        </div>
-                    @endforeach
-@endif
+                        @endforeach
+                    @endif
                 </div>
 
             </div>
@@ -220,7 +222,7 @@
 
                 <div class="row g-3">
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="dato-label">Tipo de Atención</label>
 
                         <select wire:model="tipo_atencion" class="form-control form-clinico">
@@ -231,6 +233,14 @@
                             <option value="03">Hospitalización</option>
                             <option value="05">Procedimiento Ambulatorio</option>
 
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="dato-label">Modo de Atención</label>
+
+                        <select wire:model="modo_atencion" class="form-control form-clinico">
+                            <option value="MEDICA">Atención Médica</option>
+                            <option value="PARTICULAR">Atención Particular</option>
                         </select>
                     </div>
 

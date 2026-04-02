@@ -92,7 +92,7 @@
                             </span>
                         </div>
                     @empty
-                        <div class="alert alert-danger mb-0">
+                        <div class="alert alert-warning mb-0">
                             No existen diagnósticos registrados.
                         </div>
                     @endforelse

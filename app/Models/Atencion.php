@@ -18,6 +18,7 @@ class Atencion extends Model
         'id_historia',
         'id_responsable',
         'tipo_atencion',
+        'modo_atencion',
         'relato_consulta',
         'fecha_inicio_atencion',
         'fecha_fin_atencion',
@@ -127,9 +128,8 @@ class Atencion extends Model
     | 1️⃣ MÉDICO
     |--------------------------------------------------------------------------
     */
-
-        if (!$this->id_medico) {
-            $errores[] = "No tiene médico asignado.";
+        if ($this->modo_atencion == 'MEDICA' && !$this->id_medico) {
+            $errores[] = 'No tiene médico asignado.';
         }
 
         if ($this->medico && empty($this->medico->colegiatura_cargo)) {
@@ -142,13 +142,19 @@ class Atencion extends Model
     |--------------------------------------------------------------------------
     */
 
-        if (!$this->diagnosticos()->exists()) {
-            $errores[] = "No tiene diagnósticos registrados.";
+
+        if ($this->modo_atencion == 'MEDICA') {
+
+            if (!$this->diagnosticos()->exists()) {
+                $errores[] = "No tiene diagnósticos registrados.";
+            }
+            if ($this->diagnosticos()->where('tipo', 'PRINCIPAL')->count() !== 1) {
+                $errores[] = "Debe tener exactamente 1 diagnóstico PRINCIPAL.";
+            }
         }
 
-        if ($this->diagnosticos()->where('tipo', 'PRINCIPAL')->count() !== 1) {
-            $errores[] = "Debe tener exactamente 1 diagnóstico PRINCIPAL.";
-        }
+
+
 
         /*
     |--------------------------------------------------------------------------
@@ -259,7 +265,7 @@ class Atencion extends Model
     {
         return $this->hasOne(Consulta::class, 'id_atencion', 'id_atencion');
     }
-    public function actualizarDatosIniciales($tipo, $relato)
+    public function actualizarDatosIniciales($tipo, $relato, $modo_atencion)
     {
         if ($this->estaFinalizada()) {
             throw new \Exception("La atención ya está finalizada.");
@@ -267,7 +273,8 @@ class Atencion extends Model
 
         $this->update([
             'tipo_atencion' => $tipo,
-            'relato_consulta' => $relato
+            'relato_consulta' => $relato,
+            'modo_atencion' => $modo_atencion,
         ]);
     }
 }

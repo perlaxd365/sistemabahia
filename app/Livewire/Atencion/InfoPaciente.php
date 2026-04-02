@@ -19,6 +19,8 @@ class InfoPaciente extends Component
     public $relato_consulta;
     public $atencion;
 
+    public $modo_atencion;
+
     public function mount($id_atencion)
     {
         $this->id_atencion = $id_atencion;
@@ -39,8 +41,12 @@ class InfoPaciente extends Component
 
         $atencion->actualizarDatosIniciales(
             $this->tipo_atencion,
-            $this->relato_consulta
+            $this->relato_consulta,
+            $this->modo_atencion
         );
+
+
+        $atencion->save();
 
         $this->dispatch('alert', [
             'type' => 'success',
@@ -105,7 +111,7 @@ class InfoPaciente extends Component
         $atencion = Atencion::find($this->id_atencion);
         $this->relato_consulta = $atencion->relato_consulta;
         $this->tipo_atencion = $atencion->tipo_atencion;
-
+        $this->modo_atencion = $atencion->modo_atencion;
 
         if (!$atencion) {
             abort(404, 'Atención no encontrada');
@@ -119,7 +125,7 @@ class InfoPaciente extends Component
         if ($paciente && $paciente->fecha_nacimiento) {
             $edad = Carbon::parse($paciente->fecha_nacimiento)->age;
         }
-$consultas=[];
+        $consultas = [];
         $consultas = Consulta::where('id_paciente', $atencion->id_paciente)
             ->orderBy('fecha_consulta', 'desc')
             ->get();

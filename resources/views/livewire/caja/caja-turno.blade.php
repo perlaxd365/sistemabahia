@@ -17,12 +17,11 @@
                                 <h6 class="mb-0 fw-semibold text-dark">
                                     Control de turno
                                     @isset($cajaTurno)
-                                        Monto incial <b> S/ {{ $cajaTurno->monto_apertura }}</b>
+                                        Monto inicial <b>S/ {{ number_format($cajaTurno->monto_apertura, 2) }}</b>
                                     @endisset
-
                                 </h6>
                                 <small class="text-muted">
-                                    Gestión de ingresos por servicios y farmacia
+                                    Gestión de ingresos y egresos
                                 </small>
                             </div>
                         </div>
@@ -48,7 +47,7 @@
                         <div class="alert alert-light border mb-4">
                             <strong>No existe un turno activo.</strong>
                             <div class="text-muted small">
-                                Es necesario abrir un turno para registrar pagos y comprobantes.
+                                Es necesario abrir un turno para registrar movimientos.
                             </div>
                         </div>
 
@@ -80,7 +79,11 @@
                                         {{ $cajaTurno->fecha_apertura->format('d/m/Y H:i') }}
                                     </div>
                                 </div>
-
+                                <div class="d-flex justify-content-between">
+                                    <div class="text-muted small">Monto apertura</div>
+                                    <span class="fw-semibold">S/
+                                        {{ number_format($cajaTurno->monto_apertura, 2) }}</span>
+                                </div>
                                 <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                     <div class="text-muted small">Responsable</div>
                                     <div class="fw-semibold">
@@ -93,7 +96,7 @@
                         {{-- INGRESOS --}}
                         <div class="mb-4">
                             <h6 class="fw-semibold mb-3">
-                                Ingresos registrados por método de pago
+                                Ingresos por método de pago
                             </h6>
 
                             <table class="table table-sm table-borderless">
@@ -112,14 +115,38 @@
                             </table>
                         </div>
 
-                        {{-- TOTAL --}}
+                        {{-- TOTAL INGRESOS --}}
+                        <div class="border-top pt-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold">
+                                    Total ingresos
+                                </span>
+                                <span class="fw-bold text-primary">
+                                    S/ {{ number_format($cajaTurno->totalIngresos(), 2) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- EGRESOS --}}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold text-danger">
+                                    Total egresos (Caja chica)
+                                </span>
+                                <span class="fw-bold text-danger">
+                                    S/ {{ number_format($egresos, 2) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- SALDO FINAL --}}
                         <div class="border-top pt-3 mb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-semibold">
-                                    Total de ingresos del turno
+                                    Saldo actual en caja
                                 </span>
-                                <span class="fw-bold fs-5">
-                                    S/ {{ number_format($cajaTurno->totalIngresos(), 2) }}
+                                <span class="fw-bold fs-5 text-success">
+                                    S/ {{ number_format($saldo, 2) }}
                                 </span>
                             </div>
                         </div>
