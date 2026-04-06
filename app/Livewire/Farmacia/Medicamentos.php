@@ -19,7 +19,7 @@ class Medicamentos extends Component
         $precio_venta,
         $fecha_vencimiento,
         $marca,
-        $origen;
+        $origen = "FARMACIA";
     public $search, $show;
     use  WithPagination, WithoutUrlPagination;
     protected $paginationTheme = "bootstrap";

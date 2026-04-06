@@ -11,7 +11,9 @@ class Ventas extends Component
 {
     public $fecha_inicio;
     public $fecha_fin;
+    public $estado = "EMITIDO";
     public $tipo = 'TODOS';
+    public $cliente;
 
     public function render()
     {
@@ -34,7 +36,20 @@ class Ventas extends Component
                 $q->whereIn('tipo_comprobante', ['BOLETA', 'FACTURA']);
             })
 
+
+            ->when($this->cliente, function ($q) {
+                $q->whereHas('cliente', function ($sub) {
+                    $sub->where('numero_documento', 'LIKE', '%' . $this->cliente . '%')
+                        ->orWhere('razon_social', 'LIKE', '%' . $this->cliente . '%')
+                        ->orWhere('nombres', 'LIKE', '%' . $this->cliente . '%');
+                });
+            })
             ->when(
+                in_array($this->estado, ['EMITIDO', 'ANULADO', 'PENDIENTE']),
+                function ($q) {
+                    $q->where('estado', $this->estado);
+                }
+            )->when(
                 in_array($this->tipo, ['TICKET', 'BOLETA', 'FACTURA', 'NOTA_CREDITO']),
                 function ($q) {
                     $q->where('tipo_comprobante', $this->tipo);

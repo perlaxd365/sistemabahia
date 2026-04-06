@@ -75,7 +75,7 @@
 
             <div class="row mb-4">
 
-                <div class="col-md-3">
+                <div class="col-md-2">
 
                     <label class="form-label text-muted small">
                         Fecha inicio
@@ -85,7 +85,7 @@
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
 
                     <label class="form-label text-muted small">
                         Fecha fin
@@ -94,7 +94,7 @@
                     <input type="date" class="form-control" wire:model.live="fecha_fin">
 
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
 
                     <label class="form-label small text-muted">
                         Tipo comprobante
@@ -125,8 +125,42 @@
                     </select>
 
                 </div>
-                <div class="col-md-3">
-                    <button wire:click="exportar" class="btn btn-success">
+
+                <div class="col-md-2">
+
+                    <label class="form-label small text-muted">
+                        Cliente
+                    </label>
+                    <input type="text" class="form-control" placeholder="DNI O RUC"
+                        wire:model.live.debounce.200ms='cliente'>
+                </div>
+                <div class="col-md-2">
+
+                    <label class="form-label small text-muted">
+                        Estado
+                    </label>
+
+                    <select class="form-control" wire:model.live.debounce.200ms="estado">
+
+                        <option value="TODOS">
+                            Todos
+                        </option>
+
+                        <option value="EMITIDO">
+                            Emitido
+                        </option>
+
+                        <option value="ANULADO">
+                            Anulado
+                        </option>
+
+                        <option value="PENDIENTE">
+                            Pendiente
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mt-3">
+                    <button wire:click="exportar" class="btn btn-success ">
                         Exportar Excel
                     </button>
                 </div>

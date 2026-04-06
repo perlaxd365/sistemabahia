@@ -41,9 +41,6 @@
                                     </small>
                                 </div>
                             </div>
-
-
-
                         </div>
                     @else
                         <div class="mb-3">

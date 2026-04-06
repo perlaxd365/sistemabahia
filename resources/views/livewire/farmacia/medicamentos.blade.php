@@ -134,6 +134,7 @@
                                         <th>#</th>
                                         <th>Medicamento</th>
                                         <th>Presentación</th>
+                                        <th>Concentración</th>
                                         <th>Marca/Laboratorio</th>
                                         <th>Origen</th>
                                         <th>Stock</th>
@@ -151,6 +152,7 @@
                                             <td>{{ $med->id_medicamento }}</td>
                                             <td class="fw-semibold">{{ $med->nombre }}</td>
                                             <td>{{ $med->presentacion }}</td>
+                                            <td>{{ $med->concentracion }}</td>
                                             <td>{{ $med->marca }}</td>
                                             <td>
                                                 @if ($med->stock <= 5)
