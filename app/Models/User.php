@@ -118,10 +118,25 @@ class User extends Authenticatable
     }
     public function getEdadAttribute()
     {
-        return $this->fecha_nacimiento
-            ? \Carbon\Carbon::createFromFormat('d/m/Y', $this->fecha_nacimiento)->age
-            : null;
+        if (!$this->fecha_nacimiento) {
+            return null;
+        }
+
+        try {
+            // Si viene en formato d/m/Y
+            if (str_contains($this->fecha_nacimiento, '/')) {
+                $fecha = \Carbon\Carbon::createFromFormat('d/m/Y', $this->fecha_nacimiento);
+            } else {
+                // Asume formato Y-m-d (BD)
+                $fecha = \Carbon\Carbon::parse($this->fecha_nacimiento);
+            }
+
+            return $fecha->age;
+        } catch (\Exception $e) {
+            return null; // evita que rompa la app
+        }
     }
+
     public function paciente()
     {
         return $this->belongsTo(User::class, 'id_paciente');

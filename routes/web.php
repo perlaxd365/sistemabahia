@@ -86,6 +86,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     //REPORTES
     Route::get('trama', [TramaController::class, 'index'])->name('trama');
+    Route::get('trama_aga', [TramaController::class, 'trama_aga'])->name('trama_aga');
+    Route::get('trama_tab1', [TramaController::class, 'trama_tab1'])->name('trama_tab1');
+    Route::get('trama_tab2', [TramaController::class, 'trama_tab2'])->name('trama_tab2');
+    Route::get('trama_tac1', [TramaController::class, 'trama_tac1'])->name('trama_tac1');
+    Route::get('trama_tac2', [TramaController::class, 'trama_tac2'])->name('trama_tac2');
+    Route::get('trama_tad1', [TramaController::class, 'trama_tad1'])->name('trama_tad1');
+    Route::get('trama_tad2', [TramaController::class, 'trama_tad2'])->name('trama_tad2');
     //CITAS
     Route::get('cita', [CitaController::class, 'index'])->name('cita');
 
@@ -104,5 +111,4 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     //CITAS
-    Route::get('trama_aga', [TramaController::class, 'trama_aga'])->name('trama_aga');
 });

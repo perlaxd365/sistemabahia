@@ -47,7 +47,13 @@ class Ventas extends Component
             ->when(
                 in_array($this->estado, ['EMITIDO', 'ANULADO', 'PENDIENTE']),
                 function ($q) {
-                    $q->where('estado', $this->estado);
+                    # code...
+                    $q->when($this->estado === 'EMITIDO', function ($q) {
+                        $q->whereIn('estado', ['EMITIDO', 'PENDIENTE']);
+                    });
+                    $q->when($this->estado === 'ANULADO', function ($q) {
+                        $q->whereIn('estado', ['ANULADO']);
+                    });
                 }
             )->when(
                 in_array($this->tipo, ['TICKET', 'BOLETA', 'FACTURA', 'NOTA_CREDITO']),

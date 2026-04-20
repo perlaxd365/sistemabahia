@@ -887,7 +887,7 @@ class Facturacion extends Component
                 ]);
 
                 return;
-            }
+            } 
 
             // 2️⃣ Validar estado
             if ($comprobante->estado === 'ANULADO') {
@@ -951,7 +951,7 @@ class Facturacion extends Component
             $this->dispatch('alert', [
                 'type' => 'success',
                 'title' => 'Ticket anulado',
-                'message' => 'El ticket fue anulado y la caja fue revertida correctamente.'
+                'message' => 'El comprobante fue anulado y la caja fue revertida correctamente.'
             ]);
         } catch (\Exception $e) {
 

@@ -8,22 +8,24 @@ use Livewire\Component;
 
 class Aga extends Component
 {
+    public $trama_uno;
     public function render()
     {
 
         $datos = Infraestructura::all();
-
+        $this->trama_uno = Infraestructura::first();
         return view('livewire.trama.aga', compact('datos'));
     }
 
     public function exportarTxt()
     {
-
+        $anio = now()->format('Y');
+        $mes = now()->format('m');
         $periodo = now()->format('Ym');
 
         $trama = $this->generar($periodo);
 
-        $nombre = "TRAMA_INFRAESTRUCTURA_{$periodo}.txt";
+        $nombre = "{$this->trama_uno->codigo_ipress}_{$anio}_{$mes}_TAA0.txt";
 
         return response()->streamDownload(function () use ($trama) {
 

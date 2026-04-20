@@ -494,6 +494,42 @@ return [
                     'url' => 'trama_aga',
                     'can' => 'Administrador',
                 ],
+                [
+                    'text' => 'Trama Tab1',
+                    'icon_color' => 'secondary',
+                    'url' => 'trama_tab1',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama Tab2',
+                    'icon_color' => 'warning',
+                    'url' => 'trama_tab2',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama Tac1',
+                    'icon_color' => 'warning',
+                    'url' => 'trama_tac1',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama Tac2',
+                    'icon_color' => 'green',
+                    'url' => 'trama_tac2',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama Tad1',
+                    'icon_color' => 'blue',
+                    'url' => 'trama_tad1',
+                    'can' => 'Administrador',
+                ],
+                [
+                    'text' => 'Trama Tad2',
+                    'icon_color' => 'dark',
+                    'url' => 'trama_tad2',
+                    'can' => 'Administrador',
+                ],
             ],
         ],
         [
