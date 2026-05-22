@@ -887,7 +887,7 @@ class Facturacion extends Component
                 ]);
 
                 return;
-            } 
+            }
 
             // 2️⃣ Validar estado
             if ($comprobante->estado === 'ANULADO') {
