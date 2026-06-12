@@ -263,7 +263,7 @@
             <span class="line">{{ $paciente->name }}</span>
 
             <span style="margin-left:40px">Fecha:</span>
-            <span class="line-small">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</span>
+            <span class="line-small">{{ $consulta->created_at }}</span>
         </div>
 
         <div class="row">

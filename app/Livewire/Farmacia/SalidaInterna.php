@@ -45,9 +45,16 @@ class SalidaInterna extends Component
             return false;
         }
 
-        return \Carbon\Carbon::parse($fecha)
-            ->endOfMonth()
-            ->lt(now());
+        try {
+            $fechaVencimiento = \Carbon\Carbon::createFromFormat(
+                'm/Y',
+                $fecha
+            )->endOfMonth();
+
+            return $fechaVencimiento->lt(now());
+        } catch (\Exception $e) {
+            return false;
+        }
     }
     public function guardar()
     {
@@ -118,7 +125,7 @@ class SalidaInterna extends Component
         if (strlen($this->buscar) >= 2) {
             $this->medicamentos = Medicamento::where(function ($q) {
                 $q->where('nombre', 'like', "%{$this->buscar}%")
-                ->where("estado", true)
+                    ->where("estado", true)
                     ->orWhere('presentacion', 'like', "%{$this->buscar}%")
                     ->orWhere('marca', 'like', "%{$this->buscar}%");
             })
