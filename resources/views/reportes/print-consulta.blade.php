@@ -89,8 +89,8 @@
         table th,
         table td {
             border: 1px solid #cfd8dc;
-            padding: 6px;
-            font-size: 11px;
+            padding: 4px;
+            font-size: 10px;
         }
 
         table th {
@@ -211,8 +211,11 @@
                 <th>Temp.</th>
                 <th>PA</th>
                 <th>FC</th>
-                <th>Sat O₂</th>
+                <th>FR</th>
+                <th>Sat O<sub>2</sub></th>
+                <th>FiO<sub>2</sub></th>
             </tr>
+
             <tr>
                 <td>{{ $consulta->peso_consulta }}</td>
                 <td>{{ $consulta->talla_consulta }}</td>
@@ -220,7 +223,9 @@
                 <td>{{ $consulta->temperatura_consulta }}</td>
                 <td>{{ $consulta->presion_consulta }}</td>
                 <td>{{ $consulta->frecuencia_consulta }}</td>
+                <td>{{ $consulta->frecuencia_respiratoria_consulta }}</td>
                 <td>{{ $consulta->saturacion_consulta }}</td>
+                <td>{{ $consulta->fio2_consulta }}</td>
             </tr>
         </table>
     </div>

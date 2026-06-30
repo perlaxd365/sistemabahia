@@ -277,4 +277,11 @@ class Atencion extends Model
             'modo_atencion' => $modo_atencion,
         ]);
     }
+    /**
+     * Procedimientos realizados en la atención.
+     */
+    public function procedimientos()
+    {
+        return $this->hasMany(AtencionProcedimiento::class, 'id_atencion', 'id_atencion');
+    }
 }

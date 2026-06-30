@@ -93,6 +93,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('trama_tac2', [TramaController::class, 'trama_tac2'])->name('trama_tac2');
     Route::get('trama_tad1', [TramaController::class, 'trama_tad1'])->name('trama_tad1');
     Route::get('trama_tad2', [TramaController::class, 'trama_tad2'])->name('trama_tad2');
+    Route::get('trama_tag', [TramaController::class, 'trama_tag'])->name('trama_tag');
     //CITAS
     Route::get('cita', [CitaController::class, 'index'])->name('cita');
 

@@ -32,14 +32,17 @@ class Consulta extends Component
 
         $temperatura_consulta,
         $presion_consulta,
-        $frecuencia_consulta,
+        $frecuencia_consulta, // FC
+        $frecuencia_respiratoria_consulta, // FR
         $saturacion_consulta,
+        $fio2_consulta, // FiO2
         $examen_consulta,
 
         $impresion_consulta,
         $examen_auxiliar_consulta,
         $tratamiento_consulta;
 
+    public $tipo_atencion;
     public $medico_responsable = false;
     public $nombre_paciente;
     public $dni;
@@ -55,7 +58,7 @@ class Consulta extends Component
         $this->nombre_paciente = $paciente->name;
         $this->dni = $paciente->dni;
         $this->id_paciente = $this->atencion->id_paciente;
-
+        $this->tipo_atencion = $this->atencion->tipo_atencion;
         $consulta = ModelsConsulta::where("id_atencion", $id_atencion)->first();
 
         if ($consulta) {
@@ -77,7 +80,20 @@ class Consulta extends Component
     {
         return view('livewire.atencion.consulta');
     }
+    public function updatedTipoAtencion()
+    {
+        
 
+        $this->atencion->update([
+            'tipo_atencion' => $this->tipo_atencion
+        ]);
+
+        // Actualizar la instancia local
+        $this->atencion->tipo_atencion = $this->tipo_atencion;
+
+        // Mostrar el toast de guardado automático
+        $this->guardadoAutomatico = true;
+    }
     /*
     |--------------------------------------------------------------------------
     | AUTOSAVE POR CAMPO

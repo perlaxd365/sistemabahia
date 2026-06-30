@@ -11,17 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('atencion_servicios', function (Blueprint $table) {
-            $table->boolean('facturado')
-                ->default(false)
-                ->after('estado');
-        });
+        if (!Schema::hasColumn('atencion_servicios', 'facturado')) {
 
-        Schema::table('atencion_medicamentos', function (Blueprint $table) {
-            $table->boolean('facturado')
-                ->default(false)
-                ->after('subtotal');
-        });
+            Schema::table('atencion_servicios', function (Blueprint $table) {
+
+                $table->boolean('facturado')
+                    ->default(false)
+                    ->after('estado');
+            });
+        }
+
+        if (!Schema::hasColumn('atencion_medicamentos', 'facturado')) {
+
+            Schema::table('atencion_medicamentos', function (Blueprint $table) {
+
+                $table->boolean('facturado')
+                    ->default(false)
+                    ->after('subtotal');
+            });
+        }
     }
 
     /**
@@ -29,12 +37,20 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('atencion_servicios', function (Blueprint $table) {
-            $table->dropColumn('facturado');
-        });
+        if (Schema::hasColumn('atencion_servicios', 'facturado')) {
 
-        Schema::table('atencion_medicamentos', function (Blueprint $table) {
-            $table->dropColumn('facturado');
-        });
+            Schema::table('atencion_servicios', function (Blueprint $table) {
+
+                $table->dropColumn('facturado');
+            });
+        }
+
+        if (Schema::hasColumn('atencion_medicamentos', 'facturado')) {
+
+            Schema::table('atencion_medicamentos', function (Blueprint $table) {
+
+                $table->dropColumn('facturado');
+            });
+        }
     }
 };

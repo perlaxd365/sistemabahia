@@ -34,7 +34,10 @@ class Consulta extends Model
         'frecuencia_consulta',
         'saturacion_consulta',
         'examen_consulta',
+        'frecuencia_respiratoria_consulta',
+        'fio2_consulta',
 
+        
         'impresion_consulta',
         'examen_auxiliar_consulta',
         'tratamiento_consulta',

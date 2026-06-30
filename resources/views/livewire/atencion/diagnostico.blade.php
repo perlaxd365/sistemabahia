@@ -44,13 +44,17 @@
 
                             @foreach ($resultados as $item)
                                 @php
-                                    $longitud = strlen(str_replace('.', '', $item->codigo));
-                                    $esTitulo = $longitud < 4;
-                                @endphp
+                                    $codigo = str_replace('.', '', $item->codigo);
 
+                                    // Solo capítulos y grupos (menos de 3 caracteres) son títulos
+                                    $esTitulo = strlen($codigo) < 3;
+
+                                    // Categorías (3 caracteres)
+                                    $esCategoria = strlen($codigo) == 3;
+                                @endphp
                                 <button type="button"
                                     class="list-group-item list-group-item-action text-start
-        {{ $esTitulo ? 'disabled bg-light text-muted' : '' }}"
+    {{ $esTitulo ? 'disabled bg-light text-muted' : '' }}"
                                     @if (!$esTitulo) wire:click="seleccionar({{ $item->id }})" @endif>
 
                                     <strong class="{{ $esTitulo ? 'text-dark' : 'text-primary' }}">
@@ -62,7 +66,7 @@
                                         {{ $item->descripcion }}
                                     </small>
 
-                                    @if ($esTitulo)
+                                    @if ($esCategoria)
                                         <span class="badge bg-secondary ms-2">
                                             Categoría
                                         </span>

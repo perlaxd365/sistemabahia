@@ -249,26 +249,42 @@
             <div class="hc-card">
                 <div class="hc-header">Funciones Vitales</div>
                 <div class="hc-body row g-2">
+
                     <div class="col-md-2">
                         <label>Temp °C</label>
                         <input type="number" step="0.1" class="form-control vital"
                             wire:model.live.debounce.800ms="temperatura_consulta">
                     </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-2">
                         <label>PA</label>
                         <input type="text" class="form-control vital"
                             wire:model.live.debounce.800ms="presion_consulta" placeholder="120/80">
                     </div>
+
                     <div class="col-md-2">
                         <label>FC</label>
                         <input type="number" class="form-control vital"
                             wire:model.live.debounce.800ms="frecuencia_consulta">
                     </div>
+
+                    <div class="col-md-2">
+                        <label>FR</label>
+                        <input type="number" class="form-control vital"
+                            wire:model.live.debounce.800ms="frecuencia_respiratoria_consulta">
+                    </div>
+
                     <div class="col-md-2">
                         <label>Sat O₂ %</label>
                         <input type="number" class="form-control vital"
                             wire:model.live.debounce.800ms="saturacion_consulta">
                     </div>
+
+                    <div class="col-md-2">
+                        <label>FiO₂ %</label>
+                        <input type="number" class="form-control vital" wire:model.live.debounce.800ms="fio2_consulta">
+                    </div>
+
                 </div>
             </div>
         @endif
@@ -284,6 +300,16 @@
             <!-- DIAGNÓSTICO -->
             <div class="hc-card">
                 <div class="hc-header">Impresión</div>
+                <div class="col-md-4">
+                    <label>Tipo de Atención</label>
+
+                    <select class="form-control" wire:model.live="tipo_atencion">
+                        <option value="01">Consulta Externa</option>
+                        <option value="02">Emergencia</option>
+                        <option value="03">Hospitalización</option>
+                        <option value="05">Procedimiento Ambulatorio</option>
+                    </select>
+                </div>
                 <div class="hc-body row g-2">
                     <div class="col-md-12">
                         <label>Impresión diagnóstica</label>
@@ -292,46 +318,88 @@
                 </div>
             </div>
             <!-- DIAGNÓSTICO -->
+            <!-- PLAN -->
             <div class="hc-card">
                 <div class="hc-header">Plan</div>
+
                 <div class="hc-body row g-2">
+
                     <div class="col-md-12">
                         <label>Exámenes auxiliares</label>
+
                         <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="examen_auxiliar_consulta"></textarea>
                     </div>
-                    <br>
-                    <div class="container">
-                        <br>
-                        <div class="col-md-12">
-                            <div class="alert alert-primary border-0 shadow-sm" style="background-color:#f1f7ff;">
-                                <div class="d-flex align-items-start">
-                                    <div class="me-3 fs-4 text-primary">
-                                        💊
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold text-primary">
-                                            Tratamiento farmacológico
-                                        </h6>
-                                        <p class="mb-0 text-secondary small">
-                                            En este apartado registre los medicamentos indicados al paciente,
-                                            especificando <strong>dosis</strong>, <strong>vía de
-                                                administración</strong>,
-                                            <strong>frecuencia</strong> y <strong>duración del tratamiento</strong>
-                                            según criterio médico.
-                                        </p>
-                                        <br>
-                                        <p class="mb-0 text-secondary small">
-                                            Lo indicado será recibido por farmacia</p>
-                                        <ul class="text-primary small">
-                                            <li>Solo se emitirá al paciente los farmacos disponibles.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <textarea class="form-control" rows="2" wire:model.live.debounce.800ms="tratamiento_consulta"></textarea>
-                    </div>
+
                 </div>
+
+            </div>
+
+            {{-- ========================================================= --}}
+            {{-- PROCEDIMIENTOS CLÍNICOS --}}
+            {{-- ========================================================= --}}
+
+            <livewire:atencion.procedimiento :id_atencion="$id_atencion" :key="'procedimientos-' . $id_atencion" />
+
+            <br>
+
+            {{-- ========================================================= --}}
+            {{-- DIAGNÓSTICOS CIE10 --}}
+            {{-- ========================================================= --}}
+
+            <livewire:atencion.diagnostico :id_atencion="$id_atencion" :key="'diagnosticos-' . $id_atencion" />
+
+            <br>
+
+            {{-- ========================================================= --}}
+            {{-- TRATAMIENTO --}}
+            {{-- ========================================================= --}}
+
+            <div class="hc-card">
+
+                <div class="hc-header">
+
+                    Tratamiento
+
+                </div>
+
+                <div class="hc-body">
+
+                    <div class="alert alert-primary border-0 shadow-sm" style="background:#f1f7ff;">
+
+                        <div class="d-flex align-items-start">
+
+                            <div class="me-3 fs-4">
+
+                                💊
+
+                            </div>
+
+                            <div>
+
+                                <h6 class="mb-2 text-primary">
+
+                                    Tratamiento farmacológico
+
+                                </h6>
+
+                                <small class="text-muted">
+
+                                    Registre la medicación indicada,
+                                    especificando dosis, vía,
+                                    frecuencia y duración del tratamiento.
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <textarea class="form-control" rows="3" wire:model.live.debounce.800ms="tratamiento_consulta"></textarea>
+
+                </div>
+
             </div>
         @endif
         <!-- BOTÓN -->

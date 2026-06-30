@@ -11,14 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::table('consultas', function (Blueprint $table) {
+
+            $table->string('frecuencia_respiratoria_consulta')
+                ->nullable()
+                ->after('frecuencia_consulta');
+
+            $table->string('fio2_consulta')
+                ->nullable()
+                ->after('saturacion_consulta');
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        //
+        Schema::table('consultas', function (Blueprint $table) {
+
+            $table->dropColumn([
+                'frecuencia_respiratoria_consulta',
+                'fio2_consulta'
+            ]);
+        });
     }
 };

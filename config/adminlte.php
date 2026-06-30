@@ -530,6 +530,12 @@ return [
                     'url' => 'trama_tad2',
                     'can' => 'Administrador',
                 ],
+                [
+                    'text' => 'Trama Tag',
+                    'icon_color' => 'green',
+                    'url' => 'trama_tag',
+                    'can' => 'Administrador',
+                ],
             ],
         ],
         [
