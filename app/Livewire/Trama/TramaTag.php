@@ -101,7 +101,7 @@ class TramaTag extends Component
         $anio = Carbon::parse($this->fecha_inicio)->format('Y');
         $mes  = Carbon::parse($this->fecha_inicio)->format('m');
 
-        $nombre = "{$ipress->codigo_ipress}_{$anio}_{$mes}_TG.txt";
+        $nombre = "{$ipress->codigo_ipress}_{$anio}_{$mes}_TAG0.txt";
 
         Storage::put("tramas/$nombre", $contenido);
 
